@@ -18,7 +18,6 @@ header:
       slug: /assets/MyCV_MukherjeeSrijit.pdf
     - name: Publications
     - name: Teaching
-    - name: Blog
 
 collections:
   kali:

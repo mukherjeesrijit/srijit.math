@@ -19,5 +19,4 @@ I build domain-enriched, ante-hoc interpretable ML algorithms for biomedical ima
   <a href="assets/MyCV_MukherjeeSrijit.pdf">CV</a> • 
   <a href="https://srijitmukherjee.com/publications">Publications</a> •
   <a href="https://srijitmukherjee.com/teaching">Teaching</a> •
-  <a href="https://srijitmukherjee.com/blog">Blog</a> 
 </center>

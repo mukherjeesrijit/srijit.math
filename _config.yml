@@ -12,7 +12,7 @@ header:
   pages:
     # - name: Kali
     #   slug: /kali/
-    - name: Home
+    - name: Courses
       slug: /
     - name: About
     # - name: CV

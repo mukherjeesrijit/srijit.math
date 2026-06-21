@@ -35,9 +35,12 @@ footer:
       name: szm6596@psu.edu
       value: mailto:szm6596@psu.edu
   follow:
-    - type: googlescholar
-      name: Google Scholar
-      link: https://scholar.google.com/citations?user=bmQgd0MAAAAJ&hl=en
+    - type: instagram
+      name: Instagram
+      link: https://www.instagram.com/srijit.math/
+    # - type: googlescholar
+    #   name: Google Scholar
+    #   link: https://scholar.google.com/citations?user=bmQgd0MAAAAJ&hl=en
     - type: linkedin
       name: LinkedIn
       link: https://www.linkedin.com/in/srijit-mukherjee/

@@ -16,12 +16,12 @@
             {% for course in site.courses %}
               {% if course.draft != true %}
                 <a class="course-card" href="{{ course.url | relative_url }}" style="background-color: {{ course.color | default: '#e7e7fb' }};">
-                  <h2 class="course-card-title" style="color: {{ course.title_color | default: '#5b5bd6' }};">
-                    {{ course.title }}
-                  </h2>
                   {% if course.icon %}
                     <span class="course-card-icon">{{ course.icon }}</span>
                   {% endif %}
+                  <h2 class="course-card-title" style="color: {{ course.title_color | default: '#5b5bd6' }};">
+                    {{ course.title }}
+                  </h2>
                 </a>
               {% endif %}
             {% endfor %}

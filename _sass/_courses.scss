@@ -6,11 +6,10 @@
 }
 
 .course-card {
-  position: relative;
   display: block;
   min-height: 100px;
   border-radius: 14px;
-  padding: 16px 16px 36px;
+  padding: 16px;
   text-decoration: none;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -20,18 +19,17 @@
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
 }
 
-.course-card-title {
-  margin: 0;
-  font-size: 1.05em;
-  font-weight: 700;
-  line-height: 1.25;
+.course-card-icon {
+  display: block;
+  font-size: 1.6em;
+  margin-bottom: 6px;
 }
 
-.course-card-icon {
-  position: absolute;
-  left: 16px;
-  bottom: 14px;
-  font-size: 1.4em;
+.course-card-title {
+  margin: 0;
+  font-size: 1.5em;
+  font-weight: 700;
+  line-height: 1.25;
 }
 
 .course-header {
@@ -42,12 +40,13 @@
 
 .course-icon {
   display: block;
-  font-size: 2.2em;
-  margin-bottom: 8px;
+  font-size: 1.6em;
+  margin-bottom: 6px;
 }
 
 .course-title {
   margin: 0;
+  font-size: 1.5em;
   font-weight: 700;
 }
 

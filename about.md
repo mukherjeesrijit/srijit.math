@@ -6,18 +6,4 @@ profile_picture:
   alt: website picture
 ---
 
-**PhD Candidate**: 4th year, [EECS Department, Penn State](https://www.eecs.psu.edu/) \\
-*Group*: [Information Processing & Algorithms Laboratory](https://signal.ee.psu.edu/) \\
-*Advisors*: [Vishal Monga (Penn State)](https://signal.ee.psu.edu/index.html), [Steven Schiff (Yale)](https://medicine.yale.edu/profile/steven-schiff/) \\
-*Research Interests*: Computer Vision, Biomedical Signals
-
-<p>
-I build domain-enriched, ante-hoc interpretable ML algorithms for biomedical image analysis, collaborating with clinicians at Harvard and Yale. My work targets neonatal hydrocephalus diagnosis from low-field MRI (low-SNR), embedding disease etiology and modality priors directly into model architecture - yielding interpretable, robust, state-of-the-art performance, especially in scarce, noisy, imperfect clinical conditions.
-</p>
-
-<center>
-  <a href="mailto:szm6596@psu.edu">Email</a> • 
-  <a href="assets/MyCV_MukherjeeSrijit.pdf">CV</a> • 
-  <a href="https://srijitmukherjee.com/publications">Publications</a> •
-  <a href="https://srijitmukherjee.com/teaching">Teaching</a>
-</center>
+My Mission is to teach 1 million students: Mathematics for AI and Quantitative Finance. I am a 4th year AI PhD student at the EECS Department, Penn State. My advisors are Vishal Monga (Penn State), Steven Schiff (Yale). I have received the 2026 Dr. Nirmal K Bose Dissertation Excellence Award for my PhD research. I have completed my undergraduate (B.Stat) and graduate (M.Stat) studies at Indian Statistical Institute, Kolkata. I am a Madhava Undergraduate Mathematics Competition Awardee (2017, 2018), and a Regional Mathematics Olympiad Awardee (2014). My Research Interest is Interpretable AI for Biomedical Signals. You can know more about me (my Research, my Teaching) [here on my website](https://www.srijitmukherjee.com).

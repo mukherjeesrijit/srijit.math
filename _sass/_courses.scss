@@ -33,15 +33,17 @@
 }
 
 .course-header {
-  border-radius: 18px;
-  padding: 28px 24px;
-  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 14px;
+  padding: 14px 20px;
+  margin-bottom: 28px;
 }
 
 .course-icon {
-  display: block;
   font-size: 1.6em;
-  margin-bottom: 6px;
+  line-height: 1;
 }
 
 .course-title {

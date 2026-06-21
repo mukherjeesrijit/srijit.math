@@ -4,7 +4,7 @@ title: Preparation Strategy
 icon: 📚
 color: "#dfe0fb"
 title_color: "#5b5bd6"
-draft: true
+# draft: true
 ---
 
 How I plan and structure exam and research preparation.

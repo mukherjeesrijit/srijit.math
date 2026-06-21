@@ -38,18 +38,19 @@ footer:
     - type: instagram
       name: Instagram
       link: https://www.instagram.com/srijit.math/
+    - type: youtube
+      name: YouTube
+      link: https://www.youtube.com/@mukherjeesrijit 
     # - type: googlescholar
     #   name: Google Scholar
     #   link: https://scholar.google.com/citations?user=bmQgd0MAAAAJ&hl=en
     - type: linkedin
       name: LinkedIn
       link: https://www.linkedin.com/in/srijit-mukherjee/
-    - type: github
-      name: GitHub
-      link: http://github.com/mukherjeesrijit
-    - type: youtube
-      name: YouTube
-      link: https://www.youtube.com/@mukherjeesrijit 
+    - type: website
+      name: Website
+      link: https://srijitmukherjee.com/
+    
     
 # Build settings
 markdown: kramdown

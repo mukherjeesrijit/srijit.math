@@ -14,15 +14,19 @@ header:
     #   slug: /kali/
     - name: Home
       slug: /
-    - name: CV
-      slug: /assets/MyCV_MukherjeeSrijit.pdf
-    - name: Publications
-    - name: Teaching
+    - name: About
+    # - name: CV
+    #   slug: /assets/MyCV_MukherjeeSrijit.pdf
+    # - name: Publications
+    # - name: Teaching
 
 collections:
   kali:
     output: true
     permalink: /kali/:name/
+  courses:
+    output: true
+    permalink: /courses/:name/
 
 footer:
   show_powered_by: false

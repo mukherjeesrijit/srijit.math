@@ -52,13 +52,19 @@
   font-weight: 700;
 }
 
-.course-back-link {
-  display: inline-block;
+.course-footer-nav {
+  display: flex;
+  justify-content: space-between;
   margin-top: 32px;
+}
+
+.course-back-link,
+.course-about-link {
   text-decoration: none;
 }
 
-.course-back-link:hover {
+.course-back-link:hover,
+.course-about-link:hover {
   text-decoration: underline;
 }
 

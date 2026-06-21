@@ -22,7 +22,10 @@
             {{ content }}
           </article>
 
-          <a class="course-back-link" href="{{ "/" | relative_url }}">&larr; All courses</a>
+          <div class="course-footer-nav">
+            <a class="course-back-link" href="{{ "/" | relative_url }}">&larr; All courses</a>
+            <a class="course-about-link" href="{{ "/about" | relative_url }}">About &rarr;</a>
+          </div>
 
         </div>
       </div>

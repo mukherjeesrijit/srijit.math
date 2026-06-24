@@ -30,6 +30,7 @@ This course is built upon fundamental probability courses and books available on
 **Level 1:**
 - *Introduction to Probability, Statistics, and Random Processes* by Hossein Pishro-Nik ([ProbabilityCourse.com](https://www.probabilitycourse.com)), [Video Course](https://www.probabilitycourse.com/videos/videos.php)
 - *Introduction to Probability* by Dimitri P. Bertsekas and John N. Tsitsiklis, [Video Course](https://ocw.mit.edu/courses/6-041-probabilistic-systems-analysis-and-applied-probability-fall-2010/)
+- [Probability Theory and Applications](https://nptel.ac.in/courses/111104079), IIT Kanpur, Prof. Prabha Sharma
 
 **Level 2:**
 - *A First Course in Probability* by Sheldon M. Ross
@@ -114,6 +115,8 @@ The second approach is first learning the general definition of axiomatic probab
 To reiterate, in the first case it can help you connect with your basics in high school, while in the second, you get to see counting through the lens of probability and have a unified understanding.
 
 </details>
+
+The problem sets' links will go to instagram directly. Use it wisely to ask doubts to me. The problem sets will be available soon within the next few weeks. Thanks for your patience.
 
 ## Chapter 1: Classical Probability and Combinatorics
 

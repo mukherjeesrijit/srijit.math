@@ -25,11 +25,11 @@ The course is developed into two levels - Level 1 and Level 2. The goal of the L
 <details markdown="1">
 <summary><strong>Resources: Books and Videos</strong></summary>
 
-This course is built upon fundamental probability courses and books available online. We will be using four book resources and three video resources in this reading course strictly. I will mark the books based on which books are more easily accessible to a Level 1 audience, and more to a Level 2 audience.
+This course is built upon fundamental probability courses and books available online. We will be using four book resources and four video resources in this reading course strictly. I will mark the books based on which books are more easily accessible to a Level 1 audience, and more to a Level 2 audience.
 
 **Level 1:**
 - *Introduction to Probability, Statistics, and Random Processes* by Hossein Pishro-Nik ([ProbabilityCourse.com](https://www.probabilitycourse.com)), [Video Course](https://www.probabilitycourse.com/videos/videos.php)
-- *Introduction to Probability* by Dimitri P. Bertsekas and John N. Tsitsiklis, [Video Course](https://ocw.mit.edu/courses/6-041-probabilistic-systems-analysis-and-applied-probability-fall-2010/)
+- *Introduction to Probability* by Dimitri P. Bertsekas and John N. Tsitsiklis, [Video Course](https://ocw.mit.edu/courses/6-041-probabilistic-systems-analysis-and-applied-probability-fall-2010/), [Youtube with Tutorials](https://www.youtube.com/playlist?list=PLUl4u3cNGP60A3XMwZ5sep719_nh95qOe)
 - [Probability Theory and Applications](https://nptel.ac.in/courses/111104079), IIT Kanpur, Prof. Prabha Sharma
 
 **Level 2:**
@@ -118,10 +118,10 @@ To reiterate, in the first case it can help you connect with your basics in high
 
 The problem sets' links will go to instagram directly. Use it wisely to ask doubts to me. The problem sets will be available soon within the next few weeks. Thanks for your patience. Let's give some names to each of the resources.
 
-- **Hossein** (Level 1): *Introduction to Probability, Statistics, and Random Processes* by Hossein Pishro-Nik ([ProbabilityCourse.com](https://www.probabilitycourse.com)), 
+- **Hossein** (Level 1): *Introduction to Probability, Statistics, and Random Processes* by Hossein Pishro-Nik ([ProbabilityCourse.com](https://www.probabilitycourse.com))
 - **Hossein Video** (Level 1): [Video Course](https://www.probabilitycourse.com/videos/videos.php)
-- **Tsitsiklis** (Level 1): *Introduction to Probability* by Dimitri P. Bertsekas and John N. Tsitsiklis, 
-- **Tsitsiklis Video** (Level 1): [Video Course](https://ocw.mit.edu/courses/6-041-probabilistic-systems-analysis-and-applied-probability-fall-2010/)
+- **Tsitsiklis** (Level 1): *Introduction to Probability* by Dimitri P. Bertsekas and John N. Tsitsiklis
+- **Tsitsiklis Video** (Level 1): [Video Course](https://ocw.mit.edu/courses/6-041-probabilistic-systems-analysis-and-applied-probability-fall-2010/), [Youtube with Tutorials](https://www.youtube.com/playlist?list=PLUl4u3cNGP60A3XMwZ5sep719_nh95qOe)
 - **Prabha Video** (Level 1): [Probability Theory and Applications](https://nptel.ac.in/courses/111104079), IIT Kanpur, Prof. Prabha Sharma
 - **Ross** (Level 2): *A First Course in Probability* by Sheldon M. Ross
 - **Blitzstein** (Level 2): *Introduction to Probability* by Jessica Hwang and Joseph K. Blitzstein,
@@ -134,9 +134,11 @@ The problem sets' links will go to instagram directly. Use it wisely to ask doub
 <details markdown="1">
 <summary>Lesson 1: Conceptual Resources</summary>
 
-Tsitsiklis: §1.1 \\
-Ross: — \\
-Blitzstein: §§1.1–1.3
+- Hossein: 1.0-1.2, 1.5; Hossein Video: Video 1.1, 1.2
+- Tsitsiklis: 1.1; Tsitsiklis Video: Lecture 1
+- Prabha Video: Lecture 1
+- Ross: —
+- Blitzstein: 1.1 to 1.3; Blitzstein Video: Lecture 1
 
 </details>
 
@@ -147,9 +149,11 @@ Lesson 1: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 2: Conceptual Resources</summary>
 
-Tsitsiklis: §1.6 (early) \\
-Ross: §§1.1–1.4 \\
-Blitzstein: §1.4 (early)
+- Hossein: 2; Hossein Video: Video 2.1, 2.2, 2.3
+- Tsitsiklis: 1.6 (early); Tsitsiklis Video: Lecture 4
+- Prabha Video: Lecture 1
+- Ross: 1.1 to 1.4
+- Blitzstein: 1.4 (early); Blitzstein Video: Lecture 1
 
 </details>
 
@@ -160,9 +164,11 @@ Lesson 2: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 3: Conceptual Resources</summary>
 
-Tsitsiklis: §1.6 (later) \\
-Ross: §§1.4–1.6 \\
-Blitzstein: §1.4 (later), §1.5
+- Hossein: 2; Hossein Video: Video 2.3, 2.4
+- Tsitsiklis: 1.6 (later); Tsitsiklis Video: Lecture 4
+- Prabha Video: Lecture 1
+- Ross: 1.4 to 1.6
+- Blitzstein: 1.4 (later), 1.5; Blitzstein Video: Lecture 2
 
 </details>
 
@@ -177,9 +183,11 @@ Lesson 3: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 1: Conceptual Resources</summary>
 
-Tsitsiklis: §1.2 \\
-Ross: §§2.1–2.7 \\
-Blitzstein: §§1.6–1.7
+- Hossein: 1.3, 1.5; Hossein Video: Video 1.3, 1.4
+- Tsitsiklis: 1.2; Tsitsiklis Video: Lecture 1
+- Prabha Video: Lecture 2
+- Ross: 2.1 to 2.7
+- Blitzstein: 1.6, 1.7; Blitzstein Video: Lecture 2, 3
 
 </details>
 
@@ -190,9 +198,11 @@ Lesson 1: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 2: Conceptual Resources</summary>
 
-Tsitsiklis: §1.3 (early) \\
-Ross: §§3.1–3.2 \\
-Blitzstein: §§2.1–2.2
+- Hossein: 1.4, 1.5; Hossein Video: Video 1.5, 1.6, 1.7
+- Tsitsiklis: 1.3 (early); Tsitsiklis Video: Lecture 2, 3
+- Prabha Video: Lecture 3
+- Ross: 3.1, 3.2
+- Blitzstein: 2.1, 2.2; Blitzstein Video: Lecture 4, 5
 
 </details>
 
@@ -203,9 +213,11 @@ Lesson 2: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 3: Conceptual Resources</summary>
 
-Tsitsiklis: §§1.3 (later), 1.4 \\
-Ross: §§3.3–3.5 \\
-Blitzstein: §§2.3–2.7
+- Hossein: 1.4; Hossein Video: Video 1.8, 1.9, 1.10
+- Tsitsiklis: 1.3 (later), 1.4; Tsitsiklis Video: Lecture 2
+- Prabha Video: Lecture 3
+- Ross: 3.3 to 3.5
+- Blitzstein: 2.3 to 2.7; Blitzstein Video: Lecture 4, 5, 6
 
 </details>
 
@@ -220,9 +232,11 @@ Lesson 3: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 1: Conceptual Resources</summary>
 
-Tsitsiklis: §§2.1–2.4 \\
-Ross: §§4.1–4.5 \\
-Blitzstein: §§3.1–3.2
+- Hossein: 3.1, 3.2, 3.3; Hossein Video: Video 3.1, 3.2, 3.6
+- Tsitsiklis: 2.1 to 2.4; Tsitsiklis Video: Lecture 5
+- Prabha Video: Lecture 4
+- Ross: 4.1 to 4.5
+- Blitzstein: 3.1, 3.2; Blitzstein Video: Lecture 7, 8, 9
 
 </details>
 
@@ -233,9 +247,11 @@ Lesson 1: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 2: Conceptual Resources</summary>
 
-Tsitsiklis: §2.2 \\
-Ross: §§4.6–4.9 \\
-Blitzstein: §§3.3–3.5
+- Hossein: 3.1.5, 3.3; Hossein Video: Video 3.3, 3.4
+- Tsitsiklis: 2.2; Tsitsiklis Video: Lecture 6
+- Prabha Video: Lecture 5, 6, 7
+- Ross: 4.6 to 4.9
+- Blitzstein: 3.3 to 3.5; Blitzstein Video: Lecture 7, 8, 9, 10, 11
 
 </details>
 
@@ -246,9 +262,11 @@ Lesson 2: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 3: Conceptual Resources</summary>
 
-Tsitsiklis: §§2.3, 3.2 \\
-Ross: §4.10 \\
-Blitzstein: §3.6
+- Hossein: 3.1, 3.3; Hossein Video: Video 3.5
+- Tsitsiklis: 2.3, 3.2; Tsitsiklis Video: Lecture 5, 8
+- Prabha Video: Lecture 4, 5
+- Ross: 4.1
+- Blitzstein: 3.6; Blitzstein Video: Lecture 8
 
 </details>
 
@@ -263,9 +281,11 @@ Lesson 3: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 1: Conceptual Resources</summary>
 
-Tsitsiklis: §3.1 \\
-Ross: §§5.1–5.2 \\
-Blitzstein: §5.1
+- Hossein: 4.0, 4.1, 4.4; Hossein Video: Video 4.1, 4.2, 4.3
+- Tsitsiklis: 3.1; Tsitsiklis Video: Lecture 8
+- Prabha Video: Lecture 8, 9, 10
+- Ross: 5.1, 5.2
+- Blitzstein: 5.1; Blitzstein Video: Lecture 12
 
 </details>
 
@@ -276,9 +296,11 @@ Lesson 1: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 2: Conceptual Resources</summary>
 
-Tsitsiklis: §3.3 \\
-Ross: §§5.3–5.6 \\
-Blitzstein: §§5.2, 5.4, 5.5
+- Hossein: 4.2, 4.4; Hossein Video: Video 4.7, 4.8, 4.9
+- Tsitsiklis: 3.3; Tsitsiklis Video: Lecture 8
+- Prabha Video: Lecture 8, 9, 10
+- Ross: 5.3 to 5.6
+- Blitzstein: 5.2, 5.4, 5.5; Blitzstein Video: Lecture 12, 13, 14, 16
 
 </details>
 
@@ -289,9 +311,11 @@ Lesson 2: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 3: Conceptual Resources</summary>
 
-Tsitsiklis: §3.2 \\
-Ross: §§4.10, 5.1 \\
-Blitzstein: §§3.6, 5.3
+- Hossein: 4.3, 4.4; Hossein Video: Video 4.10, 4.11, 4.12
+- Tsitsiklis: 3.2; Tsitsiklis Video: Lecture 8
+- Prabha Video: Lecture 8, 9, 10
+- Ross: 4.10, 5.1
+- Blitzstein: 3.6, 5.3; Blitzstein Video: Lecture 8, 12
 
 </details>
 
@@ -302,9 +326,11 @@ Lesson 3: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 4: Conceptual Resources</summary>
 
-Tsitsiklis: §3.6 \\
-Ross: §5.7 \\
-Blitzstein: §8.1
+- Hossein: 3.2.3, 4.1.3; Hossein Video: Video 3.8, 4.5, 4.6
+- Tsitsiklis: 3.6; Tsitsiklis Video: Lecture 10, 11
+- Prabha Video: Lecture 11
+- Ross: 5.7
+- Blitzstein: 8.1; Blitzstein Video: Lecture 22
 
 </details>
 
@@ -319,9 +345,11 @@ Lesson 4: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 1: Conceptual Resources</summary>
 
-Tsitsiklis: §§2.5, 3.5 \\
-Ross: §§6.1–6.3, 7.2–7.4 \\
-Blitzstein: §§7.1–7.3
+- Hossein: 5.1.0, 5.1.1, 5.1.2, 5.1.4, 5.1.6, 5.2.0, 5.2.1, 5.2.2, 5.2.4, 5.2.5, 5.3.1; Hossein Video: Video 5.1, 5.2, 5.5
+- Tsitsiklis: 2.5, 3.5; Tsitsiklis Video: Lecture 6, 7, 9
+- Prabha Video: Lecture 12, 13
+- Ross: 6.1 to 6.3, 7.2–7.4
+- Blitzstein: 7.1 to 7.3; Blitzstein Video: Lecture 18, 19, 20, 21
 
 </details>
 
@@ -332,9 +360,11 @@ Lesson 1: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 2: Conceptual Resources</summary>
 
-Tsitsiklis: §§2.6, 3.4 \\
-Ross: §§6.4–6.5 \\
-Blitzstein: §7.1
+- Hossein: 5.1.3, 5.2.3; Hossein Video: Video 5.3
+- Tsitsiklis: 2.6, 3.4; Tsitsiklis Video: Lecture 6, 7, 9
+- Prabha Video: Lecture 14, 15
+- Ross: 6.4, 6.5
+- Blitzstein: 7.1; Blitzstein Video: Lecture 19
 
 </details>
 
@@ -345,9 +375,11 @@ Lesson 2: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 3: Conceptual Resources</summary>
 
-Tsitsiklis: §§2.6, 4.3 \\
-Ross: §§7.5–7.6 \\
-Blitzstein: §§9.1–9.6
+- Hossein: 5.1.5, 5.3; Hossein Video: Video 5.4, 5.6
+- Tsitsiklis: 2.6, 4.3; Tsitsiklis Video: Lecture 7, 12
+- Prabha Video: Lecture 17, 18
+- Ross: 7.5, 7.6
+- Blitzstein: 9.1 to 9.6; Blitzstein Video: Lecture 25, 26, 27
 
 </details>
 
@@ -358,9 +390,11 @@ Lesson 3: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 4: Conceptual Resources</summary>
 
-Tsitsiklis: §4.7 \\
-Ross: §7.8.1 \\
-Blitzstein: §§7.4–7.5
+- Hossein: 5.3.2, 6.1.1, 6.1.5; Hossein Video: —
+- Tsitsiklis: 4.7; Tsitsiklis Video: Lecture 6, 9
+- Prabha Video: Lecture 12, 14, 23
+- Ross: 7.8.1
+- Blitzstein: 7.4, 7.5; Blitzstein Video: Lecture 20, 30
 
 </details>
 
@@ -371,9 +405,11 @@ Lesson 4: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 5: Conceptual Resources</summary>
 
-Tsitsiklis: §§3.6, 4.2 \\
-Ross: §6.7 \\
-Blitzstein: §§8.1–8.2
+- Hossein: 6.0, 6.1, 6.3; Hossein Video: —
+- Tsitsiklis: 3.6, 4.2; Tsitsiklis Video: Lecture 10, 11
+- Prabha Video: Lecture 15, 24
+- Ross: 6.7
+- Blitzstein: 8.1, 8.2; Blitzstein Video: Lecture 22
 
 </details>
 
@@ -384,9 +420,11 @@ Lesson 5: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 6: Conceptual Resources</summary>
 
-Tsitsiklis: — \\
-Ross: §§6.6, 7.8.2 \\
-Blitzstein: §§8.6, 10.4
+- Hossein: —; Hossein Video: Video 2.5 (Ruin)
+- Tsitsiklis: —; Tsitsiklis Video: —
+- Prabha Video: Lecture 15, 16
+- Ross: 6.6, 7.8.2
+- Blitzstein: 8.6, 10.4; Blitzstein Video: Lecture 25, 30
 
 </details>
 
@@ -401,9 +439,11 @@ Lesson 6: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 1: Conceptual Resources</summary>
 
-Tsitsiklis: §§7.1–7.3, 7.5 \\
-Ross: §§8.1–8.4 \\
-Blitzstein: §§10.1–10.4
+- Hossein: 7.2; Hossein Video: —
+- Tsitsiklis: 7.1 to 7.3, 7.5; Tsitsiklis Video: —
+- Prabha Video: Lecture 20
+- Ross: 8.1 to 8.4
+- Blitzstein: 10.1 to 10.4; Blitzstein Video: Lecture 29
 
 </details>
 
@@ -414,9 +454,11 @@ Lesson 1: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 2: Conceptual Resources</summary>
 
-Tsitsiklis: §7.4 \\
-Ross: §8.3 \\
-Blitzstein: §10.3
+- Hossein: 7.2.4, 7.1.2; Hossein Video: —
+- Tsitsiklis: 7.4; Tsitsiklis Video: —
+- Prabha Video: Lecture 21, 22
+- Ross: 8.3
+- Blitzstein: 10.3; Blitzstein Video: Lecture 29
 
 </details>
 
@@ -427,9 +469,11 @@ Lesson 2: Problem Set (Level 1)
 <details markdown="1">
 <summary>Lesson 3: Conceptual Resources</summary>
 
-Tsitsiklis: §§7.2–7.3 \\
-Ross: §8.2 \\
-Blitzstein: §10.2
+- Hossein: 7.2.5, 7.1.1; Hossein Video: —
+- Tsitsiklis: 7.2, 7.3; Tsitsiklis Video: —
+- Prabha Video: Lecture 23
+- Ross: 8.2
+- Blitzstein: 10.2; Blitzstein Video: Lecture 29
 
 </details>
 

@@ -71,6 +71,28 @@
   font-weight: 700;
 }
 
+.course-content h2 {
+  font-size: 1.3em;
+  font-weight: 700;
+  margin-top: 2em;
+  margin-bottom: 0.6em;
+}
+
+.course-content h3 {
+  font-size: 1.05em;
+  font-weight: 700;
+  margin-top: 1.4em;
+  margin-bottom: 0.4em;
+}
+
+.course-content details {
+  margin-bottom: 0.4em;
+}
+
+.course-content details summary {
+  cursor: pointer;
+}
+
 .course-footer-nav {
   display: flex;
   justify-content: space-between;

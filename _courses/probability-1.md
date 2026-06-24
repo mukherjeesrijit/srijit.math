@@ -80,7 +80,7 @@ Anyone with strong high school mathematics knowledge can follow this course if a
 
 **Level 1:** How will a Level 1 student prepare? A Level 1 student should focus on building conceptual understanding (80%) and problem solving (20%). A student should complete the videos and reading materials, and move ahead to the problem set of Level 1. If the student cannot solve the problems in the problem sets, then the student should go back to the theory and the example problems, and try to understand and solve them over and over again. Once a student can solve all the Level 1 problems themselves, the student can move ahead to Level 2.
 
-**Level 2:** How will a Level 2 student prepare? The goal of a Level 2 student is 80% problem solving and 20% revising concepts. It is suggested to follow the Blitzstein Book for Level 2 for complete mastery.
+**Level 2:** How will a Level 2 student prepare? The goal of a Level 2 student is 80% problem solving and 20% revising concepts. A Level 2 student should solve all the end of the chapter problems. Keep on solving the problems, till you get the patterns required to map, understand, and solve the problems. For conceptual clarity, it is suggested to follow the Blitzstein Book for Level 2 for complete mastery.
 
 </details>
 

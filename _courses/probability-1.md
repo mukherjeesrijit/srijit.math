@@ -9,7 +9,7 @@ title_color: "#e08a1e"
 Please read each of the following components of the course before you start learning so that you can track and measure your progress for good.
 
 <details markdown="1">
-<summary><strong>Machine Learning (AI) vs Quantitative Finance</strong></summary>
+<summary><strong>Machine Learning vs Quant Finance</strong></summary>
 
 There are two levels to this course: Level 1 (for Beginners) and Level 2 (for Non-Beginners). Level 1 students should focus on learning the fundamental theory while Level 2 students should focus on mastering problem solving rigorously. Students and professionals aiming for just mastering Probability for AI can just focus on Level 1 (because problem solving is not a part of AI interviews). Level 2 is absolutely necessary and sufficient for Quantitative Finance aspirants. For aspiring researchers, mastery till Level 2 is of high importance. Level 2 is associated with problem solving mastery mostly.
 

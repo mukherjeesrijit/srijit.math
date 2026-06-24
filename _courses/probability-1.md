@@ -28,12 +28,12 @@ The course is developed into two levels - Level 1 and Level 2. The goal of the L
 This course is built upon fundamental probability courses and books available online. We will be using four book resources and three video resources in this reading course strictly. I will mark the books based on which books are more easily accessible to a Level 1 audience, and more to a Level 2 audience.
 
 **Level 1:**
-- *Introduction to Probability, Statistics, and Random Processes* by Hossein Pishro-Nik (ProbabilityCourse.com)
-- *Introduction to Probability* by Dimitri P. Bertsekas and John N. Tsitsiklis
+- *Introduction to Probability, Statistics, and Random Processes* by Hossein Pishro-Nik ([ProbabilityCourse.com](https://www.probabilitycourse.com)), [Video Course](https://www.probabilitycourse.com/videos/videos.php)
+- *Introduction to Probability* by Dimitri P. Bertsekas and John N. Tsitsiklis, [Video Course](https://ocw.mit.edu/courses/6-041-probabilistic-systems-analysis-and-applied-probability-fall-2010/)
 
 **Level 2:**
 - *A First Course in Probability* by Sheldon M. Ross
-- *Introduction to Probability* by Jessica Hwang and Joseph K. Blitzstein
+- *Introduction to Probability* by Jessica Hwang and Joseph K. Blitzstein, [Video Course](https://stat110.hsites.harvard.edu/youtube)
 
 Blitzstein is the hardest, and hence the most useful book to reach the mastery of Level 2. Hossein Pishro-Nik, John N. Tsitsiklis, and Joseph K. Blitzstein have their video courses, which is awesome for any level of a student.
 

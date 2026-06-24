@@ -120,7 +120,7 @@ To reiterate, in the first case it can help you connect with your basics in high
 ### Lesson 1: Set Theory and Classical Probability Model
 
 <details markdown="1">
-<summary>Lesson 1 Resources</summary>
+<summary>Lesson 1: Conceptual Resources</summary>
 
 Tsitsiklis: §1.1 \\
 Ross: — \\
@@ -128,12 +128,12 @@ Blitzstein: §§1.1–1.3
 
 </details>
 
-[Lesson 1 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 1: Problem Set (Level 1)
 
 ### Lesson 2: Counting Principles, Permutations, and Combinations
 
 <details markdown="1">
-<summary>Lesson 2 Resources</summary>
+<summary>Lesson 2: Conceptual Resources</summary>
 
 Tsitsiklis: §1.6 (early) \\
 Ross: §§1.1–1.4 \\
@@ -141,12 +141,12 @@ Blitzstein: §1.4 (early)
 
 </details>
 
-[Lesson 2 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 2: Problem Set (Level 1)
 
 ### Lesson 3: Binomial, Multinomial, and Stars and Bars Counting
 
 <details markdown="1">
-<summary>Lesson 3 Resources</summary>
+<summary>Lesson 3: Conceptual Resources</summary>
 
 Tsitsiklis: §1.6 (later) \\
 Ross: §§1.4–1.6 \\
@@ -154,16 +154,16 @@ Blitzstein: §1.4 (later), §1.5
 
 </details>
 
-[Lesson 3 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 3: Problem Set (Level 1)
 
-[Level 2 Problem Set: Classical Probability and Combinatorics](https://www.instagram.com/srijit.math/)
+### Chapter 1: Problem Set (Level 2)
 
 ## Chapter 2: Axiomatic and Conditional Probability
 
 ### Lesson 1: Axiomatic Probability Model
 
 <details markdown="1">
-<summary>Lesson 1 Resources</summary>
+<summary>Lesson 1: Conceptual Resources</summary>
 
 Tsitsiklis: §1.2 \\
 Ross: §§2.1–2.7 \\
@@ -171,12 +171,12 @@ Blitzstein: §§1.6–1.7
 
 </details>
 
-[Lesson 1 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 1: Problem Set (Level 1)
 
 ### Lesson 2: Conditional Probability and Independence
 
 <details markdown="1">
-<summary>Lesson 2 Resources</summary>
+<summary>Lesson 2: Conceptual Resources</summary>
 
 Tsitsiklis: §1.3 (early) \\
 Ross: §§3.1–3.2 \\
@@ -184,12 +184,12 @@ Blitzstein: §§2.1–2.2
 
 </details>
 
-[Lesson 2 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 2: Problem Set (Level 1)
 
 ### Lesson 3: Laws of Conditional Probability and Bayes' Theorem
 
 <details markdown="1">
-<summary>Lesson 3 Resources</summary>
+<summary>Lesson 3: Conceptual Resources</summary>
 
 Tsitsiklis: §§1.3 (later), 1.4 \\
 Ross: §§3.3–3.5 \\
@@ -197,16 +197,16 @@ Blitzstein: §§2.3–2.7
 
 </details>
 
-[Lesson 3 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 3: Problem Set (Level 1)
 
-[Level 2 Problem Set: Axiomatic and Conditional Probability](https://www.instagram.com/srijit.math/)
+### Chapter 2: Problem Set (Level 2)
 
 ## Chapter 3: Discrete Distributions and Moments
 
 ### Lesson 1: Discrete Random Variables, PMFs, and Moments
 
 <details markdown="1">
-<summary>Lesson 1 Resources</summary>
+<summary>Lesson 1: Conceptual Resources</summary>
 
 Tsitsiklis: §§2.1–2.4 \\
 Ross: §§4.1–4.5 \\
@@ -214,12 +214,12 @@ Blitzstein: §§3.1–3.2
 
 </details>
 
-[Lesson 1 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 1: Problem Set (Level 1)
 
 ### Lesson 2: Standard Discrete Random Variables
 
 <details markdown="1">
-<summary>Lesson 2 Resources</summary>
+<summary>Lesson 2: Conceptual Resources</summary>
 
 Tsitsiklis: §2.2 \\
 Ross: §§4.6–4.9 \\
@@ -227,12 +227,12 @@ Blitzstein: §§3.3–3.5
 
 </details>
 
-[Lesson 2 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 2: Problem Set (Level 1)
 
 ### Lesson 3: Cumulative Distribution Functions (CDFs)
 
 <details markdown="1">
-<summary>Lesson 3 Resources</summary>
+<summary>Lesson 3: Conceptual Resources</summary>
 
 Tsitsiklis: §§2.3, 3.2 \\
 Ross: §4.10 \\
@@ -240,16 +240,16 @@ Blitzstein: §3.6
 
 </details>
 
-[Lesson 3 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 3: Problem Set (Level 1)
 
-[Level 2 Problem Set: Discrete Distributions and Moments](https://www.instagram.com/srijit.math/)
+### Chapter 3: Problem Set (Level 2)
 
 ## Chapter 4: Continuous Distributions and Moments
 
 ### Lesson 1: Continuous Random Variables, PDFs, and Moments
 
 <details markdown="1">
-<summary>Lesson 1 Resources</summary>
+<summary>Lesson 1: Conceptual Resources</summary>
 
 Tsitsiklis: §3.1 \\
 Ross: §§5.1–5.2 \\
@@ -257,12 +257,12 @@ Blitzstein: §5.1
 
 </details>
 
-[Lesson 1 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 1: Problem Set (Level 1)
 
 ### Lesson 2: Standard Continuous Random Variables
 
 <details markdown="1">
-<summary>Lesson 2 Resources</summary>
+<summary>Lesson 2: Conceptual Resources</summary>
 
 Tsitsiklis: §3.3 \\
 Ross: §§5.3–5.6 \\
@@ -270,12 +270,12 @@ Blitzstein: §§5.2, 5.4, 5.5
 
 </details>
 
-[Lesson 2 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 2: Problem Set (Level 1)
 
 ### Lesson 3: Revisiting CDFs and Mixed Random Variables
 
 <details markdown="1">
-<summary>Lesson 3 Resources</summary>
+<summary>Lesson 3: Conceptual Resources</summary>
 
 Tsitsiklis: §3.2 \\
 Ross: §§4.10, 5.1 \\
@@ -283,12 +283,12 @@ Blitzstein: §§3.6, 5.3
 
 </details>
 
-[Lesson 3 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 3: Problem Set (Level 1)
 
 ### Lesson 4: Functions of Univariate Random Variables
 
 <details markdown="1">
-<summary>Lesson 4 Resources</summary>
+<summary>Lesson 4: Conceptual Resources</summary>
 
 Tsitsiklis: §3.6 \\
 Ross: §5.7 \\
@@ -296,16 +296,16 @@ Blitzstein: §8.1
 
 </details>
 
-[Lesson 4 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 4: Problem Set (Level 1)
 
-[Level 2 Problem Set: Continuous Distributions and Moments](https://www.instagram.com/srijit.math/)
+### Chapter 4: Problem Set (Level 2)
 
 ## Chapter 5: Multivariate Distributions and Moments
 
 ### Lesson 1: Joint (Multivariate) Random Variables and Moments
 
 <details markdown="1">
-<summary>Lesson 1 Resources</summary>
+<summary>Lesson 1: Conceptual Resources</summary>
 
 Tsitsiklis: §§2.5, 3.5 \\
 Ross: §§6.1–6.3, 7.2–7.4 \\
@@ -313,12 +313,12 @@ Blitzstein: §§7.1–7.3
 
 </details>
 
-[Lesson 1 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 1: Problem Set (Level 1)
 
 ### Lesson 2: Conditional and Marginal Random Variables
 
 <details markdown="1">
-<summary>Lesson 2 Resources</summary>
+<summary>Lesson 2: Conceptual Resources</summary>
 
 Tsitsiklis: §§2.6, 3.4 \\
 Ross: §§6.4–6.5 \\
@@ -326,12 +326,12 @@ Blitzstein: §7.1
 
 </details>
 
-[Lesson 2 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 2: Problem Set (Level 1)
 
 ### Lesson 3: Conditional Expectation and Variance
 
 <details markdown="1">
-<summary>Lesson 3 Resources</summary>
+<summary>Lesson 3: Conceptual Resources</summary>
 
 Tsitsiklis: §§2.6, 4.3 \\
 Ross: §§7.5–7.6 \\
@@ -339,12 +339,12 @@ Blitzstein: §§9.1–9.6
 
 </details>
 
-[Lesson 3 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 3: Problem Set (Level 1)
 
 ### Lesson 4: Multinomial, Multivariate Normal, and Dirichlet Distributions
 
 <details markdown="1">
-<summary>Lesson 4 Resources</summary>
+<summary>Lesson 4: Conceptual Resources</summary>
 
 Tsitsiklis: §4.7 \\
 Ross: §7.8.1 \\
@@ -352,12 +352,12 @@ Blitzstein: §§7.4–7.5
 
 </details>
 
-[Lesson 4 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 4: Problem Set (Level 1)
 
 ### Lesson 5: Functions of Multivariate Random Variables
 
 <details markdown="1">
-<summary>Lesson 5 Resources</summary>
+<summary>Lesson 5: Conceptual Resources</summary>
 
 Tsitsiklis: §§3.6, 4.2 \\
 Ross: §6.7 \\
@@ -365,12 +365,12 @@ Blitzstein: §§8.1–8.2
 
 </details>
 
-[Lesson 5 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 5: Problem Set (Level 1)
 
 ### Lesson 6: Order Statistics and Sampling Distributions
 
 <details markdown="1">
-<summary>Lesson 6 Resources</summary>
+<summary>Lesson 6: Conceptual Resources</summary>
 
 Tsitsiklis: — \\
 Ross: §§6.6, 7.8.2 \\
@@ -378,16 +378,16 @@ Blitzstein: §§8.6, 10.4
 
 </details>
 
-[Lesson 6 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 6: Problem Set (Level 1)
 
-[Level 2 Problem Set: Multivariate Distributions and Moments](https://www.instagram.com/srijit.math/)
+### Chapter 5: Problem Set (Level 2)
 
 ## Chapter 6: Limit Theorems
 
 ### Lesson 1: Convergence of Random Variables
 
 <details markdown="1">
-<summary>Lesson 1 Resources</summary>
+<summary>Lesson 1: Conceptual Resources</summary>
 
 Tsitsiklis: §§7.1–7.3, 7.5 \\
 Ross: §§8.1–8.4 \\
@@ -395,12 +395,12 @@ Blitzstein: §§10.1–10.4
 
 </details>
 
-[Lesson 1 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 1: Problem Set (Level 1)
 
 ### Lesson 2: Convergence in Distribution and the Central Limit Theorem (CLT)
 
 <details markdown="1">
-<summary>Lesson 2 Resources</summary>
+<summary>Lesson 2: Conceptual Resources</summary>
 
 Tsitsiklis: §7.4 \\
 Ross: §8.3 \\
@@ -408,12 +408,12 @@ Blitzstein: §10.3
 
 </details>
 
-[Lesson 2 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 2: Problem Set (Level 1)
 
 ### Lesson 3: Convergence in Probability and the Weak Law of Large Numbers (WLLN)
 
 <details markdown="1">
-<summary>Lesson 3 Resources</summary>
+<summary>Lesson 3: Conceptual Resources</summary>
 
 Tsitsiklis: §§7.2–7.3 \\
 Ross: §8.2 \\
@@ -421,6 +421,6 @@ Blitzstein: §10.2
 
 </details>
 
-[Lesson 3 Problems & Doubts](https://www.instagram.com/srijit.math/)
+### Lesson 3: Problem Set (Level 1)
 
-[Level 2 Problem Set: Limit Theorems](https://www.instagram.com/srijit.math/)
+### Chapter 6: Problem Set (Level 2)

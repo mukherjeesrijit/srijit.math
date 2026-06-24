@@ -40,6 +40,19 @@ Blitzstein is the hardest, and hence the most useful book to reach the mastery o
 </details>
 
 <details markdown="1">
+<summary><strong>Advanced Resources</strong></summary>
+
+Often many advanced students want to learn probability through a measure theoretic lens or in a more abstract fashion. For them, I suggest the following resources.
+
+- *An Introduction to Probability and Statistics* by Vijay K. Rohatgi and A.K. Md. Ehsanes Saleh
+- [EE5110: Probability Foundations for Electrical Engineers (IIT Madras)](https://www.ee.iitm.ac.in/~krishnaj/ee5110notes.htm), [Video Course](https://www.youtube.com/watch?v=MqJGlPF0dhw&list=PLVhKOwOM3oudtpQG7jf6WrS1GqxTskXsP&index=22)
+- [MTL601: Measure Theoretic Probability (IIT Delhi)](https://web.iitd.ac.in/~dharmar/MTL601/main.htm), [Video Course](https://www.youtube.com/watch?v=1NPBMF2T8Iw&list=PLp6ek2hDcoNBtK-hVSSPlbBzfxXwWON4x&index=3)
+
+These advanced resources are not required for problem solving purposes, but this can help in building your foundations for Probability II - Random Processes, Stochastic Calculus, Stochastic Differential Equations.
+
+</details>
+
+<details markdown="1">
 <summary><strong>Course Design: Concepts & Problems</strong></summary>
 
 There are 6 core chapters:

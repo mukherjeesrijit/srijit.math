@@ -128,7 +128,7 @@ Blitzstein: §§1.1–1.3
 
 </details>
 
-### Lesson 1: Problem Set (Level 1)
+Lesson 1: Problem Set (Level 1)
 
 ### Lesson 2: Counting Principles, Permutations, and Combinations
 
@@ -141,7 +141,7 @@ Blitzstein: §1.4 (early)
 
 </details>
 
-### Lesson 2: Problem Set (Level 1)
+Lesson 2: Problem Set (Level 1)
 
 ### Lesson 3: Binomial, Multinomial, and Stars and Bars Counting
 
@@ -154,7 +154,7 @@ Blitzstein: §1.4 (later), §1.5
 
 </details>
 
-### Lesson 3: Problem Set (Level 1)
+Lesson 3: Problem Set (Level 1)
 
 ### Chapter 1: Problem Set (Level 2)
 
@@ -171,7 +171,7 @@ Blitzstein: §§1.6–1.7
 
 </details>
 
-### Lesson 1: Problem Set (Level 1)
+Lesson 1: Problem Set (Level 1)
 
 ### Lesson 2: Conditional Probability and Independence
 
@@ -184,7 +184,7 @@ Blitzstein: §§2.1–2.2
 
 </details>
 
-### Lesson 2: Problem Set (Level 1)
+Lesson 2: Problem Set (Level 1)
 
 ### Lesson 3: Laws of Conditional Probability and Bayes' Theorem
 
@@ -197,7 +197,7 @@ Blitzstein: §§2.3–2.7
 
 </details>
 
-### Lesson 3: Problem Set (Level 1)
+Lesson 3: Problem Set (Level 1)
 
 ### Chapter 2: Problem Set (Level 2)
 
@@ -214,7 +214,7 @@ Blitzstein: §§3.1–3.2
 
 </details>
 
-### Lesson 1: Problem Set (Level 1)
+Lesson 1: Problem Set (Level 1)
 
 ### Lesson 2: Standard Discrete Random Variables
 
@@ -227,7 +227,7 @@ Blitzstein: §§3.3–3.5
 
 </details>
 
-### Lesson 2: Problem Set (Level 1)
+Lesson 2: Problem Set (Level 1)
 
 ### Lesson 3: Cumulative Distribution Functions (CDFs)
 
@@ -240,7 +240,7 @@ Blitzstein: §3.6
 
 </details>
 
-### Lesson 3: Problem Set (Level 1)
+Lesson 3: Problem Set (Level 1)
 
 ### Chapter 3: Problem Set (Level 2)
 
@@ -257,7 +257,7 @@ Blitzstein: §5.1
 
 </details>
 
-### Lesson 1: Problem Set (Level 1)
+Lesson 1: Problem Set (Level 1)
 
 ### Lesson 2: Standard Continuous Random Variables
 
@@ -270,7 +270,7 @@ Blitzstein: §§5.2, 5.4, 5.5
 
 </details>
 
-### Lesson 2: Problem Set (Level 1)
+Lesson 2: Problem Set (Level 1)
 
 ### Lesson 3: Revisiting CDFs and Mixed Random Variables
 
@@ -283,7 +283,7 @@ Blitzstein: §§3.6, 5.3
 
 </details>
 
-### Lesson 3: Problem Set (Level 1)
+Lesson 3: Problem Set (Level 1)
 
 ### Lesson 4: Functions of Univariate Random Variables
 
@@ -296,7 +296,7 @@ Blitzstein: §8.1
 
 </details>
 
-### Lesson 4: Problem Set (Level 1)
+Lesson 4: Problem Set (Level 1)
 
 ### Chapter 4: Problem Set (Level 2)
 
@@ -313,7 +313,7 @@ Blitzstein: §§7.1–7.3
 
 </details>
 
-### Lesson 1: Problem Set (Level 1)
+Lesson 1: Problem Set (Level 1)
 
 ### Lesson 2: Conditional and Marginal Random Variables
 
@@ -326,7 +326,7 @@ Blitzstein: §7.1
 
 </details>
 
-### Lesson 2: Problem Set (Level 1)
+Lesson 2: Problem Set (Level 1)
 
 ### Lesson 3: Conditional Expectation and Variance
 
@@ -339,7 +339,7 @@ Blitzstein: §§9.1–9.6
 
 </details>
 
-### Lesson 3: Problem Set (Level 1)
+Lesson 3: Problem Set (Level 1)
 
 ### Lesson 4: Multinomial, Multivariate Normal, and Dirichlet Distributions
 
@@ -352,7 +352,7 @@ Blitzstein: §§7.4–7.5
 
 </details>
 
-### Lesson 4: Problem Set (Level 1)
+Lesson 4: Problem Set (Level 1)
 
 ### Lesson 5: Functions of Multivariate Random Variables
 
@@ -365,7 +365,7 @@ Blitzstein: §§8.1–8.2
 
 </details>
 
-### Lesson 5: Problem Set (Level 1)
+Lesson 5: Problem Set (Level 1)
 
 ### Lesson 6: Order Statistics and Sampling Distributions
 
@@ -378,7 +378,7 @@ Blitzstein: §§8.6, 10.4
 
 </details>
 
-### Lesson 6: Problem Set (Level 1)
+Lesson 6: Problem Set (Level 1)
 
 ### Chapter 5: Problem Set (Level 2)
 
@@ -395,7 +395,7 @@ Blitzstein: §§10.1–10.4
 
 </details>
 
-### Lesson 1: Problem Set (Level 1)
+Lesson 1: Problem Set (Level 1)
 
 ### Lesson 2: Convergence in Distribution and the Central Limit Theorem (CLT)
 
@@ -408,7 +408,7 @@ Blitzstein: §10.3
 
 </details>
 
-### Lesson 2: Problem Set (Level 1)
+Lesson 2: Problem Set (Level 1)
 
 ### Lesson 3: Convergence in Probability and the Weak Law of Large Numbers (WLLN)
 
@@ -421,6 +421,6 @@ Blitzstein: §10.2
 
 </details>
 
-### Lesson 3: Problem Set (Level 1)
+Lesson 3: Problem Set (Level 1)
 
 ### Chapter 6: Problem Set (Level 2)

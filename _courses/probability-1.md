@@ -116,7 +116,16 @@ To reiterate, in the first case it can help you connect with your basics in high
 
 </details>
 
-The problem sets' links will go to instagram directly. Use it wisely to ask doubts to me. The problem sets will be available soon within the next few weeks. Thanks for your patience.
+The problem sets' links will go to instagram directly. Use it wisely to ask doubts to me. The problem sets will be available soon within the next few weeks. Thanks for your patience. Let's give some names to each of the resources, we will be using.
+
+- Hossein: *Introduction to Probability, Statistics, and Random Processes* by Hossein Pishro-Nik ([ProbabilityCourse.com](https://www.probabilitycourse.com)), 
+- Hossein Video: [Video Course](https://www.probabilitycourse.com/videos/videos.php)
+- Tsitsiklis: *Introduction to Probability* by Dimitri P. Bertsekas and John N. Tsitsiklis, 
+- Tsitsiklis Video: [Video Course](https://ocw.mit.edu/courses/6-041-probabilistic-systems-analysis-and-applied-probability-fall-2010/)
+- Prabha Video: [Probability Theory and Applications](https://nptel.ac.in/courses/111104079), IIT Kanpur, Prof. Prabha Sharma
+- Ross: *A First Course in Probability* by Sheldon M. Ross
+- Blitzstein: *Introduction to Probability* by Jessica Hwang and Joseph K. Blitzstein,
+- Blitzstein Video: [Video Course](https://stat110.hsites.harvard.edu/youtube)
 
 ## Chapter 1: Classical Probability and Combinatorics
 

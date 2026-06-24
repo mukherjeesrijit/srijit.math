@@ -8,21 +8,21 @@ title_color: "#e08a1e"
 
 Please read each of the following components of the course before you start learning so that you can track and measure your progress for good.
 
-<details>
+<details markdown="1">
 <summary><strong>Machine Learning (AI) vs Quantitative Finance</strong></summary>
 
 There are two levels to this course: Level 1 (for Beginners) and Level 2 (for Non-Beginners). Level 1 students should focus on learning the fundamental theory while Level 2 students should focus on mastering problem solving rigorously. Students and professionals aiming for just mastering Probability for AI can just focus on Level 1 (because problem solving is not a part of AI interviews). Level 2 is absolutely necessary and sufficient for Quantitative Finance aspirants. For aspiring researchers, mastery till Level 2 is of high importance. Level 2 is associated with problem solving mastery mostly.
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><strong>Beginners vs Non-Beginners</strong></summary>
 
 The course is developed into two levels - Level 1 and Level 2. The goal of the Level 1 students is to learn the fundamentals, learn the algebraic techniques, and solve easy to medium problems. Level 2 students should know the entire theory. The goal of the Level 2 students is to solve and master problem solving. For example, you can learn conditional probability and Bayes theorem without tree diagrams (Level 1), however for solving conditional probability problems, and in general, you have to master the art of tree diagrams. All over Probability I, there are certain concepts used over and over again in problem solving - starting from law of total probability, chain rule of probability, conditional expectation, Adam's and Eve's laws, and quite a few more. A Level 1 student shouldn't bother about this at all. If you are not familiar or good with high school mathematics, spend time in preparing yourself with your school mathematics books, and solve problems.
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><strong>Resources: Books and Videos</strong></summary>
 
 This course is built upon fundamental probability courses and books available online. We will be using four book resources and three video resources in this reading course strictly. I will mark the books based on which books are more easily accessible to a Level 1 audience, and more to a Level 2 audience.
@@ -39,7 +39,7 @@ Blitzstein is the hardest, and hence the most useful book to reach the mastery o
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><strong>Course Design: Concepts & Problems</strong></summary>
 
 There are 6 core chapters:
@@ -60,7 +60,7 @@ Each chapter has topics inside. Each topic is like a single day of lesson (like 
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><strong>How to Measure Your Progress?</strong></summary>
 
 What is the measure of progress? The measure of progress - The Problem List. Can you solve all the problems?
@@ -73,7 +73,7 @@ Take an example problem. Understand the solution. Try to logically recreate the 
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><strong>How to Prepare? (Level 1 vs Level 2)</strong></summary>
 
 Anyone with strong high school mathematics knowledge can follow this course if approached with discipline. The course starts with set theory. Also, while reading a book, try to understand and attempt as many example problems as you can. Those actually shape your probabilistic reasoning. Problem solving is the key here. Both Level 1 and Level 2's goal is to solve problems as mentioned in the "How to Measure Your Progress?" section.
@@ -84,14 +84,14 @@ Anyone with strong high school mathematics knowledge can follow this course if a
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><strong>Where do people get stuck?</strong></summary>
 
 People get stuck because probability intuition is very much different from logical reasoning. Probabilistic reasoning needs an extra added layer of non-deterministic logic to the very hard core logic we have been trained with from school days. So, you have to give your mind this space to learn this new technique. We are trying to build the intuition of non-deterministic logic with a logical mathematical framework. It is like learning a different language. You have to give it time, and the flower will bloom. Be patient, disciplined, and persevere through those days, where you cannot solve. All the best. Let's get started.
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><strong>A Starting Note</strong></summary>
 
 There are two ways to start learning probability from scratch. Of course the very first thing is to learn set theory because probability is nothing but telling you the size of a set. But since we are taught permutation and combination in your school days, we can start with counting (combinatorics) and classical probability, because they are equivalent. Then we can move ahead to learn about axiomatic and conditional probability.

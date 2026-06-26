@@ -4,7 +4,7 @@ title: Roadmap and Preparation
 icon: 📚
 color: "#dfe0fb"
 title_color: "#5b5bd6"
-# draft: true
+draft: true
 ---
 
 ### Preparation

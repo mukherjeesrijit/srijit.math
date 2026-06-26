@@ -24,3 +24,5 @@ Step 2: Download
 </div>
 
 </div>
+
+Before panicking that you didn't get access, please make sure that you have followed the first step to join the google group. Once you join, then click on the second button to get access.

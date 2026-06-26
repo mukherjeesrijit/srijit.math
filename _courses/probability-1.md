@@ -28,6 +28,8 @@ Step 2: Download
 
 </div>
 
+Before panicking that you didn't get access, please make sure that you have followed the first step to join the google group. Once you join, then click on the second button to get access.
+
 <details markdown="1">
 <summary>Your Learning Resources</summary>
 - **Hossein** (Level 1): *Introduction to Probability, Statistics, and Random Processes* by Hossein Pishro-Nik ([ProbabilityCourse.com](https://www.probabilitycourse.com))

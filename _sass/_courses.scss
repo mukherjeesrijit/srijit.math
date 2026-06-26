@@ -117,3 +117,82 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================
+   Book Download Section
+   ========================================================== */
+
+.course-book {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.course-book img {
+  display: block;
+  margin: 0 auto;
+
+  /* core sizing rule */
+  width: min(380px, 85vw);
+  height: auto;
+
+  border-radius: 8px;
+}
+
+.course-book-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 1.5rem;
+}
+
+.course-book-button {
+  display: inline-block;
+
+  /* 🔽 reduced size */
+  padding: 11px 20px;
+  font-size: 15px;
+  font-weight: 600;
+
+  border-radius: 8px;
+  text-decoration: none;
+  color: #fff !important;
+
+  /* keep shadow (subtle + modern) */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+
+  transition: transform .15s ease, opacity .15s ease, box-shadow .15s ease;
+}
+
+.course-book-button:hover {
+  opacity: .92;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  text-decoration: none;
+}
+
+.course-book-button.join {
+  background: #e08a1e;
+}
+
+.course-book-button.download {
+  background: #2e7d32;
+}
+
+@media (max-width: 600px) {
+  .course-book-buttons {
+    flex-direction: column;
+  }
+
+  .course-book-button {
+    width: 100%;
+    max-width: 280px;
+    box-sizing: border-box;
+    text-align: center;
+
+    /* slightly tighter on mobile */
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+}

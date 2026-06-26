@@ -6,7 +6,397 @@ color: "#fbe8d6"
 title_color: "#e08a1e"
 ---
 
-Please read each of the following components of the course before you start learning so that you can track and measure your progress for good.
+<div class="course-book">
+
+<img src="{{ '/assets/img/book_cover.png' | relative_url }}" alt="Book Cover">
+
+<div class="course-book-buttons">
+
+<a class="course-book-button join"
+   href="https://groups.google.com/a/srijitmukherjee.com/g/srijit.math"
+   target="_blank">
+Step 1: Join for Free
+</a>
+
+<a class="course-book-button download"
+   href="https://drive.google.com/file/d/1LReaop5oe3w_WITddb4_RdcxuuBRKSdz/view?usp=drive_link"
+   target="_blank">
+Step 2: Download
+</a>
+
+</div>
+
+</div>
+
+<details markdown="1">
+<summary>Your Learning Resources</summary>
+- **Hossein** (Level 1): *Introduction to Probability, Statistics, and Random Processes* by Hossein Pishro-Nik ([ProbabilityCourse.com](https://www.probabilitycourse.com))
+- **Hossein Video** (Level 1): [Video Course](https://www.probabilitycourse.com/videos/videos.php)
+- **Tsitsiklis** (Level 1): *Introduction to Probability* by Dimitri P. Bertsekas and John N. Tsitsiklis
+- **Tsitsiklis Video** (Level 1): [Video Course](https://ocw.mit.edu/courses/6-041-probabilistic-systems-analysis-and-applied-probability-fall-2010/), [Youtube with Tutorials](https://www.youtube.com/playlist?list=PLUl4u3cNGP60A3XMwZ5sep719_nh95qOe)
+- **Prabha Video** (Level 1): [Probability Theory and Applications](https://nptel.ac.in/courses/111104079), IIT Kanpur, Prof. Prabha Sharma
+- **Ross** (Level 2): *A First Course in Probability* by Sheldon M. Ross
+- **Blitzstein** (Level 2): *Introduction to Probability* by Jessica Hwang and Joseph K. Blitzstein,
+- **Blitzstein Video** (Level 2): [Video Course](https://stat110.hsites.harvard.edu/youtube)
+</details>
+<details markdown="1">
+<summary>Your Preparation Strategy</summary>
+
+Preparation in this course depends strongly on your current mathematical maturity, and students are therefore grouped into three broad levels to ensure the right balance between conceptual learning and problem solving. 
+
+Level 0 students, who are not yet proficient in high school mathematics, must first focus entirely on rebuilding foundational tools such as algebra, combinatorics, and basic set theory before engaging seriously with probability. For them, the priority is strengthening school-level mathematical reasoning and slowly transitioning into classical probability ideas through counting, with heavy reliance on examples and guided understanding. At this stage, problem solving is minimal, and the goal is simply to become comfortable with the language of mathematics used in the course. They should first focus on using their high school mathematics books to sharpen their skills.
+
+Level 1 students, who are also not yet proficient in high school mathematics but are ready to begin this structured probability learning, should focus primarily on building conceptual understanding (around 80%) while keeping a small but consistent portion of effort (around 20%) for solving easy to medium problems. Note that the books are also divided into two different Levels. Their preparation should follow a strict cycle: first engaging with videos and reading materials, then attempting the book problems, and whenever they get stuck, returning to examples in the reading materials and theory until understanding stabilizes. The emphasis is not speed but repetition and exposure—learning how standard probability tools like conditional probability, basic distributions, and combinatorics naturally emerge from repeated practice. Progress is measured by the ability to independently solve all Level 1 problems before advancing. Level 1 problem sets must be solved and should be used as a measure of progress.
+
+Level 2 students, who are already proficient in Level 1 probability, should shift their focus almost entirely toward problem solving (around 80%) with minimal conceptual revision (around 20%). Their preparation is centered on mastering structured problem patterns across all chapters by repeatedly solving end-of-chapter and mixed Level 2 problems until recognition of techniques becomes automatic. At this stage, tools such as the law of total probability, chain rule, and conditional expectation must be internalized through heavy problem exposure rather than passive reading. For full mastery, students are encouraged to use advanced resources like Blitzstein and revisit concepts only as needed to support deeper problem-solving intuition, ultimately aiming for fluency in translating probabilistic ideas into rigorous solutions. Level 2 problem sets must be solved and should be used as a measure of progress.
+</details>
+
+<details markdown="1">
+<summary>Other Advanced Resources</summary>
+
+Often many advanced students want to learn probability through a measure theoretic lens or in a more abstract fashion. For them, I suggest the following resources.
+
+- *An Introduction to Probability and Statistics* by Vijay K. Rohatgi and A.K. Md. Ehsanes Saleh
+- [EE5110: Probability Foundations for Electrical Engineers (IIT Madras)](https://www.ee.iitm.ac.in/~krishnaj/ee5110notes.htm), [Video Course](https://www.youtube.com/watch?v=MqJGlPF0dhw&list=PLVhKOwOM3oudtpQG7jf6WrS1GqxTskXsP&index=22)
+- [MTL601: Measure Theoretic Probability (IIT Delhi)](https://web.iitd.ac.in/~dharmar/MTL601/main.htm), [Video Course](https://www.youtube.com/watch?v=1NPBMF2T8Iw&list=PLp6ek2hDcoNBtK-hVSSPlbBzfxXwWON4x&index=3)
+
+These advanced resources are not required for problem solving purposes, but this can help in building your foundations for Probability II - Random Processes, Stochastic Calculus, Stochastic Differential Equations.
+
+</details>
+
+### Chapter 1: Classical Probability and Combinatorics
+
+<details markdown="1">
+<summary>Lesson 1: Set Theory and Classical Probability Model</summary>
+
+- Hossein: 1.0-1.2, 1.5; Hossein Video: Video 1.1, 1.2
+- Tsitsiklis: 1.1; Tsitsiklis Video: Lecture 1
+- Prabha Video: Lecture 1
+- Ross: —
+- Blitzstein: 1.1 to 1.3; Blitzstein Video: Lecture 1
+
+</details>
+
+<details markdown="1">
+<summary>Lesson 2: Counting Principles, Permutations, and Combinations</summary>
+
+- Hossein: 2; Hossein Video: Video 2.1, 2.2, 2.3
+- Tsitsiklis: 1.6 (early); Tsitsiklis Video: Lecture 4
+- Prabha Video: Lecture 1
+- Ross: 1.1 to 1.4
+- Blitzstein: 1.4 (early); Blitzstein Video: Lecture 1
+
+</details>
+
+<details markdown="1">
+<summary>Lesson 3: Binomial, Multinomial, and Stars and Bars Counting</summary>
+
+- Hossein: 2; Hossein Video: Video 2.3, 2.4
+- Tsitsiklis: 1.6 (later); Tsitsiklis Video: Lecture 4
+- Prabha Video: Lecture 1
+- Ross: 1.4 to 1.6
+- Blitzstein: 1.4 (later), 1.5; Blitzstein Video: Lecture 2
+
+</details>
+
+<details markdown="1">
+<summary>Chapter 1: Problem Set (Level 1)</summary>
+Access the problem set from the corresponding section in the free ebook book in two steps: (1) [Join the Google Group](https://groups.google.com/a/srijitmukherjee.com/g/srijit.math), (2) [Download here](https://drive.google.com/file/d/1LReaop5oe3w_WITddb4_RdcxuuBRKSdz/view?usp=drive_link). (3) Go to the relevant section (Chapter and Level) from the table of contents.
+</details>
+
+<details markdown="1">
+<summary>Chapter 1: Problem Set (Level 2)</summary>
+Access the problem set from the corresponding section in the free ebook book in two steps: (1) [Join the Google Group](https://groups.google.com/a/srijitmukherjee.com/g/srijit.math), (2) [Download here](https://drive.google.com/file/d/1LReaop5oe3w_WITddb4_RdcxuuBRKSdz/view?usp=drive_link). (3) Go to the relevant section (Chapter and Level) from the table of contents.
+</details>
+
+### Chapter 2: Axiomatic and Conditional Probability
+
+<details markdown="1">
+<summary>Lesson 1: Axiomatic Probability Model</summary>
+
+- Hossein: 1.3, 1.5; Hossein Video: Video 1.3, 1.4
+- Tsitsiklis: 1.2; Tsitsiklis Video: Lecture 1
+- Prabha Video: Lecture 2
+- Ross: 2.1 to 2.7
+- Blitzstein: 1.6, 1.7; Blitzstein Video: Lecture 2, 3
+
+</details>
+
+<details markdown="1">
+<summary>Lesson 2: Conditional Probability and Independence</summary>
+
+- Hossein: 1.4, 1.5; Hossein Video: Video 1.5, 1.6, 1.7
+- Tsitsiklis: 1.3 (early); Tsitsiklis Video: Lecture 2, 3
+- Prabha Video: Lecture 3
+- Ross: 3.1, 3.2
+- Blitzstein: 2.1, 2.2; Blitzstein Video: Lecture 4, 5
+
+</details>
+
+<details markdown="1">
+<summary>Lesson 3: Laws of Conditional Probability and Bayes' Theorem</summary>
+
+- Hossein: 1.4; Hossein Video: Video 1.8, 1.9, 1.10
+- Tsitsiklis: 1.3 (later), 1.4; Tsitsiklis Video: Lecture 2
+- Prabha Video: Lecture 3
+- Ross: 3.3 to 3.5
+- Blitzstein: 2.3 to 2.7; Blitzstein Video: Lecture 4, 5, 6
+
+</details>
+
+<details markdown="1">
+<summary>Chapter 2: Problem Set (Level 1)</summary>
+Access the problem set from the corresponding section in the free ebook book in two steps: (1) [Join the Google Group](https://groups.google.com/a/srijitmukherjee.com/g/srijit.math), (2) [Download here](https://drive.google.com/file/d/1LReaop5oe3w_WITddb4_RdcxuuBRKSdz/view?usp=drive_link). (3) Go to the relevant section (Chapter and Level) from the table of contents.
+</details>
+
+<details markdown="1">
+<summary>Chapter 2: Problem Set (Level 2)</summary>
+Access the problem set from the corresponding section in the free ebook book in two steps: (1) [Join the Google Group](https://groups.google.com/a/srijitmukherjee.com/g/srijit.math), (2) [Download here](https://drive.google.com/file/d/1LReaop5oe3w_WITddb4_RdcxuuBRKSdz/view?usp=drive_link). (3) Go to the relevant section (Chapter and Level) from the table of contents.
+</details>
+
+### Chapter 3: Discrete Distributions and Moments
+
+<details markdown="1">
+<summary>Lesson 1: Discrete Random Variables, PMFs, and Moments</summary>
+
+- Hossein: 3.1, 3.2, 3.3; Hossein Video: Video 3.1, 3.2, 3.6
+- Tsitsiklis: 2.1 to 2.4; Tsitsiklis Video: Lecture 5
+- Prabha Video: Lecture 4
+- Ross: 4.1 to 4.5
+- Blitzstein: 3.1, 3.2; Blitzstein Video: Lecture 7, 8, 9
+
+</details>
+
+<details markdown="1">
+<summary>Lesson 2: Standard Discrete Random Variables</summary>
+
+- Hossein: 3.1.5, 3.3; Hossein Video: Video 3.3, 3.4
+- Tsitsiklis: 2.2; Tsitsiklis Video: Lecture 6
+- Prabha Video: Lecture 5, 6, 7
+- Ross: 4.6 to 4.9
+- Blitzstein: 3.3 to 3.5; Blitzstein Video: Lecture 7, 8, 9, 10, 11
+
+</details>
+
+<details markdown="1">
+<summary>Lesson 3: Cumulative Distribution Functions (CDFs)</summary>
+
+- Hossein: 3.1, 3.3; Hossein Video: Video 3.5
+- Tsitsiklis: 2.3, 3.2; Tsitsiklis Video: Lecture 5, 8
+- Prabha Video: Lecture 4, 5
+- Ross: 4.1
+- Blitzstein: 3.6; Blitzstein Video: Lecture 8
+
+</details>
+
+<details markdown="1">
+<summary>Chapter 3: Problem Set (Level 1)</summary>
+Access the problem set from the corresponding section in the free ebook book in two steps: (1) [Join the Google Group](https://groups.google.com/a/srijitmukherjee.com/g/srijit.math), (2) [Download here](https://drive.google.com/file/d/1LReaop5oe3w_WITddb4_RdcxuuBRKSdz/view?usp=drive_link). (3) Go to the relevant section (Chapter and Level) from the table of contents.
+</details>
+
+<details markdown="1">
+<summary>Chapter 3: Problem Set (Level 2)</summary>
+Access the problem set from the corresponding section in the free ebook book in two steps: (1) [Join the Google Group](https://groups.google.com/a/srijitmukherjee.com/g/srijit.math), (2) [Download here](https://drive.google.com/file/d/1LReaop5oe3w_WITddb4_RdcxuuBRKSdz/view?usp=drive_link). (3) Go to the relevant section (Chapter and Level) from the table of contents.
+</details>
+
+
+
+### Chapter 4: Continuous Distributions and Moments
+
+<details markdown="1">
+<summary>Lesson 1: Continuous Random Variables, PDFs, and Moments</summary>
+
+- Hossein: 4.0, 4.1, 4.4; Hossein Video: Video 4.1, 4.2, 4.3
+- Tsitsiklis: 3.1; Tsitsiklis Video: Lecture 8
+- Prabha Video: Lecture 8, 9, 10
+- Ross: 5.1, 5.2
+- Blitzstein: 5.1; Blitzstein Video: Lecture 12
+
+</details>
+
+<details markdown="1">
+<summary>Lesson 2: Standard Continuous Random Variables</summary>
+
+- Hossein: 4.2, 4.4; Hossein Video: Video 4.7, 4.8, 4.9
+- Tsitsiklis: 3.3; Tsitsiklis Video: Lecture 8
+- Prabha Video: Lecture 8, 9, 10
+- Ross: 5.3 to 5.6
+- Blitzstein: 5.2, 5.4, 5.5; Blitzstein Video: Lecture 12, 13, 14, 16
+
+</details>
+
+<details markdown="1">
+<summary>Lesson 3: Revisiting CDFs and Mixed Random Variables</summary>
+
+- Hossein: 4.3, 4.4; Hossein Video: Video 4.10, 4.11, 4.12
+- Tsitsiklis: 3.2; Tsitsiklis Video: Lecture 8
+- Prabha Video: Lecture 8, 9, 10
+- Ross: 4.10, 5.1
+- Blitzstein: 3.6, 5.3; Blitzstein Video: Lecture 8, 12
+
+</details>
+
+<details markdown="1">
+<summary>Lesson 4: Functions of Univariate Random Variables</summary>
+
+- Hossein: 3.2.3, 4.1.3; Hossein Video: Video 3.8, 4.5, 4.6
+- Tsitsiklis: 3.6; Tsitsiklis Video: Lecture 10, 11
+- Prabha Video: Lecture 11
+- Ross: 5.7
+- Blitzstein: 8.1; Blitzstein Video: Lecture 22
+
+</details>
+
+<details markdown="1">
+<summary>Chapter 4: Problem Set (Level 1)</summary>
+Access the problem set from the corresponding section in the free ebook book in two steps: (1) [Join the Google Group](https://groups.google.com/a/srijitmukherjee.com/g/srijit.math), (2) [Download here](https://drive.google.com/file/d/1LReaop5oe3w_WITddb4_RdcxuuBRKSdz/view?usp=drive_link). (3) Go to the relevant section (Chapter and Level) from the table of contents.
+</details>
+
+<details markdown="1">
+<summary>Chapter 4: Problem Set (Level 2)</summary>
+Access the problem set from the corresponding section in the free ebook book in two steps: (1) [Join the Google Group](https://groups.google.com/a/srijitmukherjee.com/g/srijit.math), (2) [Download here](https://drive.google.com/file/d/1LReaop5oe3w_WITddb4_RdcxuuBRKSdz/view?usp=drive_link). (3) Go to the relevant section (Chapter and Level) from the table of contents.
+</details>
+
+
+### Chapter 5: Multivariate Distributions and Moments
+
+<details markdown="1">
+<summary>Lesson 1: Joint (Multivariate) Random Variables and Moments</summary>
+
+- Hossein: 5.1.0, 5.1.1, 5.1.2, 5.1.4, 5.1.6, 5.2.0, 5.2.1, 5.2.2, 5.2.4, 5.2.5, 5.3.1; Hossein Video: Video 5.1, 5.2, 5.5
+- Tsitsiklis: 2.5, 3.5; Tsitsiklis Video: Lecture 6, 7, 9
+- Prabha Video: Lecture 12, 13
+- Ross: 6.1 to 6.3, 7.2–7.4
+- Blitzstein: 7.1 to 7.3; Blitzstein Video: Lecture 18, 19, 20, 21
+
+</details>
+
+<details markdown="1">
+<summary>Lesson 2: Conditional and Marginal Random Variables</summary>
+
+- Hossein: 5.1.3, 5.2.3; Hossein Video: Video 5.3
+- Tsitsiklis: 2.6, 3.4; Tsitsiklis Video: Lecture 6, 7, 9
+- Prabha Video: Lecture 14, 15
+- Ross: 6.4, 6.5
+- Blitzstein: 7.1; Blitzstein Video: Lecture 19
+
+</details>
+
+<details markdown="1">
+<summary>Lesson 3: Conditional Expectation and Variance</summary>
+
+- Hossein: 5.1.5, 5.3; Hossein Video: Video 5.4, 5.6
+- Tsitsiklis: 2.6, 4.3; Tsitsiklis Video: Lecture 7, 12
+- Prabha Video: Lecture 17, 18
+- Ross: 7.5, 7.6
+- Blitzstein: 9.1 to 9.6; Blitzstein Video: Lecture 25, 26, 27
+
+</details>
+
+<details markdown="1">
+<summary>Lesson 4: Multinomial, Multivariate Normal, and Dirichlet Distributions</summary>
+
+- Hossein: 5.3.2, 6.1.1, 6.1.5; Hossein Video: —
+- Tsitsiklis: 4.7; Tsitsiklis Video: Lecture 6, 9
+- Prabha Video: Lecture 12, 14, 23
+- Ross: 7.8.1
+- Blitzstein: 7.4, 7.5; Blitzstein Video: Lecture 20, 30
+
+</details>
+
+<details markdown="1">
+<summary>Lesson 5: Functions of Multivariate Random Variables</summary>
+
+- Hossein: 6.0, 6.1, 6.3; Hossein Video: —
+- Tsitsiklis: 3.6, 4.2; Tsitsiklis Video: Lecture 10, 11
+- Prabha Video: Lecture 15, 24
+- Ross: 6.7
+- Blitzstein: 8.1, 8.2; Blitzstein Video: Lecture 22
+
+</details>
+
+<details markdown="1">
+<summary>Lesson 6: Order Statistics and Sampling Distributions</summary>
+
+- Hossein: —; Hossein Video: Video 2.5 (Ruin)
+- Tsitsiklis: —; Tsitsiklis Video: —
+- Prabha Video: Lecture 15, 16
+- Ross: 6.6, 7.8.2
+- Blitzstein: 8.6, 10.4; Blitzstein Video: Lecture 25, 30
+
+</details>
+
+<details markdown="1">
+<summary>Chapter 5: Problem Set (Level 1)</summary>
+Access the problem set from the corresponding section in the free ebook book in two steps: (1) [Join the Google Group](https://groups.google.com/a/srijitmukherjee.com/g/srijit.math), (2) [Download here](https://drive.google.com/file/d/1LReaop5oe3w_WITddb4_RdcxuuBRKSdz/view?usp=drive_link). (3) Go to the relevant section (Chapter and Level) from the table of contents.
+</details>
+
+<details markdown="1">
+<summary>Chapter 5: Problem Set (Level 2)</summary>
+Access the problem set from the corresponding section in the free ebook book in two steps: (1) [Join the Google Group](https://groups.google.com/a/srijitmukherjee.com/g/srijit.math), (2) [Download here](https://drive.google.com/file/d/1LReaop5oe3w_WITddb4_RdcxuuBRKSdz/view?usp=drive_link). (3) Go to the relevant section (Chapter and Level) from the table of contents.
+</details>
+
+### Chapter 3-5: Random Variables and Expectation
+
+<details markdown="1">
+<summary>Miscellaneous Chapter 3-5: Problem Set (Level 1)</summary>
+Access the problem set from the corresponding section in the free ebook book in two steps: (1) [Join the Google Group](https://groups.google.com/a/srijitmukherjee.com/g/srijit.math), (2) [Download here](https://drive.google.com/file/d/1LReaop5oe3w_WITddb4_RdcxuuBRKSdz/view?usp=drive_link). (3) Go to the relevant section (Chapter and Level) from the table of contents.
+</details>
+
+<details markdown="1">
+<summary>Miscellaneous Chapter 3-5: Problem Set (Level 2)</summary>
+Access the problem set from the corresponding section in the free ebook book in two steps: (1) [Join the Google Group](https://groups.google.com/a/srijitmukherjee.com/g/srijit.math), (2) [Download here](https://drive.google.com/file/d/1LReaop5oe3w_WITddb4_RdcxuuBRKSdz/view?usp=drive_link). (3) Go to the relevant section (Chapter and Level) from the table of contents.
+</details>
+
+
+
+### Chapter 6: Limit Theorems
+
+<details markdown="1">
+<summary>Lesson 1: Convergence of Random Variables</summary>
+
+- Hossein: 7.2; Hossein Video: —
+- Tsitsiklis: 7.1 to 7.3, 7.5; Tsitsiklis Video: —
+- Prabha Video: Lecture 20
+- Ross: 8.1 to 8.4
+- Blitzstein: 10.1 to 10.4; Blitzstein Video: Lecture 29
+
+</details>
+
+<details markdown="1">
+<summary>Lesson 2: Convergence in Distribution and the Central Limit Theorem (CLT)</summary>
+
+- Hossein: 7.2.4, 7.1.2; Hossein Video: —
+- Tsitsiklis: 7.4; Tsitsiklis Video: —
+- Prabha Video: Lecture 21, 22
+- Ross: 8.3
+- Blitzstein: 10.3; Blitzstein Video: Lecture 29
+
+</details>
+
+<details markdown="1">
+<summary>Lesson 3: Convergence in Probability and the Weak Law of Large Numbers (WLLN)</summary>
+
+- Hossein: 7.2.5, 7.1.1; Hossein Video: —
+- Tsitsiklis: 7.2, 7.3; Tsitsiklis Video: —
+- Prabha Video: Lecture 23
+- Ross: 8.2
+- Blitzstein: 10.2; Blitzstein Video: Lecture 29
+
+</details>
+
+<details markdown="1">
+<summary>Chapter 6: Problem Set (Level 1)</summary>
+Access the problem set from the corresponding section in the free ebook book in two steps: (1) [Join the Google Group](https://groups.google.com/a/srijitmukherjee.com/g/srijit.math), (2) [Download here](https://drive.google.com/file/d/1LReaop5oe3w_WITddb4_RdcxuuBRKSdz/view?usp=drive_link). (3) Go to the relevant section (Chapter and Level) from the table of contents.
+</details>
+
+<details markdown="1">
+<summary>Chapter 6: Problem Set (Level 2)</summary>
+Access the problem set from the corresponding section in the free ebook book in two steps: (1) [Join the Google Group](https://groups.google.com/a/srijitmukherjee.com/g/srijit.math), (2) [Download here](https://drive.google.com/file/d/1LReaop5oe3w_WITddb4_RdcxuuBRKSdz/view?usp=drive_link). (3) Go to the relevant section (Chapter and Level) from the table of contents.
+</details>
+
+
+<!-- Please read each of the following components of the course before you start learning so that you can track and measure your progress for good.
 
 <details markdown="1">
 <summary><strong>Machine Learning vs Quant Finance</strong></summary>
@@ -37,19 +427,6 @@ This course is built upon fundamental probability courses and books available on
 - *Introduction to Probability* by Jessica Hwang and Joseph K. Blitzstein, [Video Course](https://stat110.hsites.harvard.edu/youtube)
 
 Blitzstein is the hardest, and hence the most useful book to reach the mastery of Level 2. Hossein Pishro-Nik, John N. Tsitsiklis, and Joseph K. Blitzstein have their video courses, which is awesome for any level of a student.
-
-</details>
-
-<details markdown="1">
-<summary><strong>Advanced Resources</strong></summary>
-
-Often many advanced students want to learn probability through a measure theoretic lens or in a more abstract fashion. For them, I suggest the following resources.
-
-- *An Introduction to Probability and Statistics* by Vijay K. Rohatgi and A.K. Md. Ehsanes Saleh
-- [EE5110: Probability Foundations for Electrical Engineers (IIT Madras)](https://www.ee.iitm.ac.in/~krishnaj/ee5110notes.htm), [Video Course](https://www.youtube.com/watch?v=MqJGlPF0dhw&list=PLVhKOwOM3oudtpQG7jf6WrS1GqxTskXsP&index=22)
-- [MTL601: Measure Theoretic Probability (IIT Delhi)](https://web.iitd.ac.in/~dharmar/MTL601/main.htm), [Video Course](https://www.youtube.com/watch?v=1NPBMF2T8Iw&list=PLp6ek2hDcoNBtK-hVSSPlbBzfxXwWON4x&index=3)
-
-These advanced resources are not required for problem solving purposes, but this can help in building your foundations for Probability II - Random Processes, Stochastic Calculus, Stochastic Differential Equations.
 
 </details>
 
@@ -116,367 +493,4 @@ To reiterate, in the first case it can help you connect with your basics in high
 
 </details>
 
-The problem sets' links will go to instagram directly. Use it wisely to ask doubts to me. The problem sets will be available soon within the next few weeks. Thanks for your patience. Let's give some names to each of the resources.
-
-- **Hossein** (Level 1): *Introduction to Probability, Statistics, and Random Processes* by Hossein Pishro-Nik ([ProbabilityCourse.com](https://www.probabilitycourse.com))
-- **Hossein Video** (Level 1): [Video Course](https://www.probabilitycourse.com/videos/videos.php)
-- **Tsitsiklis** (Level 1): *Introduction to Probability* by Dimitri P. Bertsekas and John N. Tsitsiklis
-- **Tsitsiklis Video** (Level 1): [Video Course](https://ocw.mit.edu/courses/6-041-probabilistic-systems-analysis-and-applied-probability-fall-2010/), [Youtube with Tutorials](https://www.youtube.com/playlist?list=PLUl4u3cNGP60A3XMwZ5sep719_nh95qOe)
-- **Prabha Video** (Level 1): [Probability Theory and Applications](https://nptel.ac.in/courses/111104079), IIT Kanpur, Prof. Prabha Sharma
-- **Ross** (Level 2): *A First Course in Probability* by Sheldon M. Ross
-- **Blitzstein** (Level 2): *Introduction to Probability* by Jessica Hwang and Joseph K. Blitzstein,
-- **Blitzstein Video** (Level 2): [Video Course](https://stat110.hsites.harvard.edu/youtube)
-
-## Chapter 1: Classical Probability and Combinatorics
-
-### Lesson 1: Set Theory and Classical Probability Model
-
-<details markdown="1">
-<summary>Lesson 1: Conceptual Resources</summary>
-
-- Hossein: 1.0-1.2, 1.5; Hossein Video: Video 1.1, 1.2
-- Tsitsiklis: 1.1; Tsitsiklis Video: Lecture 1
-- Prabha Video: Lecture 1
-- Ross: —
-- Blitzstein: 1.1 to 1.3; Blitzstein Video: Lecture 1
-
-</details>
-
-Lesson 1: Problem Set (Level 1)
-
-### Lesson 2: Counting Principles, Permutations, and Combinations
-
-<details markdown="1">
-<summary>Lesson 2: Conceptual Resources</summary>
-
-- Hossein: 2; Hossein Video: Video 2.1, 2.2, 2.3
-- Tsitsiklis: 1.6 (early); Tsitsiklis Video: Lecture 4
-- Prabha Video: Lecture 1
-- Ross: 1.1 to 1.4
-- Blitzstein: 1.4 (early); Blitzstein Video: Lecture 1
-
-</details>
-
-Lesson 2: Problem Set (Level 1)
-
-### Lesson 3: Binomial, Multinomial, and Stars and Bars Counting
-
-<details markdown="1">
-<summary>Lesson 3: Conceptual Resources</summary>
-
-- Hossein: 2; Hossein Video: Video 2.3, 2.4
-- Tsitsiklis: 1.6 (later); Tsitsiklis Video: Lecture 4
-- Prabha Video: Lecture 1
-- Ross: 1.4 to 1.6
-- Blitzstein: 1.4 (later), 1.5; Blitzstein Video: Lecture 2
-
-</details>
-
-Lesson 3: Problem Set (Level 1)
-
-### Chapter 1: Problem Set (Level 2)
-
-## Chapter 2: Axiomatic and Conditional Probability
-
-### Lesson 1: Axiomatic Probability Model
-
-<details markdown="1">
-<summary>Lesson 1: Conceptual Resources</summary>
-
-- Hossein: 1.3, 1.5; Hossein Video: Video 1.3, 1.4
-- Tsitsiklis: 1.2; Tsitsiklis Video: Lecture 1
-- Prabha Video: Lecture 2
-- Ross: 2.1 to 2.7
-- Blitzstein: 1.6, 1.7; Blitzstein Video: Lecture 2, 3
-
-</details>
-
-Lesson 1: Problem Set (Level 1)
-
-### Lesson 2: Conditional Probability and Independence
-
-<details markdown="1">
-<summary>Lesson 2: Conceptual Resources</summary>
-
-- Hossein: 1.4, 1.5; Hossein Video: Video 1.5, 1.6, 1.7
-- Tsitsiklis: 1.3 (early); Tsitsiklis Video: Lecture 2, 3
-- Prabha Video: Lecture 3
-- Ross: 3.1, 3.2
-- Blitzstein: 2.1, 2.2; Blitzstein Video: Lecture 4, 5
-
-</details>
-
-Lesson 2: Problem Set (Level 1)
-
-### Lesson 3: Laws of Conditional Probability and Bayes' Theorem
-
-<details markdown="1">
-<summary>Lesson 3: Conceptual Resources</summary>
-
-- Hossein: 1.4; Hossein Video: Video 1.8, 1.9, 1.10
-- Tsitsiklis: 1.3 (later), 1.4; Tsitsiklis Video: Lecture 2
-- Prabha Video: Lecture 3
-- Ross: 3.3 to 3.5
-- Blitzstein: 2.3 to 2.7; Blitzstein Video: Lecture 4, 5, 6
-
-</details>
-
-Lesson 3: Problem Set (Level 1)
-
-### Chapter 2: Problem Set (Level 2)
-
-## Chapter 3: Discrete Distributions and Moments
-
-### Lesson 1: Discrete Random Variables, PMFs, and Moments
-
-<details markdown="1">
-<summary>Lesson 1: Conceptual Resources</summary>
-
-- Hossein: 3.1, 3.2, 3.3; Hossein Video: Video 3.1, 3.2, 3.6
-- Tsitsiklis: 2.1 to 2.4; Tsitsiklis Video: Lecture 5
-- Prabha Video: Lecture 4
-- Ross: 4.1 to 4.5
-- Blitzstein: 3.1, 3.2; Blitzstein Video: Lecture 7, 8, 9
-
-</details>
-
-Lesson 1: Problem Set (Level 1)
-
-### Lesson 2: Standard Discrete Random Variables
-
-<details markdown="1">
-<summary>Lesson 2: Conceptual Resources</summary>
-
-- Hossein: 3.1.5, 3.3; Hossein Video: Video 3.3, 3.4
-- Tsitsiklis: 2.2; Tsitsiklis Video: Lecture 6
-- Prabha Video: Lecture 5, 6, 7
-- Ross: 4.6 to 4.9
-- Blitzstein: 3.3 to 3.5; Blitzstein Video: Lecture 7, 8, 9, 10, 11
-
-</details>
-
-Lesson 2: Problem Set (Level 1)
-
-### Lesson 3: Cumulative Distribution Functions (CDFs)
-
-<details markdown="1">
-<summary>Lesson 3: Conceptual Resources</summary>
-
-- Hossein: 3.1, 3.3; Hossein Video: Video 3.5
-- Tsitsiklis: 2.3, 3.2; Tsitsiklis Video: Lecture 5, 8
-- Prabha Video: Lecture 4, 5
-- Ross: 4.1
-- Blitzstein: 3.6; Blitzstein Video: Lecture 8
-
-</details>
-
-Lesson 3: Problem Set (Level 1)
-
-### Chapter 3: Problem Set (Level 2)
-
-## Chapter 4: Continuous Distributions and Moments
-
-### Lesson 1: Continuous Random Variables, PDFs, and Moments
-
-<details markdown="1">
-<summary>Lesson 1: Conceptual Resources</summary>
-
-- Hossein: 4.0, 4.1, 4.4; Hossein Video: Video 4.1, 4.2, 4.3
-- Tsitsiklis: 3.1; Tsitsiklis Video: Lecture 8
-- Prabha Video: Lecture 8, 9, 10
-- Ross: 5.1, 5.2
-- Blitzstein: 5.1; Blitzstein Video: Lecture 12
-
-</details>
-
-Lesson 1: Problem Set (Level 1)
-
-### Lesson 2: Standard Continuous Random Variables
-
-<details markdown="1">
-<summary>Lesson 2: Conceptual Resources</summary>
-
-- Hossein: 4.2, 4.4; Hossein Video: Video 4.7, 4.8, 4.9
-- Tsitsiklis: 3.3; Tsitsiklis Video: Lecture 8
-- Prabha Video: Lecture 8, 9, 10
-- Ross: 5.3 to 5.6
-- Blitzstein: 5.2, 5.4, 5.5; Blitzstein Video: Lecture 12, 13, 14, 16
-
-</details>
-
-Lesson 2: Problem Set (Level 1)
-
-### Lesson 3: Revisiting CDFs and Mixed Random Variables
-
-<details markdown="1">
-<summary>Lesson 3: Conceptual Resources</summary>
-
-- Hossein: 4.3, 4.4; Hossein Video: Video 4.10, 4.11, 4.12
-- Tsitsiklis: 3.2; Tsitsiklis Video: Lecture 8
-- Prabha Video: Lecture 8, 9, 10
-- Ross: 4.10, 5.1
-- Blitzstein: 3.6, 5.3; Blitzstein Video: Lecture 8, 12
-
-</details>
-
-Lesson 3: Problem Set (Level 1)
-
-### Lesson 4: Functions of Univariate Random Variables
-
-<details markdown="1">
-<summary>Lesson 4: Conceptual Resources</summary>
-
-- Hossein: 3.2.3, 4.1.3; Hossein Video: Video 3.8, 4.5, 4.6
-- Tsitsiklis: 3.6; Tsitsiklis Video: Lecture 10, 11
-- Prabha Video: Lecture 11
-- Ross: 5.7
-- Blitzstein: 8.1; Blitzstein Video: Lecture 22
-
-</details>
-
-Lesson 4: Problem Set (Level 1)
-
-### Chapter 4: Problem Set (Level 2)
-
-## Chapter 5: Multivariate Distributions and Moments
-
-### Lesson 1: Joint (Multivariate) Random Variables and Moments
-
-<details markdown="1">
-<summary>Lesson 1: Conceptual Resources</summary>
-
-- Hossein: 5.1.0, 5.1.1, 5.1.2, 5.1.4, 5.1.6, 5.2.0, 5.2.1, 5.2.2, 5.2.4, 5.2.5, 5.3.1; Hossein Video: Video 5.1, 5.2, 5.5
-- Tsitsiklis: 2.5, 3.5; Tsitsiklis Video: Lecture 6, 7, 9
-- Prabha Video: Lecture 12, 13
-- Ross: 6.1 to 6.3, 7.2–7.4
-- Blitzstein: 7.1 to 7.3; Blitzstein Video: Lecture 18, 19, 20, 21
-
-</details>
-
-Lesson 1: Problem Set (Level 1)
-
-### Lesson 2: Conditional and Marginal Random Variables
-
-<details markdown="1">
-<summary>Lesson 2: Conceptual Resources</summary>
-
-- Hossein: 5.1.3, 5.2.3; Hossein Video: Video 5.3
-- Tsitsiklis: 2.6, 3.4; Tsitsiklis Video: Lecture 6, 7, 9
-- Prabha Video: Lecture 14, 15
-- Ross: 6.4, 6.5
-- Blitzstein: 7.1; Blitzstein Video: Lecture 19
-
-</details>
-
-Lesson 2: Problem Set (Level 1)
-
-### Lesson 3: Conditional Expectation and Variance
-
-<details markdown="1">
-<summary>Lesson 3: Conceptual Resources</summary>
-
-- Hossein: 5.1.5, 5.3; Hossein Video: Video 5.4, 5.6
-- Tsitsiklis: 2.6, 4.3; Tsitsiklis Video: Lecture 7, 12
-- Prabha Video: Lecture 17, 18
-- Ross: 7.5, 7.6
-- Blitzstein: 9.1 to 9.6; Blitzstein Video: Lecture 25, 26, 27
-
-</details>
-
-Lesson 3: Problem Set (Level 1)
-
-### Lesson 4: Multinomial, Multivariate Normal, and Dirichlet Distributions
-
-<details markdown="1">
-<summary>Lesson 4: Conceptual Resources</summary>
-
-- Hossein: 5.3.2, 6.1.1, 6.1.5; Hossein Video: —
-- Tsitsiklis: 4.7; Tsitsiklis Video: Lecture 6, 9
-- Prabha Video: Lecture 12, 14, 23
-- Ross: 7.8.1
-- Blitzstein: 7.4, 7.5; Blitzstein Video: Lecture 20, 30
-
-</details>
-
-Lesson 4: Problem Set (Level 1)
-
-### Lesson 5: Functions of Multivariate Random Variables
-
-<details markdown="1">
-<summary>Lesson 5: Conceptual Resources</summary>
-
-- Hossein: 6.0, 6.1, 6.3; Hossein Video: —
-- Tsitsiklis: 3.6, 4.2; Tsitsiklis Video: Lecture 10, 11
-- Prabha Video: Lecture 15, 24
-- Ross: 6.7
-- Blitzstein: 8.1, 8.2; Blitzstein Video: Lecture 22
-
-</details>
-
-Lesson 5: Problem Set (Level 1)
-
-### Lesson 6: Order Statistics and Sampling Distributions
-
-<details markdown="1">
-<summary>Lesson 6: Conceptual Resources</summary>
-
-- Hossein: —; Hossein Video: Video 2.5 (Ruin)
-- Tsitsiklis: —; Tsitsiklis Video: —
-- Prabha Video: Lecture 15, 16
-- Ross: 6.6, 7.8.2
-- Blitzstein: 8.6, 10.4; Blitzstein Video: Lecture 25, 30
-
-</details>
-
-Lesson 6: Problem Set (Level 1)
-
-### Chapter 5: Problem Set (Level 2)
-
-## Chapter 6: Limit Theorems
-
-### Lesson 1: Convergence of Random Variables
-
-<details markdown="1">
-<summary>Lesson 1: Conceptual Resources</summary>
-
-- Hossein: 7.2; Hossein Video: —
-- Tsitsiklis: 7.1 to 7.3, 7.5; Tsitsiklis Video: —
-- Prabha Video: Lecture 20
-- Ross: 8.1 to 8.4
-- Blitzstein: 10.1 to 10.4; Blitzstein Video: Lecture 29
-
-</details>
-
-Lesson 1: Problem Set (Level 1)
-
-### Lesson 2: Convergence in Distribution and the Central Limit Theorem (CLT)
-
-<details markdown="1">
-<summary>Lesson 2: Conceptual Resources</summary>
-
-- Hossein: 7.2.4, 7.1.2; Hossein Video: —
-- Tsitsiklis: 7.4; Tsitsiklis Video: —
-- Prabha Video: Lecture 21, 22
-- Ross: 8.3
-- Blitzstein: 10.3; Blitzstein Video: Lecture 29
-
-</details>
-
-Lesson 2: Problem Set (Level 1)
-
-### Lesson 3: Convergence in Probability and the Weak Law of Large Numbers (WLLN)
-
-<details markdown="1">
-<summary>Lesson 3: Conceptual Resources</summary>
-
-- Hossein: 7.2.5, 7.1.1; Hossein Video: —
-- Tsitsiklis: 7.2, 7.3; Tsitsiklis Video: —
-- Prabha Video: Lecture 23
-- Ross: 8.2
-- Blitzstein: 10.2; Blitzstein Video: Lecture 29
-
-</details>
-
-Lesson 3: Problem Set (Level 1)
-
-### Chapter 6: Problem Set (Level 2)
+The problem sets' links will go to instagram directly. Use it wisely to ask doubts to me. The problem sets will be available soon within the next few weeks. Thanks for your patience. Let's give some names to each of the resources.-->

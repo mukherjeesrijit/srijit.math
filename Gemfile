@@ -5,6 +5,9 @@ source "https://rubygems.org"
 #
 #     bundle exec jekyll serve
 gem "jekyll", "~> 4.3.4"
+gem "logger"
+gem "csv"
+gem "base64"
 
 # Plugins
 group :jekyll_plugins do

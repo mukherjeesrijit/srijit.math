@@ -5,24 +5,16 @@ title: Courses
 
 <div class="course-book">
 
-<img src="{{ '/assets/img/book_cover.png' | relative_url }}" alt="Book Cover">
+<img src="{{ '/assets/img/book_covers.png' | relative_url }}" alt="Book Cover">
 
 <div class="course-book-buttons">
 
 <a class="course-book-button join"
    href="https://groups.google.com/a/srijitmukherjee.com/g/srijit.math"
    target="_blank">
-Step 1: Join for Free
-</a>
-
-<a class="course-book-button download"
-   href="https://drive.google.com/file/d/1LReaop5oe3w_WITddb4_RdcxuuBRKSdz/view?usp=drive_link"
-   target="_blank">
-Step 2: Download
+Join and Download
 </a>
 
 </div>
 
 </div>
-
-Before panicking that you didn't get access, please make sure that you have followed the first step to join the google group. Once you join, then click on the second button to get access.

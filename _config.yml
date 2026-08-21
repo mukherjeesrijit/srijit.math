@@ -12,9 +12,9 @@ header:
   pages:
     # - name: Kali
     #   slug: /kali/
-    - name: Courses
-      slug: /
-    - name: About
+    # - name: Courses
+    #   slug: /
+    # - name: About
     # - name: CV
     #   slug: /assets/MyCV_MukherjeeSrijit.pdf
     # - name: Publications

@@ -1,7 +1,7 @@
 ---
 # layout: courses
 # title: Courses
-layout: home
+layout: blog
 title: Foolish Me and My Mathematics!
 ---
 

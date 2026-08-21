@@ -1,9 +1,11 @@
 ---
-layout: courses
-title: Courses
+# layout: courses
+# title: Courses
+layout: blog
+title: Home
 ---
 
-Mathematics taught me how to love and how to live. Out of that love, and my zeal to persevere through the delicate intricacies of life, I write about mathematics, machine learning, and more. You can know about my professional journey here. Now time for some foolishness.
+Mathematics held me hand and taught me how to love and how to live. Out of that love, and my zeal to persevere through the delicate intricacies of life, I write about mathematics, machine learning, and more. You can know about my professional journey here. Now time for some foolishness. In the beginning, I [write by hand](https://drive.google.com/file/d/1GeFjfICOjKTlV8YP3zTviW1JSwgj669z/view?usp=drive_link) and then use Gemini to change it into latex for better readability (because people cannot stand my handwriting. XD)
 
 # August 2026
 * [20 August 2026](https://drive.google.com/file/d/1y2dfzJrtoQUpwW9X9iR3Gu6nQqsBlmgr/view?usp=drive_link) 

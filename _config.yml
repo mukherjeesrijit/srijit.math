@@ -14,7 +14,8 @@ header:
     #   slug: /kali/
     # - name: Courses
     #   slug: /
-    # - name: About
+    - name: About
+      slug: https://srijitmukherjee.com/
     # - name: CV
     #   slug: /assets/MyCV_MukherjeeSrijit.pdf
     # - name: Publications

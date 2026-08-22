@@ -5,7 +5,7 @@ layout: blog
 title: Foolish Me and My Mathematics!
 ---
 
-Mathematics held me hand and taught me how to love and how to live. Out of that love, and my stubborn zeal to persevere through the delicate intricacies of life - I write about mathematics, machine learning, $+ \epsilon$. You can know more about my [professional self here](https://srijitmukherjee.com/). Usually, I begin by [writing everything by hand](https://drive.google.com/file/d/1GeFjfICOjKTlV8YP3zTviW1JSwgj669z/view?usp=drive_link) and then use Gemini to change it into latex for the sake of readability (because people  cannot stand my cursive handwriting. Haha!).
+Mathematics held my hand and taught me how to love and how to live. Out of that love, and my stubborn zeal to persevere through the delicate intricacies of life - I write about mathematics, machine learning, $+ \epsilon$. You can know more about my [professional persona here](https://srijitmukherjee.com/). Usually, I begin by [writing everything by hand](https://drive.google.com/file/d/1GeFjfICOjKTlV8YP3zTviW1JSwgj669z/view?usp=drive_link) and then use Gemini to change it into latex for the sake of readability (because people cannot stand my cursive handwriting. Haha!).
 
 # August 2026
 * [22 August 2026 (Machine Learning)](https://drive.google.com/file/d/1vZCID8Nq2VsATSQMUId0aZL-0mprZS5l/view?usp=drive_link) 

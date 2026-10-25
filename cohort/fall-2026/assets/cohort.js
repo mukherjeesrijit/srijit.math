@@ -87,10 +87,14 @@
     const att = document.querySelector("[data-attended]");
     if (att) {
       get({ a: "attended" }).then((d) => {
-        if (!d.names || !d.names.length) return;
-        const shown = d.names.slice(0, 12).map((n) => "<b>" + n.replace(/</g, "&lt;") + "</b>").join(", ");
-        att.innerHTML = shown + (d.names.length > 12 ? " and " + (d.names.length - 12) + " others" : "") +
-          " attended today · " + d.visitors + " learner" + (d.visitors === 1 ? "" : "s") + " here today";
+        const parts = [];
+        const en = document.querySelector("[data-enrolled]"); // live count, once it passes the published one
+        if (en && d.enrolled > Number(en.textContent.replace(/,/g, ""))) en.textContent = d.enrolled.toLocaleString();
+        if (d.names && d.names.length) {
+          const shown = d.names.slice(0, 12).map((n) => "<b>" + n.replace(/</g, "&lt;") + "</b>").join(", ");
+          parts.push(shown + (d.names.length > 12 ? " and " + (d.names.length - 12) + " others" : "") + " attended today");
+        }
+        if (parts.length) att.innerHTML = parts.join(" · ");
       }).catch(() => {});
     }
   }
@@ -130,6 +134,18 @@
     open = null; panel.hidden = true;
     actions.querySelectorAll("button").forEach((b) => b.setAttribute("aria-expanded", "false"));
   }
+  let loading = null; // the content request, started as soon as a signed-in learner opens the page
+  function load() {
+    if (!loading) {
+      loading = get({ a: "content", id: actions.dataset.id, session: user.session }).then((d) => {
+        if (d.error === "session") { signOut(); loading = null; return null; }
+        content = d.ok ? d : {};
+        return content;
+      }).catch(() => { loading = null; return null; });
+    }
+    return loading;
+  }
+  if (actions && user && API) signingIn.then(() => user && load());
   if (actions) {
     actions.addEventListener("click", (e) => {
       const b = e.target.closest("button[data-gate]");
@@ -138,13 +154,17 @@
       const kind = b.dataset.gate;
       if (open === kind) return close();
       if (content) return show(kind);
+      // still on its way: open the panel at once so the click visibly does something
+      open = kind;
+      actions.querySelectorAll("button").forEach((x) => x.setAttribute("aria-expanded", x.dataset.gate === kind));
+      panel.innerHTML = "<h2>" + TITLES[kind] + "</h2><p class=\"soon\">Loading…</p>";
+      panel.hidden = false;
       b.disabled = true;
-      get({ a: "content", id: actions.dataset.id, session: user.session })
-        .then((d) => {
-          if (d.error === "session") { signOut(); askToEnrol(); return; }
-          content = d.ok ? d : {}; show(kind);
+      load().then((c) => {
+          if (!user) { close(); askToEnrol(); return; }
+          if (!c) { toast("Couldn't load it. Please try again."); close(); return; }
+          if (open === kind) show(kind);
         })
-        .catch(() => toast("Couldn't load it. Please try again."))
         .finally(() => (b.disabled = false));
     });
   }

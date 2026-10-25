@@ -86,6 +86,14 @@
       .then((d) => { if (d && d.ok && user && !d.signedIn) signOut(); }).catch(() => {});
   }
 
+  // -- the learner count: live from the sheet, once it passes the published number ----------------------
+  const enrolled = document.querySelector("[data-enrolled]");
+  if (enrolled && API) {
+    get({ a: "attended" }).then((d) => {
+      if (d.enrolled > Number(enrolled.textContent.replace(/,/g, ""))) enrolled.textContent = d.enrolled.toLocaleString();
+    }).catch(() => {});
+  }
+
   // -- "<name> joined": real first names from the learner list, one at a time ------------------------
   const ticker = document.querySelector("[data-ticker]");
   if (ticker && API) {

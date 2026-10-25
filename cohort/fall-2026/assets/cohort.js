@@ -98,7 +98,7 @@
   const ticker = document.querySelector("[data-ticker]");
   if (ticker && API) {
     get({ a: "learners" }).then((d) => {
-      const names = (d.names || []).slice();
+      const names = (d.names || []).filter((n) => n.length >= 3); // no initials ("Kd")
       if (names.length < 2) return;
       const slot = ticker.querySelector("b");
       let k = 0;

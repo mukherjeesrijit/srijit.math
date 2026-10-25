@@ -99,6 +99,23 @@
     }
   }
 
+  // -- "Learning with us": real first names from the learner list, one at a time ------------------------
+  const ticker = document.querySelector("[data-ticker]");
+  if (ticker && API) {
+    get({ a: "learners" }).then((d) => {
+      const names = (d.names || []).slice();
+      if (names.length < 2) return;
+      const slot = ticker.querySelector("b");
+      let k = 0;
+      slot.textContent = names[0];
+      ticker.hidden = false;
+      setInterval(() => {
+        slot.classList.add("fade");
+        setTimeout(() => { k = (k + 1) % names.length; slot.textContent = names[k]; slot.classList.remove("fade"); }, 350);
+      }, 2600);
+    }).catch(() => {});
+  }
+
   // -- gated actions on a problem page: Story / Discussion / Video open below ---------------------------
   const actions = document.querySelector(".actions");
   const panel = document.querySelector(".panel");

@@ -1,5 +1,5 @@
 // Fall 2026 cohort pages: enrolment with a magic link (first name + email -> emailed one-time link -> session),
-// daily visits, who attended today, and gated content (discussion: story + steps, and video). The backend is a
+// daily visits, a rotating "<name> joined.", and gated content (discussion: story + steps, and video). The backend is a
 // Google Apps Script web app (window.COHORT.api); without it the problems still show.
 (function () {
   const API = (window.COHORT || {}).api;
@@ -80,26 +80,13 @@
     document.querySelectorAll("[data-guard]").forEach((el) => el.classList.toggle("locked", !user));
   }
 
-  // -- visits + who attended today ---------------------------------------------------------------------
+  // -- visits (private analytics) ----------------------------------------------------------------------
   if (API) {
     signingIn.then(() => post({ a: "visit", vid, session: user ? user.session : "", page: location.pathname }))
       .then((d) => { if (d && d.ok && user && !d.signedIn) signOut(); }).catch(() => {});
-    const att = document.querySelector("[data-attended]");
-    if (att) {
-      get({ a: "attended" }).then((d) => {
-        const parts = [];
-        const en = document.querySelector("[data-enrolled]"); // live count, once it passes the published one
-        if (en && d.enrolled > Number(en.textContent.replace(/,/g, ""))) en.textContent = d.enrolled.toLocaleString();
-        if (d.names && d.names.length) {
-          const shown = d.names.slice(0, 12).map((n) => "<b>" + n.replace(/</g, "&lt;") + "</b>").join(", ");
-          parts.push(shown + (d.names.length > 12 ? " and " + (d.names.length - 12) + " others" : "") + " attended today");
-        }
-        if (parts.length) att.innerHTML = parts.join(" · ");
-      }).catch(() => {});
-    }
   }
 
-  // -- "Learning with us": real first names from the learner list, one at a time ------------------------
+  // -- "<name> joined": real first names from the learner list, one at a time ------------------------
   const ticker = document.querySelector("[data-ticker]");
   if (ticker && API) {
     get({ a: "learners" }).then((d) => {

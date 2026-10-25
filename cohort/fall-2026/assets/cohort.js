@@ -115,17 +115,10 @@
       const id = (c.video_url || "").match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/);
       panel.insertAdjacentHTML("beforeend", id ? '<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/' +
         id[1] + '" allowfullscreen title="Video"></iframe></div>' : '<p class="soon">The video for this problem is coming soon.</p>');
-    } else if (c.story || c.solution || (c.handwritten || []).length) {
-      // the idea first, then the solution, then the handwritten solution (images from your Drive)
+    } else if (c.story || c.solution) {
+      // the idea first, then the solution
       if (c.story) { panel.insertAdjacentHTML("beforeend", "<h3>Idea</h3>"); paragraphs(c.story); }
       if (c.solution) { panel.insertAdjacentHTML("beforeend", "<h3>Solution</h3>"); paragraphs(c.solution); }
-      if ((c.handwritten || []).length) {
-        panel.insertAdjacentHTML("beforeend", "<h3>Handwritten solution</h3>");
-        c.handwritten.forEach((src) => {
-          const img = Object.assign(document.createElement("img"), { src, className: "hand", alt: "Handwritten solution" });
-          panel.appendChild(img);
-        });
-      }
     } else {
       panel.insertAdjacentHTML("beforeend", '<p class="soon">The discussion for this problem is coming soon.</p>');
     }

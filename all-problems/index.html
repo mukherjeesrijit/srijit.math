@@ -175,7 +175,7 @@ svg .bar { fill: var(--ok); }
         <div><h3>Topic map</h3><div class="diagram" id="map"></div>
           <p class="legend"><span><i class="dot locked"></i>locked</span><span><i class="dot ready"></i>open</span><span><i class="dot solved"></i>core done</span><span>faded: not ticked</span></p></div>
         <div><h3>This session</h3><div class="trail" id="trail"></div></div>
-        <form id="goto"><input id="goto-id" placeholder="Go to a problem id" aria-label="Problem id" autocomplete="off"><button class="btn ghost" type="submit">Go</button></form>
+        <form id="goto"><input id="goto-id" placeholder="Go to a problem, e.g. ALG-12" aria-label="Problem id" autocomplete="off"><button class="btn ghost" type="submit">Go</button></form>
       </aside>
     </div>
   </section>
@@ -255,12 +255,13 @@ svg .bar { fill: var(--ok); }
   }
 
   // -- the graph -------------------------------------------------------------------------------------------
-  let T, P, SK, byId, tix, kids, inTopic, sol, sel, cov, openT, state, cur = null, trail = [], skipped = new Set();
+  let byCode, T, P, SK, byId, tix, kids, inTopic, sol, sel, cov, openT, state, cur = null, trail = [], skipped = new Set();
   const TIER = ["", "warm-up", "core", "challenge"];
 
   function init(G, rows) {
     T = G.topics; P = G.problems; SK = G.skills;
     byId = new Map(P.map((p, i) => [p.id, i]));
+    byCode = new Map(P.map((p, i) => [p.cd, i]));
     tix = new Map(T.map((t, i) => [t.k, i]));
     kids = P.map(() => []);
     P.forEach((p, i) => { p.ai = p.a.map((a) => byId.get(a)).filter((j) => j != null); p.ai.forEach((j) => kids[j].push(i)); });
@@ -272,11 +273,16 @@ svg .bar { fill: var(--ok); }
     $("who-email").textContent = user.email; $("who").hidden = false;
     $("gate").hidden = true; $("app").hidden = false;
     compute(); renderTopics();
-    const fromHash = byId.get(decodeURIComponent(location.hash.slice(1)));
+    const fromHash = fromAddress();
     const last = byId.get(store.get("allp_last"));
     const first = fromHash != null ? { i: fromHash } : last != null && !cov.has(last) ? { i: last, why: "Where you left off" } : anywhere();
     if (first) show(first.i, first.why); else renderEmpty();
-    addEventListener("hashchange", () => { const i = byId.get(decodeURIComponent(location.hash.slice(1))); if (i != null && i !== cur) show(i); });
+    addEventListener("hashchange", () => { const i = fromAddress(); if (i != null && i !== cur) show(i); });
+  }
+
+  function fromAddress() { // #ALG-12 (older links may still carry the exam id)
+    const h = decodeURIComponent(location.hash.slice(1));
+    return byCode.get(h.toUpperCase()) ?? byId.get(h);
   }
 
   function compute() {
@@ -325,7 +331,7 @@ svg .bar { fill: var(--ok); }
     const back = [...sol].filter(([i, s]) => s.status === "stuck" && P[i].ai.includes(x) && P[i].ai.every((j) => cov.has(j))).map(([i]) => i);
     if (back.length) return { i: back[0], why: "Back to the one you were stuck on", back: true };
     const k = kids[x].filter((i) => isReady(i) && fresh(i));
-    if (k.length) { const i = pick(k), s = shared(i, x); return { i, why: "Unlocked by " + P[x].id + (s.length ? " · " + s[0] : "") }; }
+    if (k.length) { const i = pick(k), s = shared(i, x); return { i, why: "Unlocked by " + P[x].cd + (s.length ? " · " + s[0] : "") }; }
     return inSameTopic(x) || anywhere();
   }
   function whenStuck(x) {
@@ -334,7 +340,7 @@ svg .bar { fill: var(--ok); }
       for (const j of P[i].ai) { if (cov.has(j) || seen.has(j)) continue; seen.add(j);
         if (isReady(j)) found.push(j); else if (depth < 5) walk(j, depth + 1); }
     })(x, 0);
-    if (found.length) { const i = pick(found), s = shared(x, i); return { i, why: "Builds " + (s[0] || "the basics") + " for " + P[x].id, back: true }; }
+    if (found.length) { const i = pick(found), s = shared(x, i); return { i, why: "Builds " + (s[0] || "the basics") + " for " + P[x].cd, back: true }; }
     const easier = inTopic.get(P[x].t).filter((i) => isReady(i) && fresh(i) && P[i].d <= P[x].d && shared(i, x).length);
     if (easier.length) { const i = pick(easier); return { i, why: "Easier, also uses " + shared(i, x)[0], back: true }; }
     return inSameTopic(x) || anywhere();
@@ -421,10 +427,10 @@ svg .bar { fill: var(--ok); }
     const node = (j, x, y, sub, center) => {
       const g = sv("g", { class: "gn " + state[j] + (center ? " center" : "") });
       g.append(sv("rect", { class: "box", x, y, width: NW, height: NH, rx: 6 }));
-      g.append(sv("text", { class: "id", x: x + 9, y: y + 15 }, P[j].id + " · " + TIER[P[j].d]));
+      g.append(sv("text", { class: "id", x: x + 9, y: y + 15 }, P[j].cd + " · " + TIER[P[j].d]));
       g.append(sv("text", { x: x + 9, y: y + 30, "font-size": 11.5 }, clip(title(j), 32)));
       if (sub) g.append(sv("text", { class: "sm", x: x + 9, y: y + 43 }, clip(sub, 36)));
-      g.append(sv("title", {}, `${P[j].id} · ${TIER[P[j].d]} · ${state[j]}\n${title(j)}`));
+      g.append(sv("title", {}, `${P[j].cd} · ${TIER[P[j].d]} · ${state[j]}\n${title(j)}`));
       if (!center) clickable(g, () => show(j));
       return g;
     };
@@ -452,7 +458,7 @@ svg .bar { fill: var(--ok); }
     $("trail").replaceChildren(...trail.map((j) => {
       const b = document.createElement("button");
       b.type = "button"; b.title = title(j);
-      b.innerHTML = `<span class="dot ${state[j]}"></span>${P[j].id}`;
+      b.innerHTML = `<span class="dot ${state[j]}"></span>${P[j].cd}`;
       b.onclick = () => show(j);
       return b;
     }));
@@ -475,7 +481,7 @@ svg .bar { fill: var(--ok); }
     cur = i; why = reason ? { text: reason, back } : null;
     if (trail[0] !== i) trail = [i, ...trail.filter((j) => j !== i)].slice(0, 15);
     store.set("allp_last", P[i].id);
-    if (decodeURIComponent(location.hash.slice(1)) !== P[i].id) history.replaceState(null, "", "#" + P[i].id);
+    if (location.hash.slice(1) !== P[i].cd) history.replaceState(null, "", "#" + P[i].cd);
     renderProblem();
     scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -486,11 +492,11 @@ svg .bar { fill: var(--ok); }
     const label = { solved: "solved", credited: "covered by a harder solve", stuck: "stuck", draft: "draft saved", ready: "ready", locked: "locked" }[st];
     const draft = store.get("allp_draft_" + p.id);
     const text = draft != null ? draft : s ? s.text : "";
-    const missing = p.ai.filter((j) => !cov.has(j) && sel.has(P[j].t)).map((j) => P[j].id);
+    const missing = p.ai.filter((j) => !cov.has(j) && sel.has(P[j].t)).map((j) => P[j].cd);
     $("prob").innerHTML = `
       ${why ? `<p class="why${why.back ? " back" : ""}">${esc(why.text)}</p>` : ""}
       <p class="crumb"><span>${esc(t.ch)} › ${esc(t.full)}</span><span class="chip">${"●".repeat(p.d)}${"○".repeat(3 - p.d)} ${TIER[p.d]}</span><span class="chip ${st}">${label}</span></p>
-      <h1>${p.nm ? esc(p.nm) : "Problem"}<span class="mono">${p.id}</span></h1>
+      <h1>${p.nm ? esc(p.nm) : "Problem"}<span class="mono">${p.cd}</span></h1>
       ${p.c || p.v ? `<div class="links">${p.c ? `<a href="/cohort/fall-2026/${p.c}/">Cohort page →</a>` : ""}${p.v ? `<a href="${esc(p.v)}" target="_blank" rel="noopener">Your video ↗</a>` : ""}</div>` : ""}
       <div class="stmt">${stmtHTML(p.x)}</div>
       ${p.k.length ? `<div class="skills">${p.k.map((k) => `<span class="chip">${esc(SK[k])}</span>`).join("")}</div>` : ""}
@@ -555,7 +561,7 @@ svg .bar { fill: var(--ok); }
   $("goto").onsubmit = (e) => {
     e.preventDefault();
     const v = $("goto-id").value.trim().toUpperCase();
-    const i = byId.get(v) ?? P.findIndex((p) => p.id.toUpperCase() === v);
+    const i = byCode.get(v) ?? byId.get(v) ?? P.findIndex((p) => p.id.toUpperCase() === v);
     if (i != null && i >= 0) { $("goto-id").value = ""; show(i); } else toast("No problem with id " + v);
   };
 

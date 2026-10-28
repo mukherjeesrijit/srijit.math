@@ -244,7 +244,7 @@ svg .bar { fill: var(--ok); }
     signingIn.then(() => {
       if (!user || !API) return gate("g-form");
       gate("g-load");
-      get({ a: "graph", session: user.session }).then((d) => {
+      post({ a: "graph", session: user.session }).then((d) => {
         if (d.ok) return init(d.graph, d.solutions);
         if (d.error === "owner") return gate("g-no");
         if (!d.error) return gate("g-form", "The backend is still the old version. In Apps Script: paste the new Code.gs, then Deploy > Manage deployments > edit > New version > Deploy. Then reload this page.");

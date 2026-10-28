@@ -149,7 +149,7 @@
   let loading = null; // the content request, started as soon as a signed-in learner opens the page
   function load() {
     if (!loading) {
-      loading = get({ a: "content", id: actions.dataset.id, session: user.session }).then((d) => {
+      loading = post({ a: "content", id: actions.dataset.id, session: user.session }).then((d) => {
         if (d.error === "session") { signOut(); loading = null; return null; }
         content = d.ok ? d : {};
         return content;

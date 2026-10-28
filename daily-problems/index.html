@@ -81,7 +81,7 @@ input:focus { border-color: var(--ink); outline: none; }
     <p class="hand">Solve 1–5 problems daily, by hand.<span id="steps" aria-live="polite"></span></p>
     <div id="solve" class="app">
       <article class="prob" id="prob"></article>
-      <div class="actions">
+      <div class="actions" id="acts">
         <button type="button" class="btn ok" id="b-solved">Solved</button>
         <button type="button" class="btn ghost" id="b-not">Not solved</button>
         <button type="button" class="btn ghost" id="b-next">Next problem</button>
@@ -164,22 +164,24 @@ input:focus { border-color: var(--ink); outline: none; }
   }
   function steps() { $("steps").textContent = `${k + 1} / ${total}`; }
   function buttons(on) { ["b-solved", "b-not", "b-next"].forEach((id) => ($(id).disabled = !on)); }
+  function nothing(text) { $("prob").className = "prob wait"; $("prob").textContent = text; $("acts").hidden = true; $("steps").textContent = ""; }
 
   function open(j) {
     k = j;
     $("solve").hidden = false; $("end").hidden = true;
-    steps(); buttons(false);
+    steps(); buttons(false); $("acts").hidden = false;
     $("prob").className = "prob wait"; $("prob").textContent = "Loading…";
     post({ a: "daily", session: user.session, k: j }).then((d) => {
       if (!d.ok) {
         if (d.error === "session") { user = null; store.set("cohort_user", null); return gate("g-form", "Please sign in again."); }
-        $("prob").textContent = "Today's problems aren't ready yet. Please try again a little later."; return;
+        return nothing("Today's problems aren't ready yet. Please try again a little later.");
       }
-      if (!d.total) { $("prob").textContent = "No problems today. Check back tomorrow."; return; }
+      if (d.total === 0) return nothing("No problems today. Check back tomorrow.");
+      if (typeof d.statement !== "string") return nothing("Today's problems aren't ready yet. Please try again a little later.");
       if (d.total !== total) { total = d.total; keep(); steps(); }
       $("prob").className = "prob"; $("prob").innerHTML = stmtHTML(d.statement); math($("prob"));
       buttons(true);
-    }).catch(() => { $("prob").textContent = "Couldn't load the problem. Check your connection and try again."; buttons(true); });
+    }).catch(() => nothing("Couldn't load the problem. Check your connection and reload the page."));
   }
   // the next problem not yet marked, after j (wrapping round); none left -> the end screen
   function nextOpen(j) {

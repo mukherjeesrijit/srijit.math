@@ -62,7 +62,8 @@ input:focus, textarea:focus { border-color: var(--ink); outline: none; }
 .stats { color: var(--muted); font-size: .9rem; margin: 14px 0 18px; font-variant-numeric: tabular-nums; }
 
 /* problem + side */
-.layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 36px; align-items: start; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 480px; gap: 36px; align-items: start; }
+@media (max-width: 1100px) { .layout { grid-template-columns: minmax(0, 1fr) 400px; } }
 @media (max-width: 600px) { #who-email { display: none; } .top { flex-wrap: wrap; } }
 @media (max-width: 880px) { .layout { grid-template-columns: minmax(0, 1fr); } main { padding: 18px 16px 64px; } .top { padding: 12px 16px; } }
 .prob { display: grid; gap: 14px; min-width: 0; }
@@ -101,6 +102,36 @@ input:focus, textarea:focus { border-color: var(--ink); outline: none; }
 .node:hover { background: var(--soft); }
 .node .tx { overflow-wrap: anywhere; }
 .node small { display: block; color: var(--muted); }
+.diagram { overflow-x: auto; }
+.diagram svg { display: block; width: 100%; height: auto; }
+#pgraph svg { min-width: 560px; }
+.gh { margin: 8px 0 6px; font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+svg text { font-family: "Inter", -apple-system, "Segoe UI", sans-serif; fill: var(--ink); }
+svg .sm { font-size: 10px; fill: var(--muted); }
+svg .id { font-family: var(--mono); font-size: 10.5px; }
+svg .edge { fill: none; stroke: #d6d6da; stroke-width: 1.3; }
+svg .edge.hot { stroke: var(--accent); stroke-width: 1.8; }
+svg .arrow { fill: #9a9aa0; }
+svg .gn { cursor: pointer; }
+svg .gn rect.box { fill: var(--bg); stroke: #cfcfd3; stroke-width: 1.2; }
+svg .gn.locked rect.box { fill: var(--soft); }
+svg .gn.locked text { fill: var(--muted); }
+svg .gn.ready rect.box, svg .gn.draft rect.box { stroke: var(--accent); }
+svg .gn.solved rect.box, svg .gn.credited rect.box, svg .gn.done rect.box { fill: var(--ok-soft); stroke: var(--ok); }
+svg .gn.stuck rect.box { fill: var(--stuck-soft); stroke: var(--stuck); }
+svg .gn.off { opacity: .4; }
+svg .gn.sel rect.box { stroke: var(--ink); stroke-width: 2.2; }
+svg .gn:hover rect.box { stroke: var(--ink); }
+svg .gn.center { cursor: default; }
+svg .gn.center rect.box { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+svg .bar-bg { fill: var(--line); }
+svg .bar { fill: var(--ok); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .78rem; color: var(--muted); margin: 6px 0 0; }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.trail { display: flex; flex-wrap: wrap; gap: 6px; }
+.trail button { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: none; border-radius: 999px;
+  padding: 2px 10px; font-family: var(--mono); font-size: .78rem; }
+.trail button:hover { border-color: var(--ink); }
 .dot { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid #c9c9cd; display: inline-block; }
 .dot.ready, .dot.draft { border-color: var(--accent); }
 .dot.solved, .dot.credited { background: var(--ok); border-color: var(--ok); }
@@ -141,9 +172,9 @@ input:focus, textarea:focus { border-color: var(--ink); outline: none; }
     <div class="layout">
       <article class="prob" id="prob"></article>
       <aside class="side">
-        <div><h3>Comes after</h3><ul id="after"></ul></div>
-        <div><h3>Unlocks</h3><ul id="unlocks"></ul></div>
-        <div><h3>This session</h3><ol id="trail"></ol></div>
+        <div><h3>Topic map</h3><div class="diagram" id="map"></div>
+          <p class="legend"><span><i class="dot locked"></i>locked</span><span><i class="dot ready"></i>open</span><span><i class="dot solved"></i>core done</span><span>faded: not ticked</span></p></div>
+        <div><h3>This session</h3><div class="trail" id="trail"></div></div>
         <form id="goto"><input id="goto-id" placeholder="Go to a problem id" aria-label="Problem id" autocomplete="off"><button class="btn ghost" type="submit">Go</button></form>
       </aside>
     </div>
@@ -331,19 +362,100 @@ input:focus, textarea:focus { border-color: var(--ink); outline: none; }
   function renderEmpty() {
     cur = null;
     $("prob").innerHTML = `<p class="none">Nothing is ready in the topics you ticked. Tick more topics, or open any problem by its id.</p>`;
-    ["after", "unlocks"].forEach((id) => ($(id).innerHTML = ""));
-    renderStats();
+    renderMap(); renderStats();
   }
-  function nodeList(el, list, sub, more) {
-    el.innerHTML = list.length ? "" : `<li><p class="none">${more ? "Nothing" : "No earlier problem: a starting point"}</p></li>`;
-    list.forEach((j) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<button type="button" class="node"><span class="dot ${state[j]}" title="${state[j]}"></span>
-        <span class="tx"><span class="mono">${P[j].id}</span> · ${TIER[P[j].d]}<small>${esc(title(j))}</small>${sub(j) ? `<small>${esc(sub(j))}</small>` : ""}</span></button>`;
-      li.firstChild.onclick = () => show(j);
-      el.appendChild(li);
+  const NS = "http://www.w3.org/2000/svg";
+  function sv(tag, attrs, text) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; }
+  const clip = (s, n) => (s.length > n ? s.slice(0, n - 1) + "…" : s);
+  function clickable(g, go) {
+    g.setAttribute("tabindex", 0); g.setAttribute("role", "button");
+    g.addEventListener("click", go);
+    g.addEventListener("keydown", (e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), go()));
+  }
+
+  // the topic map: topics in rows by depth, arrows from prerequisites; click a topic to open its next problem
+  function renderMap() {
+    const depth = new Map();
+    T.forEach((t) => depth.set(t.k, t.pre.length ? 1 + Math.max(...t.pre.map((k) => depth.get(k))) : 0));
+    const rows = []; T.forEach((t) => (rows[depth.get(t.k)] ||= []).push(t));
+    const W = 480, RH = 58, NW = 112, NH = 38, pos = new Map(), curT = cur != null ? P[cur].t : null;
+    rows.forEach((r, d) => r.forEach((t, k) => pos.set(t.k, { x: W / r.length * (k + 0.5), y: 24 + d * RH })));
+    const svg = sv("svg", { viewBox: `0 0 ${W} ${10 + rows.length * RH}`, role: "img", "aria-label": "Topic map" });
+    const eg = sv("g", {}), ng = sv("g", {});
+    T.forEach((t) => t.pre.forEach((k) => {
+      const a = pos.get(k), b = pos.get(t.k), my = (a.y + b.y) / 2;
+      eg.append(sv("path", { class: "edge" + (t.k === curT || k === curT ? " hot" : ""),
+        d: `M${a.x},${a.y + NH / 2} C${a.x},${my} ${b.x},${my} ${b.x},${b.y - NH / 2}` }));
+    }));
+    T.forEach((t) => {
+      const { x, y } = pos.get(t.k), items = inTopic.get(t.k), done = items.filter((i) => cov.has(i)).length;
+      const core = items.every((i) => P[i].d > 2 || cov.has(i));
+      const g = sv("g", { class: "gn " + (core ? "done" : openT.get(t.k) ? "ready" : "locked") + (sel.has(t.k) ? "" : " off") + (t.k === curT ? " sel" : "") });
+      g.append(sv("rect", { class: "box", x: x - NW / 2, y: y - NH / 2, width: NW, height: NH, rx: 6 }));
+      g.append(sv("text", { x: x - NW / 2 + 7, y: y - 3, "font-size": 10.5, "font-weight": 600 }, clip(t.name, 20)));
+      g.append(sv("text", { class: "sm", x: x - NW / 2 + 7, y: y + 11 }, `${done}/${t.n}`));
+      g.append(sv("rect", { class: "bar-bg", x: x - 8, y: y + 6, width: NW / 2, height: 4, rx: 2 }));
+      g.append(sv("rect", { class: "bar", x: x - 8, y: y + 6, width: NW / 2 * done / t.n, height: 4, rx: 2 }));
+      g.append(sv("title", {}, `${t.ch} › ${t.full}: ${done} of ${t.n} covered`));
+      clickable(g, () => {
+        const left = items.filter((i) => !cov.has(i));
+        const ready = left.filter(isReady);
+        const pool = ready.length ? ready : left.length ? left : items;
+        show(pick(easiest(pool)), "Picked from the topic map: " + t.name);
+      });
+      ng.append(g);
     });
-    if (more) el.insertAdjacentHTML("beforeend", `<li><p class="none">+ ${more} more</p></li>`);
+    svg.append(eg, ng);
+    $("map").replaceChildren(svg);
+  }
+
+  // the problem graph: what this problem comes after -> this problem -> what it unlocks (ids on every node)
+  function problemGraph(i) {
+    const L = P[i].ai, R = kids[i], RS = R.slice(0, 5), more = R.length - RS.length;
+    const W = 690, NW = 200, NH = 50, GAP = 12, n = Math.max(L.length, RS.length + (more ? 1 : 0), 1);
+    const H = n * (NH + GAP) + 26, cy = H / 2 + 10, xs = [8, (W - NW) / 2, W - NW - 8];
+    const svg = sv("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Problem graph" });
+    svg.append(sv("text", { class: "sm", x: xs[0], y: 12 }, L.length ? "COMES AFTER" : "NO EARLIER PROBLEM: A STARTING POINT"));
+    svg.append(sv("text", { class: "sm", x: xs[2], y: 12 }, R.length ? `UNLOCKS · ${R.length}` : "UNLOCKS NOTHING DIRECTLY"));
+    const colY = (k) => { const top = cy - (k * (NH + GAP) - GAP) / 2; return (idx) => top + idx * (NH + GAP); };
+    const node = (j, x, y, sub, center) => {
+      const g = sv("g", { class: "gn " + state[j] + (center ? " center" : "") });
+      g.append(sv("rect", { class: "box", x, y, width: NW, height: NH, rx: 6 }));
+      g.append(sv("text", { class: "id", x: x + 9, y: y + 15 }, P[j].id + " · " + TIER[P[j].d]));
+      g.append(sv("text", { x: x + 9, y: y + 30, "font-size": 11.5 }, clip(title(j), 32)));
+      if (sub) g.append(sv("text", { class: "sm", x: x + 9, y: y + 43 }, clip(sub, 36)));
+      g.append(sv("title", {}, `${P[j].id} · ${TIER[P[j].d]} · ${state[j]}\n${title(j)}`));
+      if (!center) clickable(g, () => show(j));
+      return g;
+    };
+    const defs = sv("defs", {}), mk = sv("marker", { id: "ah", viewBox: "0 0 8 8", refX: 7, refY: 4, markerWidth: 7, markerHeight: 7, orient: "auto" });
+    mk.append(sv("path", { class: "arrow", d: "M0,0 L8,4 L0,8 z" })); defs.append(mk); svg.append(defs);
+    const eg = sv("g", {}), ng = sv("g", {});
+    const ly = colY(L.length), ry = colY(RS.length + (more ? 1 : 0));
+    L.forEach((j, k) => {
+      const y = ly(k), sk = shared(i, j);
+      eg.append(sv("path", { class: "edge hot", d: `M${xs[0] + NW},${y + NH / 2} C${xs[1] - 30},${y + NH / 2} ${xs[0] + NW + 30},${cy} ${xs[1]},${cy}`, "marker-end": "url(#ah)" }));
+      ng.append(node(j, xs[0], y, sk.length ? "via " + sk.join(", ") : P[j].t === P[i].t ? "previous in topic" : tname(P[j].t)));
+    });
+    RS.forEach((j, k) => {
+      const y = ry(k), sk = shared(j, i);
+      eg.append(sv("path", { class: "edge", d: `M${xs[1] + NW},${cy} C${xs[2] - 30},${cy} ${xs[1] + NW + 30},${y + NH / 2} ${xs[2]},${y + NH / 2}`, "marker-end": "url(#ah)" }));
+      ng.append(node(j, xs[2], y, (P[j].t !== P[i].t ? tname(P[j].t) + " · " : "") + (sk[0] || "")));
+    });
+    if (more) svg.append(sv("text", { class: "sm", x: xs[2] + 9, y: ry(RS.length) + 20 }, `+ ${more} more`));
+    ng.append(node(i, xs[1], cy - NH / 2, tname(P[i].t), true));
+    svg.append(eg, ng);
+    return svg;
+  }
+
+  function renderTrail() {
+    $("trail").replaceChildren(...trail.map((j) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.title = title(j);
+      b.innerHTML = `<span class="dot ${state[j]}"></span>${P[j].id}`;
+      b.onclick = () => show(j);
+      return b;
+    }));
   }
   function stmtHTML(x) {
     const parts = esc(x).split(/(\$\$[\s\S]*?\$\$|\$[^$]*\$|\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\))/);
@@ -395,7 +507,8 @@ input:focus, textarea:focus { border-color: var(--ink); outline: none; }
           <button type="button" class="btn ghost" id="b-skip">Skip</button>
           <span class="saved" id="saved">${draft != null && (!s || draft !== s.text) ? "Unsaved changes" : s ? "Saved " + esc(s.at) : ""}</span>
         </div>
-      </div>`;
+      </div>
+      <div><p class="gh">Problem graph</p><div class="diagram" id="pgraph"></div></div>`;
     math($("prob").querySelector(".stmt"));
     const ta = $("sol"), pv = $("preview");
     const paint = () => { pv.innerHTML = ta.value.trim() ? preview(ta.value) : ""; math(pv); };
@@ -411,16 +524,8 @@ input:focus, textarea:focus { border-color: var(--ink); outline: none; }
     $("b-stuck").onclick = () => save("stuck").then((ok) => ok && go(whenStuck(i)));
     $("b-skip").onclick = () => { skipped.add(i); go(inSameTopic(i) || anywhere()); };
 
-    nodeList($("after"), p.ai, (j) => { const sk = shared(i, j); return sk.length ? "via " + sk.join(", ") : P[j].t === p.t ? "previous in topic" : tname(P[j].t); }, 0);
-    const un = kids[i];
-    nodeList($("unlocks"), un.slice(0, 10), (j) => (P[j].t !== p.t ? tname(P[j].t) + " · " : "") + (shared(j, i)[0] || ""), Math.max(0, un.length - 10));
-    $("trail").innerHTML = "";
-    trail.forEach((j) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<button type="button" class="node"><span class="dot ${state[j]}"></span><span class="tx"><span class="mono">${P[j].id}</span><small>${esc(title(j))}</small></span></button>`;
-      li.firstChild.onclick = () => show(j);
-      $("trail").appendChild(li);
-    });
+    $("pgraph").replaceChildren(problemGraph(i));
+    renderMap(); renderTrail();
     renderStats();
   }
 

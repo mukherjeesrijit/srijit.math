@@ -216,6 +216,7 @@ input:focus, textarea:focus { border-color: var(--ink); outline: none; }
       get({ a: "graph", session: user.session }).then((d) => {
         if (d.ok) return init(d.graph, d.solutions);
         if (d.error === "owner") return gate("g-no");
+        if (!d.error) return gate("g-form", "The backend is still the old version. In Apps Script: paste the new Code.gs, then Deploy > Manage deployments > edit > New version > Deploy. Then reload this page.");
         forget();
         gate("g-form", d.error === "expired" ? "Your sign-in is more than 30 days old. Sign in again." : "");
       }).catch(() => gate("g-form", "Couldn't load the problems. Check your connection and reload."));

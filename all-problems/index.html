@@ -432,15 +432,16 @@ input:focus, textarea:focus { border-color: var(--ink); outline: none; }
     return post({ a: "save", session: user.session, id: p.id, topic: p.t, status, solution: text }).then((d) => {
       if (!d.ok) {
         if (d.error === "session" || d.error === "expired" || d.error === "owner") { forget(); store.set("allp_draft_" + p.id, text); start(); return false; }
-        throw new Error(d.error);
+        throw new Error(d.message || d.error || "unknown");
       }
       sol.set(i, { status, text, at: d.saved_at });
       store.set("allp_draft_" + p.id, null);
       compute(); renderTopics();
       if (status !== "solved" && status !== "stuck") { why = null; renderProblem(); }
       return true;
-    }).catch(() => {
-      $("saved").textContent = "Couldn't save. Your text is kept in this browser; try again.";
+    }).catch((err) => {
+      const why = err instanceof SyntaxError || err instanceof TypeError ? "the server didn't answer" : err.message;
+      $("saved").textContent = "Couldn't save (" + why + "). Your text is kept in this browser; try again.";
       $("saved").classList.add("err");
       return false;
     }).finally(() => buttons.forEach((b) => (b.disabled = false)));

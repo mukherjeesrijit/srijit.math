@@ -1,0 +1,222 @@
+<!doctype html>
+<!-- srijitmath.com/daily-problems: up to five problems a day for a signed-in learner, one at a time. This file holds no
+     problems: the Apps Script (daily_) sends one statement per request, from the learner's five for today. -->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daily problems · srijitmath</title>
+<meta name="description" content="Solve 1–5 mathematics problems daily, by hand.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<style>
+/* Same palette as the cohort pages: white, black, one accent. */
+:root {
+  --bg: #ffffff; --ink: #0b0b0c; --muted: #5d6067; --line: #e6e6e8; --soft: #f6f6f7;
+  --accent: #e8590c; --accent-soft: #fff1e8; --ok: #237a47; --ok-soft: #e7f4ec; --err: #b3261e; --err-soft: #fbeae8;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 17px/1.6 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; }
+a { color: var(--ink); }
+button { font: inherit; cursor: pointer; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+.btn { display: inline-block; border: 1.5px solid var(--ink); background: var(--ink); color: #fff; border-radius: 999px;
+  padding: .6em 1.4em; font-weight: 600; text-decoration: none; }
+.btn.ok { background: var(--ok); border-color: var(--ok); }
+.btn.accent { background: var(--accent); border-color: var(--accent); }
+.btn.ghost { background: none; color: var(--ink); }
+.btn:disabled { opacity: .5; cursor: default; }
+.link { background: none; border: 0; padding: 0; color: var(--muted); text-decoration: underline; }
+
+main { max-width: 680px; margin: 0 auto; padding: 12vh 24px 48px; }
+@media (max-width: 600px) { main { padding: 8vh 16px 40px; } }
+
+h1 { margin: 0; font-size: 2rem; letter-spacing: -.03em; line-height: 1.15; text-wrap: balance; }
+
+/* sign-in */
+.gate { max-width: 460px; margin: 8vh auto 0; display: grid; gap: 14px; }
+.gate p { margin: 0; color: var(--muted); }
+.gate form { display: grid; gap: 12px; }
+.gate label { display: grid; gap: 4px; font-weight: 600; font-size: .9rem; }
+input { font: inherit; color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 10px; padding: .6em .8em; }
+input:focus { border-color: var(--ink); outline: none; }
+.msg { color: var(--err) !important; min-height: 1.2em; }
+
+/* one problem at a time: nothing else on the page */
+.app { display: grid; gap: 28px; }
+.hand { margin: 0; display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: .95rem; }
+.hand span { font-variant-numeric: tabular-nums; }
+.prob { margin: 0; font-size: 1.2rem; line-height: 1.8; overflow-x: auto; min-height: 6em; }
+.prob ol.opts { list-style: upper-alpha; padding-left: 1.7rem; margin: 10px 0 0; }
+.prob .blank { display: inline-block; width: 3em; border-bottom: 1px solid currentColor; }
+.prob.wait { color: var(--muted); }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.end { display: grid; gap: 8px; }
+.end p:last-child { margin: 0; color: var(--muted); }
+.quiet { margin-top: 72px; font-size: .8rem; color: var(--muted); }
+.quiet a { color: var(--muted); }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: .7em 1.2em;
+  border-radius: 999px; font-size: .9rem; z-index: 9; max-width: calc(100% - 32px); }
+</style>
+</head><body>
+<main>
+  <section class="gate" id="gate">
+    <div id="g-form" style="display:grid;gap:14px">
+      <h1>Solve 1–5 problems daily, by hand.</h1>
+      <p>Sign in with your email to get today's problems. It's free; we'll email you a sign-in link.</p>
+      <form id="signin">
+        <label>First name<input id="name" required autocomplete="given-name"></label>
+        <label>Email<input id="email" type="email" required autocomplete="email"></label>
+        <p class="msg" id="g-msg" role="alert"></p>
+        <div><button type="submit" class="btn accent">Email me a sign-in link</button></div>
+      </form>
+    </div>
+    <div id="g-sent" hidden style="display:grid;gap:10px"><h1>Check your email</h1><p>We sent a sign-in link to <b id="sent-to"></b>.
+      Open it on this device. It works once and expires in 30 minutes; if you don't see it, check spam.</p></div>
+    <p id="g-load" hidden>Loading today's problems…</p>
+  </section>
+
+  <section class="app" id="app" hidden>
+    <p class="hand">Solve 1–5 problems daily, by hand.<span id="steps" aria-live="polite"></span></p>
+    <div id="solve" class="app">
+      <article class="prob" id="prob"></article>
+      <div class="actions">
+        <button type="button" class="btn ok" id="b-solved">Solved</button>
+        <button type="button" class="btn ghost" id="b-not">Not solved</button>
+        <button type="button" class="btn ghost" id="b-next">Next problem</button>
+      </div>
+    </div>
+    <div id="end" class="end" hidden>
+      <p class="prob" id="end-title"></p>
+      <p>New problems tomorrow.</p>
+    </div>
+  </section>
+  <footer class="quiet"><a href="/">srijitmath.com</a><span id="who" hidden> · <span id="who-name"></span> · <button type="button" class="link" id="signout">Sign out</button></span></footer>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script src="/cohort/fall-2026/assets/config.js"></script>
+<script>
+(function () {
+  const API = (window.COHORT || {}).api;
+  const store = {
+    get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+    set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode */ } },
+  };
+  const post = (data) => fetch(API, { method: "POST", body: JSON.stringify(data) }).then((r) => r.json());
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  const math = (el) => window.renderMathInElement && renderMathInElement(el, {
+    delimiters: [{ left: "$$", right: "$$", display: true }, { left: "\\[", right: "\\]", display: true },
+                 { left: "$", right: "$", display: false }, { left: "\\(", right: "\\)", display: false }],
+    throwOnError: false });
+  const toast = (msg) => {
+    const t = Object.assign(document.createElement("div"), { className: "toast", textContent: msg });
+    document.body.appendChild(t); setTimeout(() => t.remove(), 3500);
+  };
+  let user = store.get("cohort_user"); // shared with the cohort pages: {name, email, session}
+  if (user && !user.session) user = null;
+
+  // -- sign-in --------------------------------------------------------------------------------------------
+  function gate(which, msg) {
+    $("gate").hidden = false; $("app").hidden = true;
+    ["g-form", "g-sent", "g-load"].forEach((id) => ($(id).hidden = id !== which));
+    $("g-msg").textContent = msg || "";
+  }
+  $("signin").onsubmit = (e) => {
+    e.preventDefault();
+    if (!API) { $("g-msg").textContent = "Sign-in isn't available right now."; return; }
+    const email = $("email").value.trim().toLowerCase(), button = e.target.querySelector("button");
+    button.disabled = true;
+    post({ a: "enrol", name: $("name").value.trim(), email, back: location.origin + location.pathname })
+      .then((d) => {
+        if (d.ok) { $("sent-to").textContent = email; return gate("g-sent"); }
+        gate("g-form", d.error === "wait" ? "We already sent you a few links. Check your inbox (and spam), or try again in an hour."
+          : d.error === "email" ? "That email doesn't look right." : "Something went wrong. Please try again.");
+      })
+      .catch(() => gate("g-form", "Couldn't reach the server. Please try again."))
+      .finally(() => (button.disabled = false));
+  };
+  $("signout").onclick = () => {
+    const s = user && user.session;
+    user = null; store.set("cohort_user", null);
+    (s ? post({ a: "signout", session: s }).catch(() => {}) : Promise.resolve()).then(() => location.replace(location.pathname));
+  };
+
+  // -- one problem at a time ------------------------------------------------------------------------------
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date()); // the server's day
+  let total = 5, k = 0, marks = {}; // marks[k] = "solved" | "not"
+  const KEY = () => "daily_" + today;
+  const load = () => { const s = store.get(KEY()) || {}; total = s.total || 5; marks = s.marks || {}; };
+  const keep = () => store.set(KEY(), { total, marks });
+
+  function stmtHTML(x) {
+    const parts = esc(x).split(/(\$\$[\s\S]*?\$\$|\$[^$]*\$|\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\))/);
+    return parts.map((s, n) => n % 2 ? s : s
+      .replace(/\\underline\{\\hspace\{[^}]*\}\}|\\rule\{[^}]*\}\{[^}]*\}/g, '<span class="blank"></span>')
+      .replace(/\\renewcommand\{[^}]*\}\{(?:[^{}]|\{[^{}]*\})*\}/g, "")
+      .replace(/\\begin\{enumerate\}(\[[^\]]*\])?\s*\\item/g, '<ol class="opts"><li>')
+      .replace(/\\item/g, "</li><li>").replace(/\\end\{enumerate\}/g, "</li></ol>")
+      .replace(/\\textbf\{([^{}]*)\}/g, "<b>$1</b>").replace(/\\(emph|textit)\{([^{}]*)\}/g, "<i>$2</i>")
+      .replace(/\\%/g, "%").replace(/\\\\/g, "<br>").replace(/``|''/g, "\"").replace(/~/g, " ")
+      .replace(/\\(noindent|medskip|smallskip|bigskip|newline)\b/g, "")).join("");
+  }
+  function steps() { $("steps").textContent = `${k + 1} / ${total}`; }
+  function buttons(on) { ["b-solved", "b-not", "b-next"].forEach((id) => ($(id).disabled = !on)); }
+
+  function open(j) {
+    k = j;
+    $("solve").hidden = false; $("end").hidden = true;
+    steps(); buttons(false);
+    $("prob").className = "prob wait"; $("prob").textContent = "Loading…";
+    post({ a: "daily", session: user.session, k: j }).then((d) => {
+      if (!d.ok) {
+        if (d.error === "session") { user = null; store.set("cohort_user", null); return gate("g-form", "Please sign in again."); }
+        $("prob").textContent = "Today's problems aren't ready yet. Please try again a little later."; return;
+      }
+      if (!d.total) { $("prob").textContent = "No problems today. Check back tomorrow."; return; }
+      if (d.total !== total) { total = d.total; keep(); steps(); }
+      $("prob").className = "prob"; $("prob").innerHTML = stmtHTML(d.statement); math($("prob"));
+      buttons(true);
+    }).catch(() => { $("prob").textContent = "Couldn't load the problem. Check your connection and try again."; buttons(true); });
+  }
+  // the next problem not yet marked, after j (wrapping round); none left -> the end screen
+  function nextOpen(j) {
+    for (let s = 1; s <= total; s++) { const n = (j + s) % total; if (!marks[n]) return n; }
+    return -1;
+  }
+  function advance() { const n = nextOpen(k); n < 0 ? finish() : open(n); }
+  function mark(m) { marks[k] = m; keep(); advance(); }
+  $("b-solved").onclick = () => mark("solved");
+  $("b-not").onclick = () => mark("not");
+  $("b-next").onclick = () => { const n = nextOpen(k); if (n < 0 || n === k) toast("This is the last one left."); else open(n); };
+
+  function finish() {
+    const solved = Object.values(marks).filter((m) => m === "solved").length;
+    $("solve").hidden = true; $("end").hidden = false;
+    $("end-title").textContent = solved ? `You solved ${solved} of ${total} today.` : "Done for today.";
+    $("steps").textContent = "";
+  }
+
+  function begin() {
+    $("gate").hidden = true; $("app").hidden = false;
+    $("who-name").textContent = user.name || user.email; $("who").hidden = false;
+    load();
+    const first = nextOpen(total - 1);
+    first < 0 ? finish() : open(first);
+  }
+
+  function start() {
+    const token = new URLSearchParams(location.search).get("login");
+    const signingIn = token && API ? post({ a: "verify", token }).then((d) => {
+      history.replaceState(null, "", location.pathname);
+      if (d.ok) { user = { name: d.name, email: d.email, session: d.session }; store.set("cohort_user", user); }
+      else toast("That sign-in link has expired or was already used. Ask for a new one.");
+    }).catch(() => {}) : Promise.resolve();
+    signingIn.then(() => (user && API ? begin() : gate("g-form")));
+  }
+  start();
+})();
+</script>
+</body></html>

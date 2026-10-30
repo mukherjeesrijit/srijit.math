@@ -49,7 +49,7 @@
   const day = (ms) => new Date(ms).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" });
   const ERR = { limit: "You've reached today's limit for that. Try again tomorrow.", locked: "This can't be edited any more.",
     "too long": "That's too long.", empty: "Write something first.", own: "You can't do that on your own post.",
-    claps: "You've given all 10 claps to this one.", already: "You've already posted your solution here. Edit it under Solve." };
+    claps: "You've given all 50 claps to this one.", already: "You've already posted your solution here. Edit it under Solve." };
 
   // -- sign-in: cohort.js owns it -----------------------------------------------------------------------
   const auth = window.srijitAuth;
@@ -105,7 +105,7 @@
     const out = [];
     if (kind === "post" && x.kind === "solution") {
       const can = !x.mine && !(me && me.owner);
-      out.push(`<button class="clap${x.myClaps ? " on" : ""}" data-act="clap" ${can ? "" : "disabled"} title="${can ? "Clap (up to 10)" : "Claps"}">👏 ${x.claps}${x.myClaps ? ` <small>· you ${x.myClaps}</small>` : ""}</button>`);
+      out.push(`<button class="clap${x.myClaps ? " on" : ""}" data-act="clap" ${can ? "" : "disabled"} title="${can ? "Clap (as many as 50 times)" : "Claps"}">👏 ${x.claps}${x.myClaps ? ` <small>· you ${x.myClaps}</small>` : ""}</button>`);
     } else {
       out.push(`<span class="votes"><button class="up${x.voted === 1 ? " on" : ""}" data-act="up" aria-pressed="${x.voted === 1}" ${x.mine ? "disabled" : ""} aria-label="Upvote">▲</button>`
         + `<b class="score">${x.score}</b><button class="down${x.voted === -1 ? " on" : ""}" data-act="down" aria-pressed="${x.voted === -1}" ${x.mine ? "disabled" : ""} aria-label="Downvote">▼</button></span>`);
@@ -129,7 +129,7 @@
   function graded(p) {
     if (p.grade == null && !p.feedback) return "";
     return `${p.grade != null ? `<p class="grade">Srijit's grade: <b>👏 ${p.grade}/10</b></p>` : ""}
-      ${p.feedback ? `<div class="feedback"><p class="muted">${me && me.owner ? "Your feedback · only the author sees it" : "Srijit's feedback for you · only you can see it"}</p>${md(p.feedback)}</div>` : ""}`;
+      ${p.feedback ? `<div class="feedback"><p class="muted">Srijit's feedback</p>${md(p.feedback)}</div>` : ""}`;
   }
   function commentHTML(c) {
     return `<div class="comment${c.hidden ? " is-hidden" : ""}" data-kind="comment" data-id="${c.id}">
@@ -155,9 +155,9 @@
   function renderThread() {
     const list = box.querySelector(".posts");
     list.innerHTML = posts.length ? posts.map(postHTML).join("")
-      : `<p class="soon">No posts yet. Be the first: press Solve to share your solution, or ask about the step where you got stuck.</p>`;
+      : `<p class="soon">No solutions yet. Be the first: press Solve and share yours.</p>`;
     math(list); fits(list);
-    box.querySelector(".count").textContent = posts.length ? `${posts.length} post${posts.length > 1 ? "s" : ""}` : "";
+    box.querySelector(".count").textContent = posts.length ? `${posts.length} solution${posts.length > 1 ? "s" : ""}` : "";
     const n = posts.reduce((t, p) => t + 1 + p.comments.length, 0);
     if (talkBtn) talkBtn.textContent = n ? `Discuss · ${n}` : "Discuss";
     refreshSolve();
@@ -170,11 +170,7 @@
   }
   function shell() {
     box.innerHTML = `<h2>Discussion</h2>
-      <div class="pin"><p class="soon">Loading Srijit's solution…</p></div>
-      <form class="compose">
-        <textarea maxlength="8000" rows="2" placeholder="Ask a question or share a thought about this problem. Markdown and $maths$ work."></textarea>
-        <div class="row"><span class="muted">Posting as <b class="me-name"></b> · <button type="button" class="linkish" data-act="rename">change name</button></span>
-          <button type="submit" class="btn accent small">Post</button></div></form>
+      <p class="muted">Open a solution to clap for it and reply to it. You're <b class="me-name"></b> · <button type="button" class="linkish" data-act="rename">change name</button></p>
       <div class="sortbar"><span class="count"></span>
         <span><button type="button" data-sort="top" aria-pressed="true">Top</button><button type="button" data-sort="new" aria-pressed="false">New</button></span></div>
       <div class="posts"><p class="soon">Loading the discussion…</p></div>`;
@@ -195,9 +191,6 @@
     if (!API) return pinnedOnly(); // no Worker configured: Srijit's solution still shows for signed-in learners
     if (!(await signIn())) return signedOut();
     shell();
-    const content = window.cohortContent ? window.cohortContent() : Promise.resolve(null);
-    content.then((c) => { const el = box.querySelector(".pin"); el.innerHTML = pinned(c); math(el); fits(el); })
-      .catch(() => { box.querySelector(".pin").innerHTML = pinned(null); });
     await loadThread().catch(failed);
     const m = location.hash.match(/^#post-(\d+)$/); // a link from the bell or a profile: open that post
     if (m) {
@@ -242,9 +235,8 @@
       if (!b) {
         const card = e.target.closest("[data-card]");
         if (!card || e.target.closest("a, textarea, input, select, form, .comments") || getSelection().toString()) return;
-        const k = card.dataset.card === "pin" ? "pin" : Number(card.dataset.card);
+        const k = Number(card.dataset.card);
         opened.has(k) ? opened.delete(k) : opened.add(k);
-        if (k === "pin") return repaintPin();
         renderThread();
         if (opened.has(k)) { const el = document.getElementById("post-" + k); if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
         return;
@@ -288,7 +280,7 @@
           const g = it.item.grade == null ? 8 : it.item.grade;
           const f = document.createElement("form"); f.className = "grading";
           f.innerHTML = `<label>Your grade <select>${Array.from({ length: 11 }, (_, k) => `<option value="${k}"${k === g ? " selected" : ""}>👏 ${k}/10</option>`).join("")}</select></label>
-            <textarea maxlength="3000" rows="3" placeholder="Feedback for improvement. Only ${esc(it.item.author.name)} sees it."></textarea>
+            <textarea maxlength="3000" rows="3" placeholder="Feedback for improvement. Everyone can read it."></textarea>
             <div class="row"><button type="button" class="linkish" data-act="cancel">Cancel</button><button type="submit" class="btn small">Save grade</button></div>`;
           f.querySelector("textarea").value = it.item.feedback || "";
           it.node.querySelector(":scope > .tools").before(f); b.disabled = true;
@@ -410,37 +402,9 @@
       if (!store.get("solve_draft_" + solveBox.dataset.solve)) { ta.value = mySolution.body; ta.dispatchEvent(new Event("input")); }
     } else { note.hidden = true; btn.textContent = "Post to the discussion"; }
   }
-  function ownerSolve() {
-    solveBox.innerHTML = `<h2>Your solution</h2>
-      <p class="hint">Your Idea and Solution for this problem. Everyone sees them as Srijit's solution under Discuss.</p>
-      <form class="write owner">
-        <label>Idea<textarea name="story" maxlength="8000" rows="5"></textarea></label>
-        <label>Solution<textarea name="solution" maxlength="8000" rows="8"></textarea></label>
-        <div class="preview"></div>
-        <div class="row"><span class="muted">Maths between $ signs.</span><button type="submit" class="btn accent small">Save</button></div></form>`;
-    const f = solveBox.querySelector("form"), st = f.querySelector("[name=story]"), so = f.querySelector("[name=solution]");
-    const pv = solveBox.querySelector(".preview");
-    const paint = () => { pv.innerHTML = (st.value.trim() ? `<h3>Idea</h3>${paras(st.value)}` : "") + (so.value.trim() ? `<h3>Solution</h3>${paras(so.value)}` : ""); math(pv); };
-    let t = null;
-    [st, so].forEach((x) => x.addEventListener("input", () => { clearTimeout(t); t = setTimeout(paint, 300); }));
-    (window.cohortContent ? window.cohortContent() : Promise.resolve(null)).then((c) => {
-      st.value = (c && c.story) || ""; so.value = (c && c.solution) || ""; paint();
-    });
-    f.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const btn = f.querySelector("button[type=submit]"); btn.disabled = true;
-      try {
-        await call("POST", "/content", { problem: solveBox.dataset.solve, story: st.value, solution: so.value });
-        srijit = Object.assign({}, srijit || {}, { story: st.value.trim(), solution: so.value.trim() });
-        repaintPin(); toast("Saved. Your solution is updated under Discuss.");
-        openTalk(true);
-      } catch (err) { failed(err); } finally { btn.disabled = false; }
-    });
-  }
   async function startSolve() {
     if (!solveBox) return;
     if (!(await signedInAny())) return solveSignedOut();
-    if (API && auth.me() && auth.me().owner) return ownerSolve();
     solveShell(); refreshSolve();
   }
   if (solveBox) solveBox.addEventListener("click", (e) => { const b = e.target.closest('[data-act="join"]'); if (b) askToSignIn(); });

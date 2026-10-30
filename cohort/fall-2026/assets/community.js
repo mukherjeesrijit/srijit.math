@@ -431,6 +431,7 @@
     if (n.type === "grade") return `Srijit graded your solution to ${on}: 👏 ${n.n}/10`;
     if (n.type === "feedback") return `Srijit left feedback on your solution to ${on} (👏 ${n.n}/10)`;
     if (n.type === "reply") return `${who} replied to your post on ${on}`;
+    if (n.type === "solution") return `${who} posted a solution to ${on}. Open it to grade it.`;
     return `News on ${on}`;
   }
   function startBell() {

@@ -180,9 +180,12 @@
   }
   if (actions) {
     actions.addEventListener("click", (e) => {
-      const b = e.target.closest("button[data-gate]");
+      const b = e.target.closest('button[data-gate="video"]'); // Discuss is community.js
       if (!b) return;
       if (!signedIn()) return askToEnrol();
+      const talk = document.querySelector("[data-discuss]"), talkBtn = actions.querySelector('[data-gate="discuss"]');
+      if (talk) talk.hidden = true;  // one panel at a time
+      if (talkBtn) talkBtn.setAttribute("aria-expanded", "false");
       if (b.getAttribute("aria-expanded") === "true") { b.setAttribute("aria-expanded", "false"); panel.hidden = true; return; }
       b.setAttribute("aria-expanded", "true");
       if (content) return showVideo();

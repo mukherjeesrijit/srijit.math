@@ -150,6 +150,20 @@ main.cohort h1 { font-size: 34px; line-height: 1.2; letter-spacing: -.02em; marg
 .side .cnt { display: inline-block; min-width: 18px; padding: 0 5px; border-radius: 999px; background: var(--accent-soft); color: var(--accent);
   font-size: 12px; font-weight: 700; text-align: center; margin-left: 4px; }
 
+/* "Your solution": the writing box under the problem */
+.solve { margin-top: 28px; display: grid; gap: 10px; }
+.solve h2 { font-size: 20px; margin: 0; }
+.solve .write { display: grid; gap: 8px; }
+.solve textarea { width: 100%; font: inherit; font-size: 16px; line-height: 1.55; padding: .7em .9em; border: 1.5px solid var(--line);
+  border-radius: 12px; resize: vertical; color: var(--ink); background: #fff; }
+.solve textarea:focus { outline: none; border-color: var(--ink); }
+.solve .muted { color: var(--muted); font-size: 14px; margin: 0; }
+.solve .preview { border-left: 3px solid var(--line); padding: 2px 0 2px 14px; overflow-x: auto; }
+.solve .preview:empty { display: none; }
+.solve .preview p { margin: 0 0 .6em; }
+.solve .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.discuss[hidden] { display: none !important; }
+
 /* home: the latest posts; and the leaderboard page */
 .recent { margin-top: 56px; }
 .recent h2 { font-size: 22px; margin: 0 0 8px; }

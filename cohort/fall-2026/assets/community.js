@@ -5,6 +5,8 @@
   const C = window.COHORT || {};
   const API = C.community;
   const box = document.querySelector("[data-discuss]");
+  const solveBox = document.querySelector("[data-solve]");
+  const talkBtn = document.querySelector('.actions [data-gate="discuss"]');
   const board = document.querySelector("[data-leaderboard]");
   const latest = document.querySelector("[data-recent]");
   if (!(box || board || latest)) return;
@@ -104,6 +106,8 @@
       : `<p class="soon">No posts yet. Be the first: share how you solved it, or ask about the step where you got stuck.</p>`;
     math(list);
     box.querySelector(".count").textContent = posts.length ? `${posts.length} post${posts.length > 1 ? "s" : ""}` : "";
+    const n = posts.reduce((t, p) => t + 1 + p.comments.length, 0);
+    if (talkBtn) talkBtn.textContent = n ? `Discuss · ${n}` : "Discuss";
   }
   async function loadThread() {
     const d = await call("GET", "/thread?p=" + encodeURIComponent(box.dataset.discuss) + "&sort=" + sort);
@@ -115,10 +119,8 @@
     box.innerHTML = `<h2>Discussion</h2>
       <div class="pin"><p class="soon">Loading Srijit's solution…</p></div>
       <form class="compose">
-        <div class="kinds" role="radiogroup" aria-label="Kind of post">
-          <label><input type="radio" name="kind" value="solution" checked> My solution</label>
-          <label><input type="radio" name="kind" value="question"> A question</label></div>
-        <textarea maxlength="8000" rows="4" placeholder="Share how you solved it, where you got stuck, or ask a question. Maths between $ signs, e.g. $\\frac{1}{n}$."></textarea>
+        <input type="hidden" name="kind" value="question">
+        <textarea maxlength="8000" rows="2" placeholder="Ask a question or share a thought about this problem. Maths between $ signs."></textarea>
         <div class="row"><span class="muted">Posting as <b class="me-name"></b> · <button type="button" class="linkish" data-act="rename">change name</button></span>
           <button type="submit" class="btn accent small">Post</button></div></form>
       <div class="sortbar"><span class="count"></span>
@@ -165,7 +167,7 @@
       btn.disabled = true;
       try {
         if (f.classList.contains("compose")) {
-          await call("POST", "/posts", { problem: box.dataset.discuss, kind: f.querySelector("input[name=kind]:checked").value, body: ta.value });
+          await call("POST", "/posts", { problem: box.dataset.discuss, kind: f.querySelector("input[name=kind]").value, body: ta.value });
           ta.value = ""; sort = "new"; syncSort(); toast("Posted.");
         } else if (f.classList.contains("reply")) {
           await call("POST", `/posts/${itemOf(f).id}/comments`, { body: ta.value });
@@ -225,6 +227,66 @@
       } catch (err) { failed(err); }
     });
   }
+  function openTalk(show) {
+    if (!box) return;
+    box.hidden = !show;
+    if (talkBtn) talkBtn.setAttribute("aria-expanded", String(show));
+    if (show) {
+      const panel = document.querySelector(".panel"), vid = document.querySelector('.actions [data-gate="video"]');
+      if (panel) panel.hidden = true;
+      if (vid) vid.setAttribute("aria-expanded", "false");
+      box.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+  if (talkBtn) talkBtn.addEventListener("click", async () => {
+    if (!(await signedInAny())) return askToSignIn();
+    openTalk(box.hidden);
+  });
+  async function signedInAny() { // with the Worker: its token; without it: the older Apps Script sign-in
+    if (!auth) return false;
+    await auth.ready;
+    return !!(API ? auth.token() : auth.session());
+  }
+
+  // -- "Your solution": write it here, then it is posted to the discussion --------------------------------
+  function solveSignedOut() {
+    solveBox.innerHTML = `<h2>Your solution</h2><div class="join"><p>Solve it by hand first. Then write your solution here and share it with the cohort.</p>
+      <button type="button" class="btn accent small" data-act="join">Sign in to solve</button></div>`;
+  }
+  function solveShell() {
+    const key = "solve_draft_" + solveBox.dataset.solve;
+    solveBox.innerHTML = `<h2>Your solution</h2>
+      <form class="write">
+        <textarea maxlength="8000" rows="6" placeholder="Write it the way you'd explain it to a friend: the idea first, then the steps. Maths between $ signs, e.g. $\\frac{1}{n}$."></textarea>
+        <p class="muted">A blank line starts a new paragraph. Your draft stays in this browser until you post it.</p>
+        <div class="preview"></div>
+        <div class="row"><span class="muted">Everyone in the cohort can read it under Discuss.</span>
+          <button type="submit" class="btn accent small">Post to the discussion</button></div></form>`;
+    const ta = solveBox.querySelector("textarea"), pv = solveBox.querySelector(".preview");
+    ta.value = store.get(key) || "";
+    let t = null;
+    const paint = () => { pv.innerHTML = ta.value.trim() ? paras(ta.value) : ""; math(pv); };
+    ta.addEventListener("input", () => { store.set(key, ta.value || null); clearTimeout(t); t = setTimeout(paint, 300); });
+    paint();
+    solveBox.querySelector("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!ta.value.trim()) return toast(ERR.empty);
+      if (!API) return toast("Posting opens soon.");
+      const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
+      try {
+        await call("POST", "/posts", { problem: solveBox.dataset.solve, kind: "solution", body: ta.value });
+        ta.value = ""; store.set(key, null); paint();
+        toast("Posted. Thanks for sharing it.");
+        sort = "new"; syncSort(); await loadThread(); openTalk(true);
+      } catch (err) { failed(err); } finally { btn.disabled = false; }
+    });
+  }
+  async function startSolve() {
+    if (!solveBox) return;
+    if (await signedInAny()) solveShell(); else solveSignedOut();
+  }
+  if (solveBox) solveBox.addEventListener("click", (e) => { const b = e.target.closest('[data-act="join"]'); if (b) askToSignIn(); });
+
   function syncSort() { box.querySelectorAll("[data-sort]").forEach((x) => x.setAttribute("aria-pressed", x.dataset.sort === sort)); }
   async function rename() {
     const name = window.prompt ? window.prompt("The name people see:", me ? me.name : "") : null;
@@ -271,6 +333,7 @@
   }
 
   if (box) { bindDiscussion(); startDiscussion().then(() => API && sidebarCounts()).catch(() => signedOut()); }
+  startSolve();
   if (board && API) startBoard();
   if (latest && API) startRecent();
 })();

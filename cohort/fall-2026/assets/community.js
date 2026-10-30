@@ -14,6 +14,8 @@
   const board = document.querySelector("[data-leaderboard]");
   const latest = document.querySelector("[data-recent]");
   const profileBox = document.querySelector("[data-profile]");
+  // what cohort.js's one request per page already brought; each part falls back to its own request
+  const hello = (key, fallback) => (window.cohortHello || Promise.resolve(null)).then((h) => (h && h[key] != null ? h : fallback()));
 
   const store = {
     get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
@@ -166,11 +168,23 @@
     if (talkBtn) talkBtn.textContent = n ? `Discuss · ${n}` : "Discuss";
     refreshSolve();
   }
+  let loaded = false, mineFromPage = null; // the whole discussion loads when Discuss is first opened
   async function loadThread() {
     const d = await call("GET", "/thread?p=" + encodeURIComponent(box.dataset.discuss) + "&sort=" + sort);
     me = d.me; auth.setMe(me);
-    posts = d.posts; renderThread();
+    posts = d.posts; loaded = true; renderThread();
     paintLove(d.loves, d.loved);
+  }
+  const threadFailed = (err) => { // say it in the page, not only in a passing note
+    box.querySelector(".posts").innerHTML = `<p class="soon">${esc(ERR[err.message] || "Couldn't load the discussion. Please reload the page.")}</p>`;
+  };
+  async function loadPage() { // on opening the page: ♥, my solution and how many posts, not the whole discussion
+    const d = (await hello("problem", () => call("GET", "/page?p=" + encodeURIComponent(box.dataset.discuss))
+      .then((problem) => ({ problem })))).problem;
+    me = d.me; auth.setMe(me);
+    paintLove(d.loves, d.loved);
+    if (talkBtn && !loaded) talkBtn.textContent = d.talk ? `Discuss · ${d.talk}` : "Discuss";
+    mineFromPage = d.mine; refreshSolve();
   }
   function shell() {
     box.innerHTML = `<h2>Discussion</h2>
@@ -195,10 +209,9 @@
     if (!API) return pinnedOnly(); // no Worker configured: Srijit's solution still shows for signed-in learners
     if (!(await signIn())) return signedOut();
     shell();
-    await loadThread().catch((err) => { // say it in the page, not only in a passing note
-      box.querySelector(".posts").innerHTML = `<p class="soon">${esc(ERR[err.message] || "Couldn't load the discussion. Please reload the page.")}</p>`;
-    });
     const m = location.hash.match(/^#post-(\d+)$/); // a link from the bell or a profile: open that post
+    if (!m) return loadPage().catch(threadFailed);
+    await loadThread().catch(threadFailed);
     if (m) {
       opened.add(Number(m[1])); renderThread(); openTalk(true);
       const el = document.getElementById("post-" + m[1]);
@@ -338,6 +351,7 @@
   if (talkBtn) talkBtn.addEventListener("click", async () => {
     if (!(await signedInAny())) return askToSignIn();
     openTalk(box.hidden);
+    if (!box.hidden && !loaded && API) await loadThread().catch(threadFailed);
   });
   if (solveBtn) solveBtn.addEventListener("click", async () => {
     if (!(await signedInAny())) return askToSignIn();
@@ -399,7 +413,7 @@
   }
   function refreshSolve() { // once the thread is loaded: if I've posted my solution, the box edits it
     if (!solveBox || !solveBox.querySelector("form.write") || solveBox.querySelector("form.owner")) return;
-    mySolution = posts.find((p) => p.mine && p.kind === "solution") || null;
+    mySolution = (loaded ? posts.find((p) => p.mine && p.kind === "solution") : mineFromPage) || null;
     const note = solveBox.querySelector(".mine-note"), ta = solveBox.querySelector("textarea");
     const btn = solveBox.querySelector("button[type=submit]");
     if (mySolution) {
@@ -419,7 +433,7 @@
   function sidebarCounts() {
     const links = document.querySelectorAll(".side li a");
     if (!links.length) return;
-    call("GET", "/counts").then((d) => {
+    hello("counts", () => call("GET", "/counts")).then((d) => {
       links.forEach((a) => {
         const slug = a.getAttribute("href").split("/").filter(Boolean).pop(), n = d.counts[slug];
         if (n && !a.querySelector(".cnt")) a.insertAdjacentHTML("beforeend", ` <span class="cnt" title="posts and replies">${n}</span>`);
@@ -447,7 +461,7 @@
     const btn = wrap.querySelector(".bellbtn"), dot = wrap.querySelector(".dot"), list = wrap.querySelector(".notes");
     let items = [];
     const paint = (d) => {
-      items = d.items; shown = d.unseen;
+      items = d.items;
       dot.hidden = !d.unseen; dot.textContent = d.unseen > 9 ? "9+" : d.unseen;
       list.innerHTML = items.length ? items.map((n) => `<a class="${n.seen ? "" : "new"}" href="${BASE}${encodeURIComponent(n.problem || "")}/#post-${n.post_id}">
           <span>${noteText(n)}</span><time>${ago(n.created)}</time></a>`).join("")
@@ -455,14 +469,18 @@
       math(list);
     };
     const load = () => call("GET", "/notifications").then(paint).catch(() => {});
-    let shown = null; // the check every 2 min asks only how many are new; the list loads when that changes
-    const check = () => call("GET", "/notifications/unseen").then((d) => { if (d.unseen !== shown) { shown = d.unseen; if (d.unseen) load(); else dot.hidden = true; } }).catch(() => {});
+    // the number of new ones comes with the page (no polling); the list loads when the bell is opened
+    const check = () => hello("unseen", () => call("GET", "/notifications/unseen")).then((d) => {
+      dot.hidden = !d.unseen; dot.textContent = d.unseen > 9 ? "9+" : d.unseen; }).catch(() => {});
     btn.addEventListener("click", async () => {
       list.hidden = !list.hidden; btn.setAttribute("aria-expanded", String(!list.hidden));
-      if (!list.hidden && !dot.hidden) { await call("POST", "/notifications/seen", {}).catch(() => {}); dot.hidden = true; shown = 0; }
+      if (list.hidden) return;
+      if (!items.length) list.innerHTML = `<p class="muted">Loading…</p>`;
+      await load();
+      if (!dot.hidden) { await call("POST", "/notifications/seen", {}).catch(() => {}); dot.hidden = true; }
     });
     document.addEventListener("click", (e) => { if (!wrap.contains(e.target)) { list.hidden = true; btn.setAttribute("aria-expanded", "false"); } });
-    load(); setInterval(() => { if (!document.hidden) check(); }, 120000); // every 2 min, only while the tab is in view
+    check(); // every 2 min, only while the tab is in view
   }
   // your name at the top opens your profile
   function nameToProfile() {
@@ -537,7 +555,7 @@
       latest.querySelector("button").onclick = askToSignIn; latest.hidden = false; return;
     }
     try {
-      const d = await call("GET", "/recent");
+      const d = await hello("items", () => call("GET", "/recent"));
       if (!d.items.length) {
         latest.innerHTML = `<h2>Latest in the discussion</h2><p class="soon">Nothing yet. Open a problem, solve it by hand and share your solution.</p>`;
         latest.hidden = false; return;

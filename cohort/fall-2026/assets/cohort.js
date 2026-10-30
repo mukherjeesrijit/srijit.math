@@ -76,17 +76,27 @@
     document.querySelectorAll("[data-guard]").forEach((el) => el.classList.toggle("locked", !signedIn()));
   }
 
-  // -- visits (private analytics, in Cloudflare); the same request brings the learner count on pages that show it --
+  // -- one request per page ("/hello"): the visit (private analytics) and everything this page shows -----------
+  // (the learner count, the sidebar counts, the latest posts, the bell's number, the problem's ♥ and my solution).
+  // community.js reads it from window.cohortHello. Nothing polls: Cloudflare counts every request.
   const enrolled = document.querySelector("[data-enrolled]");
   const ticker = document.querySelector("[data-ticker]");
-  const visited = CF ? cf("/visit", { vid, page: location.pathname, stats: !!(enrolled || ticker) }, true).catch(() => null) : null;
+  const discuss = document.querySelector("[data-discuss]");
+  const want = [];
+  if (enrolled || ticker) want.push("stats");
+  if (document.querySelector(".side li a")) want.push("counts");
+  if (document.querySelector("[data-recent]")) want.push("recent");
+  const hello = !CF ? Promise.resolve(null) : cf("/hello", { vid, page: location.pathname, want,
+      problem: discuss ? discuss.dataset.discuss : undefined }, true)
+    .then((d) => { if (d.ok && token && !d.signedIn) clear(); return d.ok ? d : null; }) // a sign-in that has run out
+    .catch(() => null);
+  window.cohortHello = hello;
 
-  // -- the learner count and "<name> joined" (refreshed every 5 minutes) -------------------------------------
-  const stats = () => cf("/stats").catch(() => null);
+  // -- the learner count and "<name> joined" ------------------------------------------------------------------
   const shown = () => Number(enrolled.textContent.replace(/,/g, "")) || 0;
   const live = (d) => { if (enrolled && d && d.ok && d.learners >= shown()) enrolled.textContent = d.learners.toLocaleString(); return d; };
   if (CF && (enrolled || ticker)) {
-    visited.then(live).then((d) => {
+    hello.then(live).then((d) => {
       const names = ((d && d.names) || []).filter((n) => n.length >= 3); // no initials ("Kd")
       if (!ticker || names.length < 2) return;
       const slot = ticker.querySelector("b");
@@ -98,7 +108,6 @@
         setTimeout(() => { k = (k + 1) % names.length; slot.textContent = names[k]; slot.classList.remove("fade"); }, 350);
       }, 2600);
     });
-    if (enrolled) setInterval(() => { if (!document.hidden) stats().then(live); }, 300000); // every 5 min, only while the tab is in view
   }
 
   // -- Srijit's solution and video for this problem (pinned in the discussion; Video opens below) ------------

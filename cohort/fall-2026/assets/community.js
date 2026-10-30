@@ -49,6 +49,7 @@
   const day = (ms) => new Date(ms).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" });
   const ERR = { limit: "You've reached today's limit for that. Try again tomorrow.", locked: "This can't be edited any more.",
     "too long": "That's too long.", empty: "Write something first.", own: "You can't do that on your own post.",
+    resting: "The discussion is taking a short break. Please try again in a little while.",
     claps: "You've given all 50 claps to this one.", linkedin: "That isn't a LinkedIn profile link. It should look like linkedin.com/in/your-name.", already: "You've already posted your solution here. Edit it under Solve." };
 
   // -- sign-in: cohort.js owns it -----------------------------------------------------------------------
@@ -457,7 +458,7 @@
       if (!list.hidden && !dot.hidden) { await call("POST", "/notifications/seen", {}).catch(() => {}); dot.hidden = true; }
     });
     document.addEventListener("click", (e) => { if (!wrap.contains(e.target)) { list.hidden = true; btn.setAttribute("aria-expanded", "false"); } });
-    load(); setInterval(load, 60000);
+    load(); setInterval(() => { if (!document.hidden) load(); }, 120000); // every 2 min, only while the tab is in view
   }
   // your name at the top opens your profile
   function nameToProfile() {

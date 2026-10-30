@@ -78,7 +78,7 @@
   // -- visits (private analytics, in Cloudflare) -------------------------------------------------------------
   if (CF) cf("/visit", { vid, page: location.pathname }, true).catch(() => {});
 
-  // -- the learner count and "<name> joined": live from Cloudflare (every 15 s) ----------------------------
+  // -- the learner count and "<name> joined": from Cloudflare (refreshed every 2 minutes) ---------------------
   const enrolled = document.querySelector("[data-enrolled]");
   const ticker = document.querySelector("[data-ticker]");
   const stats = () => cf("/stats").catch(() => null);
@@ -97,7 +97,7 @@
         setTimeout(() => { k = (k + 1) % names.length; slot.textContent = names[k]; slot.classList.remove("fade"); }, 350);
       }, 2600);
     });
-    if (enrolled) setInterval(() => stats().then(live), 15000);
+    if (enrolled) setInterval(() => { if (!document.hidden) stats().then(live); }, 120000); // every 2 min, only while the tab is in view
   }
 
   // -- Srijit's solution and video for this problem (pinned in the discussion; Video opens below) ------------

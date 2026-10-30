@@ -356,7 +356,7 @@
   if (solveBtn) solveBtn.addEventListener("click", async () => {
     if (!(await signedInAny())) return askToSignIn();
     only(solveBox, solveBtn, solveBox.hidden);
-    if (!solveBox.hidden) { const ta = solveBox.querySelector("textarea"); if (ta) ta.focus(); }
+    if (!solveBox.hidden) { const ta = solveBox.querySelector("form.write textarea"); if (ta) ta.focus(); }
   });
 
   // -- ♥ on the problem -----------------------------------------------------------------------------------
@@ -391,45 +391,32 @@
     "- Leave out anything I crossed out. For a drawing or a graph, write [figure].",
     "- Reply with the Markdown only: no code block, no title, no comments before or after.",
   ].join("\n");
-  const EXAMPLE = [
-    "The roots satisfy $x^2 - 5x + 6 = 0$, so",
-    "",
-    "$$(x-2)(x-3) = 0.$$",
-    "",
-    "Hence $x = 2$ or $x = 3$, and the [unclear] root is $3$.",
-  ].join("\n");
-  function copyPrompt(btn, pre) {
-    const done = () => { btn.textContent = "Copied ✓"; setTimeout(() => (btn.textContent = "Copy"), 1800); };
-    const select = () => { const r = document.createRange(); r.selectNodeContents(pre); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
-      toast("Selected. Press Ctrl+C (or ⌘C) to copy."); };
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(PROMPT).then(done, select);
-    else select();
+  function copyPrompt(btn, box) { // the clipboard; where the browser refuses, the prompt shows, selected, to copy by hand
+    const done = () => { btn.textContent = "Prompt copied ✓"; setTimeout(() => (btn.textContent = "Copy prompt"), 2000); };
+    const old = () => {
+      const t = Object.assign(document.createElement("textarea"), { value: PROMPT }); t.style.cssText = "position:fixed;opacity:0";
+      document.body.appendChild(t); t.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (e) { /* refused */ } t.remove();
+      if (ok) return done();
+      box.hidden = false; box.focus(); box.select();
+      toast("Copy the prompt shown below the line.");
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(PROMPT).then(done, old);
+    else old();
   }
   function solveShell() {
     const key = "solve_draft_" + solveBox.dataset.solve;
     solveBox.innerHTML = `<h2>Your solution</h2>
-      <ol class="steps">
-        <li>Solve it by hand, on paper.</li>
-        <li>Take a photo and open your AI: Claude, Gemini or ChatGPT.</li>
-        <li>Attach the photo, paste this prompt and send it.</li>
-        <li>Paste what it gives back below. Check it against your page, then post. Your peers read it under Discuss.</li>
-      </ol>
-      <div class="prompt"><div class="prompt-head"><b>The prompt</b><button type="button" class="copy" data-act="copy-prompt">Copy</button></div>
-        <pre>${esc(PROMPT)}</pre></div>
-      <details class="example"><summary>See an example</summary>
-        <p class="muted">For a page that reads “The roots satisfy x² − 5x + 6 = 0, so (x − 2)(x − 3) = 0. Hence x = 2 or x = 3 …”
-          with one word too smudged to read, the AI should give back exactly this:</p>
-        <pre>${esc(EXAMPLE)}</pre>
-        <p class="muted">which shows on the site as:</p><div class="md example-look"></div></details>
+      <p class="hint">Solve it by hand, photograph it and give the photo to your AI (Claude, Gemini, ChatGPT) with this prompt
+        <button type="button" class="copy" data-act="copy-prompt">Copy prompt</button>, then paste its reply below.</p>
+      <textarea class="prompt-text" readonly rows="9" hidden>${esc(PROMPT)}</textarea>
       <p class="mine-note" hidden></p>
       <form class="write">
         <textarea maxlength="8000" rows="8" placeholder="Paste what your AI gave back here. You can also type: Markdown works, and maths between $ signs, e.g. $\\frac{1}{n}$."></textarea>
         <div class="preview md"></div>
         <div class="row"><span class="muted">One solution per problem. You can edit it any time.</span>
           <button type="submit" class="btn accent small">Post to the discussion</button></div></form>`;
-    const look = solveBox.querySelector(".example-look"); look.innerHTML = md(EXAMPLE); math(look);
-    solveBox.querySelector('[data-act="copy-prompt"]').addEventListener("click", (e) => copyPrompt(e.currentTarget, solveBox.querySelector(".prompt pre")));
-    const ta = solveBox.querySelector("textarea"), pv = solveBox.querySelector(".preview");
+    solveBox.querySelector('[data-act="copy-prompt"]').addEventListener("click", (e) => copyPrompt(e.currentTarget, solveBox.querySelector(".prompt-text")));
+    const ta = solveBox.querySelector("form.write textarea"), pv = solveBox.querySelector(".preview");
     ta.value = store.get(key) || "";
     let t = null;
     const paint = () => { pv.innerHTML = ta.value.trim() ? md(ta.value) : ""; math(pv); };
@@ -452,7 +439,7 @@
   function refreshSolve() { // once the thread is loaded: if I've posted my solution, the box edits it
     if (!solveBox || !solveBox.querySelector("form.write") || solveBox.querySelector("form.owner")) return;
     mySolution = (loaded ? posts.find((p) => p.mine && p.kind === "solution") : mineFromPage) || null;
-    const note = solveBox.querySelector(".mine-note"), ta = solveBox.querySelector("textarea");
+    const note = solveBox.querySelector(".mine-note"), ta = solveBox.querySelector("form.write textarea");
     const btn = solveBox.querySelector("button[type=submit]");
     if (mySolution) {
       note.hidden = false; note.textContent = `You posted your solution ${ago(mySolution.created)}. Edit it here and save.`;

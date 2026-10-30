@@ -1,14 +1,19 @@
-// Fall 2026 cohort pages: enrolment with a magic link (first name + email -> emailed one-time link -> session),
-// daily visits, a rotating "<name> joined.", and gated content (discussion: story + steps, and video). The backend is a
-// Google Apps Script web app (window.COHORT.api); without it the problems still show.
+// Fall 2026 cohort pages: sign-in, daily visits, the learner count and a rotating "<name> joined.", and the Video panel.
+// With the community Worker (window.COHORT.community, Cloudflare) sign-in is "Continue with Google", with a sign-in
+// link by email as the fallback, and Srijit's solutions and videos come from the Worker. Without it the older Apps
+// Script sign-in and content are used (window.COHORT.api). The Apps Script also keeps the learner list, visits and
+// the email links. Other scripts use window.srijitAuth (ready, token, me, signIn, clear, setMe).
 (function () {
-  const API = (window.COHORT || {}).api;
+  const CFG = window.COHORT || {};
+  const API = CFG.api, CF = CFG.community, GOOGLE = CFG.google;
   const store = {
     get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
     set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode */ } },
   };
-  let user = store.get("cohort_user"); // {name, email, session} once the emailed link was opened
+  let user = store.get("cohort_user"); // Apps Script session {name, email, session}: the emailed link, older sign-ins
   if (user && !user.session) user = null;
+  let token = store.get("community_token"), me = store.get("community_me"); // the Worker's sign-in
+  if (!CF || !token || !me) { token = null; me = null; }
   let vid = store.get("cohort_vid");
   if (!vid) { vid = Math.random().toString(36).slice(2) + Date.now().toString(36); store.set("cohort_vid", vid); }
 
@@ -18,25 +23,59 @@
     throwOnError: false });
   const post = (data) => fetch(API, { method: "POST", body: JSON.stringify(data) }).then((r) => r.json());
   const get = (params) => fetch(API + "?" + new URLSearchParams(params)).then((r) => r.json());
+  const cf = (path, body, auth) => fetch(CF + path, { method: body ? "POST" : "GET",
+    headers: Object.assign({ "content-type": "application/json" }, auth ? { authorization: "Bearer " + token } : {}),
+    body: body ? JSON.stringify(body) : undefined }).then((r) => r.json().then((d) => Object.assign({ status: r.status }, d)));
   const toast = (msg) => {
     const t = Object.assign(document.createElement("div"), { className: "toast", textContent: msg });
     document.body.appendChild(t); setTimeout(() => t.remove(), 3200);
   };
-  function signOut() {
-    user = null; store.set("cohort_user", null); store.set("community_token", null); store.set("community_me", null); refresh();
+  const signedIn = () => (CF ? !!token : !!user);
+  const shownName = () => (CF ? (me && me.name) : (user && user.name)) || "You";
+  function keep(d) { token = d.token; me = d.me; store.set("community_token", token); store.set("community_me", me); }
+  function clear() {
+    user = null; token = null; me = null;
+    ["cohort_user", "community_token", "community_me"].forEach((k) => store.set(k, null));
+    refresh();
   }
+  // an Apps Script session (emailed link, or an older sign-in) -> the Worker's token
+  const exchange = (session) => cf("/auth", { session }).then((d) => { if (d.ok) keep(d); return d.ok; }).catch(() => false);
 
-  // -- enrolment: ask for name + email, email a sign-in link ------------------------------------------
+  // -- signing in: "Continue with Google", or a link by email ---------------------------------------------
   const modal = document.querySelector(".modal");
   const form = modal.querySelector("form");
   const sent = modal.querySelector(".sent");
   const msg = modal.querySelector(".msg");
+  const gbox = modal.querySelector(".google");
+  let googleReady = false;
+  function onGoogle(resp) {
+    cf("/auth/google", { credential: resp.credential }).then((d) => {
+      if (!d.ok) { toast("Google sign-in didn't work. Try again, or use the email link."); return; }
+      keep(d); modal.hidden = true; location.reload(); // every part of the page redraws signed in
+    }).catch(() => toast("Couldn't reach the server. Please try again."));
+  }
+  function showGoogle() {
+    if (!(CF && GOOGLE && gbox && window.google && window.google.accounts)) return false;
+    if (!googleReady) {
+      window.google.accounts.id.initialize({ client_id: GOOGLE, callback: onGoogle, ux_mode: "popup" });
+      window.google.accounts.id.renderButton(gbox.querySelector(".gbtn"),
+        { theme: "outline", size: "large", text: "continue_with", shape: "pill", width: 300 });
+      googleReady = true;
+    }
+    gbox.hidden = false; form.hidden = true; sent.hidden = true;
+    return true;
+  }
   function askToEnrol() {
-    form.hidden = false; sent.hidden = true; msg.textContent = "";
-    modal.hidden = false; form.querySelector("input").focus();
+    msg.textContent = "";
+    modal.hidden = false;
+    if (showGoogle()) return;
+    if (gbox) gbox.hidden = true;
+    form.hidden = false; sent.hidden = true; form.querySelector("input").focus();
   }
   modal.querySelectorAll("[data-close]").forEach((b) => (b.onclick = () => { modal.hidden = true; }));
   modal.addEventListener("click", (e) => { if (e.target === modal) modal.hidden = true; });
+  const byEmail = modal.querySelector("[data-email]");
+  if (byEmail) byEmail.onclick = () => { gbox.hidden = true; form.hidden = false; form.querySelector("input").focus(); };
   form.onsubmit = (e) => {
     e.preventDefault();
     if (!API) { msg.textContent = "Enrolment opens soon."; return; }
@@ -57,36 +96,35 @@
       .catch(() => { msg.textContent = "Couldn't reach the server. Please try again."; })
       .finally(() => (button.disabled = false));
   };
-  document.querySelectorAll("[data-enrol]").forEach((b) => (b.onclick = () => !user && askToEnrol()));
+  document.querySelectorAll("[data-enrol]").forEach((b) => (b.onclick = () => !signedIn() && askToEnrol()));
 
-  // -- opening the emailed link: trade the one-time token for a session -------------------------------
-  const token = new URLSearchParams(location.search).get("login");
-  const signingIn = token && API ? post({ a: "verify", token }).then((d) => {
+  // -- opening the emailed link (and moving older sign-ins over to the Worker) ----------------------------
+  const linkToken = new URLSearchParams(location.search).get("login");
+  const signingIn = (linkToken && API ? post({ a: "verify", token: linkToken }).then(async (d) => {
     history.replaceState(null, "", location.pathname + location.hash);
-    if (d.ok) {
-      user = { name: d.name, email: d.email, session: d.session };
-      store.set("cohort_user", user);
-      toast("Welcome, " + (d.name || "learner") + "! You're signed in.");
-    } else {
-      toast("That sign-in link has expired or was already used. Enrol again for a new one.");
-    }
-    refresh();
-  }).catch(() => {}) : Promise.resolve();
-  window.cohortReady = signingIn; // community.js waits for the emailed link to finish signing in
+    if (!d.ok) { toast("That sign-in link has expired or was already used. Ask for a new one."); return; }
+    user = { name: d.name, email: d.email, session: d.session };
+    store.set("cohort_user", user);
+    if (CF && !(await exchange(d.session))) { toast("Signed in, but the discussion couldn't start. Please reload."); return; }
+    toast("Welcome, " + (d.name || shownName()) + "! You're signed in.");
+  }).catch(() => {}) : Promise.resolve())
+    .then(() => (CF && !token && user ? exchange(user.session) : null)) // signed in before Google sign-in existed
+    .then(() => refresh());
+  window.cohortReady = signingIn;
 
   function refresh() {
     document.querySelectorAll("[data-enrol]").forEach((b) => {
       const header = b.classList.contains("enrol");
-      b.classList.toggle("done", !!user);
-      b.textContent = user ? (header ? user.name : "You're enrolled ✓") : (header ? "Enroll" : "Enroll in Fall 2026");
+      b.classList.toggle("done", signedIn());
+      b.textContent = signedIn() ? (header ? shownName() : "You're enrolled ✓") : (header ? "Enroll" : "Enroll in Fall 2026");
     });
-    document.querySelectorAll("[data-guard]").forEach((el) => el.classList.toggle("locked", !user));
+    document.querySelectorAll("[data-guard]").forEach((el) => el.classList.toggle("locked", !signedIn()));
   }
 
   // -- visits (private analytics) ----------------------------------------------------------------------
   if (API) {
     signingIn.then(() => post({ a: "visit", vid, session: user ? user.session : "", page: location.pathname }))
-      .then((d) => { if (d && d.ok && user && !d.signedIn) signOut(); }).catch(() => {});
+      .then((d) => { if (!CF && d && d.ok && user && !d.signedIn) clear(); }).catch(() => {});
   }
 
   // -- the learner count: live from the sheet, once it passes the published number ----------------------
@@ -114,83 +152,60 @@
     }).catch(() => {});
   }
 
-  // -- gated actions on a problem page: Story / Discussion / Video open below ---------------------------
+  // -- Srijit's solution and video for this problem (pinned in the discussion; Video opens below) ------------
   const actions = document.querySelector(".actions");
   const panel = document.querySelector(".panel");
-  const TITLES = { discussion: "Discussion", video: "Video" };
   let content = null;
-  let open = null;
-  function paragraphs(text) {
-    text.split(/\n+/).forEach((para) => {
-      const p = document.createElement("p"); p.textContent = para; panel.appendChild(p);
-    });
-  }
-  function show(kind) {
-    open = kind;
-    actions.querySelectorAll("button").forEach((b) => b.setAttribute("aria-expanded", b.dataset.gate === kind));
-    const c = content || {};
-    panel.innerHTML = "<h2>" + TITLES[kind] + "</h2>";
-    if (kind === "video") {
-      const id = (c.video_url || "").match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/);
-      panel.insertAdjacentHTML("beforeend", id ? '<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/' +
-        id[1] + '" allowfullscreen title="Video"></iframe></div>' : '<p class="soon">The video for this problem is coming soon.</p>');
-    } else if (c.story || c.solution) {
-      // the idea first, then the solution
-      if (c.story) { panel.insertAdjacentHTML("beforeend", "<h3>Idea</h3>"); paragraphs(c.story); }
-      if (c.solution) { panel.insertAdjacentHTML("beforeend", "<h3>Solution</h3>"); paragraphs(c.solution); }
-    } else {
-      panel.insertAdjacentHTML("beforeend", '<p class="soon">The discussion for this problem is coming soon.</p>');
-    }
-    panel.hidden = false;
-    math(panel);
-    panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }
-  function close() {
-    open = null; panel.hidden = true;
-    actions.querySelectorAll("button").forEach((b) => b.setAttribute("aria-expanded", "false"));
-  }
-  let loading = null; // the content request, started as soon as a signed-in learner opens the page
+  let loading = null;
   function load() {
     if (!loading) {
-      loading = post({ a: "content", id: actions.dataset.id, session: user.session }).then((d) => {
-        if (d.error === "session") { signOut(); loading = null; return null; }
+      const ask = CF ? cf("/content?p=" + encodeURIComponent(actions.dataset.slug || ""), null, true)
+        : post({ a: "content", id: actions.dataset.id, session: user.session });
+      loading = ask.then((d) => {
+        if (d.error === "session") { clear(); loading = null; return null; }
         content = d.ok ? d : {};
         return content;
       }).catch(() => { loading = null; return null; });
     }
     return loading;
   }
-  window.cohortContent = () => (actions && user && API ? load() : Promise.resolve(null)); // Srijit's solution, for the discussion
-  if (actions && user && API) signingIn.then(() => user && load());
+  window.cohortContent = () => signingIn.then(() => (actions && signedIn() ? load() : null)); // used by community.js
+  function showVideo() {
+    const c = content || {};
+    const id = (c.video_url || "").match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/);
+    panel.innerHTML = "<h2>Video</h2>" + (id ? '<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/' +
+      id[1] + '" allowfullscreen title="Video"></iframe></div>' : '<p class="soon">The video for this problem is coming soon.</p>');
+    panel.hidden = false;
+    panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
   if (actions) {
     actions.addEventListener("click", (e) => {
       const b = e.target.closest("button[data-gate]");
       if (!b) return;
-      if (!user) return askToEnrol();
-      const kind = b.dataset.gate;
-      if (open === kind) return close();
-      if (content) return show(kind);
-      // still on its way: open the panel at once so the click visibly does something
-      open = kind;
-      actions.querySelectorAll("button").forEach((x) => x.setAttribute("aria-expanded", x.dataset.gate === kind));
-      panel.innerHTML = "<h2>" + TITLES[kind] + "</h2><p class=\"soon\">Loading…</p>";
-      panel.hidden = false;
-      b.disabled = true;
+      if (!signedIn()) return askToEnrol();
+      if (b.getAttribute("aria-expanded") === "true") { b.setAttribute("aria-expanded", "false"); panel.hidden = true; return; }
+      b.setAttribute("aria-expanded", "true");
+      if (content) return showVideo();
+      panel.innerHTML = "<h2>Video</h2><p class=\"soon\">Loading…</p>"; panel.hidden = false; b.disabled = true;
       load().then((c) => {
-          if (!user) { close(); askToEnrol(); return; }
-          if (!c) { toast("Couldn't load it. Please try again."); close(); return; }
-          if (open === kind) show(kind);
-        })
-        .finally(() => (b.disabled = false));
+        if (!signedIn()) { panel.hidden = true; askToEnrol(); return; }
+        if (!c) { toast("Couldn't load it. Please try again."); panel.hidden = true; b.setAttribute("aria-expanded", "false"); return; }
+        showVideo();
+      }).finally(() => (b.disabled = false));
     });
   }
   document.addEventListener("copy", (e) => {
     const node = document.getSelection().anchorNode;
-    if (!user && node && node.parentElement && node.parentElement.closest("[data-guard]")) {
+    if (!signedIn() && node && node.parentElement && node.parentElement.closest("[data-guard]")) {
       e.preventDefault(); askToEnrol();
     }
   });
 
+  window.srijitAuth = {
+    ready: signingIn, token: () => token, me: () => me, signIn: askToEnrol, clear,
+    setMe(m) { me = m; store.set("community_me", me); refresh(); },
+    session: () => (user ? user.session : null), // Apps Script session, for the older content path
+  };
   refresh();
   math(document.querySelector("main"));
 })();

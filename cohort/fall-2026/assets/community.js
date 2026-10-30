@@ -34,34 +34,25 @@
   const ERR = { limit: "You've reached today's limit for that. Try again tomorrow.", locked: "This can't be edited any more.",
     "too long": "That's too long.", empty: "Write something first.", own: "You can't do that on your own post." };
 
-  // -- sign-in: cohort session -> community token --------------------------------------------------------
-  const cohortUser = () => { const u = store.get("cohort_user"); return u && u.session ? u : null; };
-  let token = store.get("community_token"), me = store.get("community_me");
-  if (!cohortUser() || (me && me.email && cohortUser().email && me.email !== cohortUser().email)) { token = null; me = null; }
+  // -- sign-in: cohort.js owns it (window.srijitAuth: Google, or the emailed link traded for a Worker token) ---
+  const auth = window.srijitAuth;
+  let token = null, me = null;
   async function signIn() {
-    await (window.cohortReady || Promise.resolve());
-    const u = cohortUser();
-    if (!u) return false;
-    if (token && me) return true;
-    const d = await fetch(API + "/auth", { method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ session: u.session }) }).then((r) => r.json()).catch(() => null);
-    if (!d || !d.ok) { token = null; me = null; store.set("community_token", null); store.set("community_me", null); return false; }
-    token = d.token; me = d.me; store.set("community_token", token); store.set("community_me", me);
-    return true;
+    if (!auth) return false;
+    await auth.ready;
+    token = auth.token(); me = auth.me();
+    return !!token;
   }
-  async function call(method, path, body, retried) {
+  async function call(method, path, body) {
     const r = await fetch(API + path, { method, headers: { "content-type": "application/json", authorization: "Bearer " + token },
       body: body ? JSON.stringify(body) : undefined });
     const d = await r.json().catch(() => ({ ok: false, error: "server" }));
-    if (r.status === 401 && !retried) {
-      token = null; me = null; store.set("community_token", null);
-      if (await signIn()) return call(method, path, body, true);
-    }
+    if (r.status === 401) { auth.clear(); throw new Error("session"); }
     if (!d.ok) throw new Error(d.error || "server");
     return d;
   }
   const failed = (e) => toast(ERR[e.message] || "Something went wrong. Please try again.");
-  const askToSignIn = () => { const b = document.querySelector(".top [data-enrol]"); if (b) b.click(); };
+  const askToSignIn = () => auth && auth.signIn();
 
   // -- the discussion on a problem page ------------------------------------------------------------------
   let sort = "top", posts = [];
@@ -116,7 +107,7 @@
   }
   async function loadThread() {
     const d = await call("GET", "/thread?p=" + encodeURIComponent(box.dataset.discuss) + "&sort=" + sort);
-    me = d.me; store.set("community_me", me);
+    me = d.me; auth.setMe(me);
     posts = d.posts; renderThread();
   }
 
@@ -137,7 +128,7 @@
   }
   async function pinnedOnly() {
     await (window.cohortReady || Promise.resolve());
-    if (!cohortUser()) return signedOut();
+    if (!(auth && auth.session())) return signedOut();
     box.innerHTML = `<h2>Discussion</h2><div class="pin"><p class="soon">Loading Srijit's solution…</p></div>`;
     const c = await (window.cohortContent ? window.cohortContent() : Promise.resolve(null)).catch(() => null);
     const el = box.querySelector(".pin"); el.innerHTML = pinned(c); math(el);
@@ -238,7 +229,7 @@
   async function rename() {
     const name = window.prompt ? window.prompt("The name people see:", me ? me.name : "") : null;
     if (!name || !name.trim()) return;
-    try { const d = await call("POST", "/me", { name }); me = d.me; store.set("community_me", me); box.querySelector(".me-name").textContent = me.name; await loadThread(); }
+    try { const d = await call("POST", "/me", { name }); me = d.me; auth.setMe(me); box.querySelector(".me-name").textContent = me.name; await loadThread(); }
     catch (err) { failed(err); }
   }
 

@@ -169,6 +169,13 @@ main.cohort h1 { font-size: 34px; line-height: 1.2; letter-spacing: -.02em; marg
 .lb .up { margin-left: auto; color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
 @media (max-width: 640px) { .lb-grid { grid-template-columns: minmax(0, 1fr); } .lb-page { padding: 32px 16px 64px; } }
 
+.prose h2 { font-size: 20px; margin: 28px 0 8px; }
+.prose p, .prose li { max-width: 680px; color: var(--ink); }
+.prose ul { padding-left: 1.2em; }
+.prose li { margin: 6px 0; }
+.fine { margin-top: 48px; font-size: 14px; }
+.fine a { color: var(--muted); }
+
 /* modal + toast */
 .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff;
   padding: 9px 18px; border-radius: 999px; font-size: 15px; z-index: 9; }

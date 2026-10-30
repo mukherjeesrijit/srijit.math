@@ -49,7 +49,7 @@
   const day = (ms) => new Date(ms).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" });
   const ERR = { limit: "You've reached today's limit for that. Try again tomorrow.", locked: "This can't be edited any more.",
     "too long": "That's too long.", empty: "Write something first.", own: "You can't do that on your own post.",
-    claps: "You've given all 50 claps to this one.", already: "You've already posted your solution here. Edit it under Solve." };
+    claps: "You've given all 50 claps to this one.", linkedin: "That isn't a LinkedIn profile link. It should look like linkedin.com/in/your-name.", already: "You've already posted your solution here. Edit it under Solve." };
 
   // -- sign-in: cohort.js owns it -----------------------------------------------------------------------
   const auth = window.srijitAuth;
@@ -78,7 +78,10 @@
 
   // people: a name links to their profile; their level sits beside it
   const lvl = (l) => (l ? `<span class="lvl" title="Level ${l.n}">Lv ${l.n} · ${esc(l.name)}</span>` : "");
-  const person = (a) => `<a class="who" href="${BASE}profile/#${a.id}">${esc(a.name)}</a>${a.owner ? '<span class="tag">Srijit</span>' : lvl(a.level)}`;
+  const LI_SVG = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="#0A66C2" d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>';
+  const linkedin = (a) => (a.linkedin && /^https:\/\/([a-z]{2,3}\.)?linkedin\.com\/in\//.test(a.linkedin)
+    ? `<a class="li" href="${esc(a.linkedin)}" target="_blank" rel="noopener nofollow" title="${esc(a.name)} on LinkedIn" aria-label="${esc(a.name)} on LinkedIn">${LI_SVG}</a>` : "");
+  const person = (a) => `<a class="who" href="${BASE}profile/#${a.id}">${esc(a.name)}</a>${linkedin(a)}${a.owner ? "" : lvl(a.level)}`;
 
   // -- the discussion on a problem page ------------------------------------------------------------------
   let sort = "top", posts = [];
@@ -473,9 +476,11 @@
         const p = d.person, l = d.level, next = l.next;
         const pct = next ? Math.round(100 * (d.karma - (LEVEL_FLOOR[l.n - 1] || 0)) / (next - (LEVEL_FLOOR[l.n - 1] || 0))) : 100;
         document.title = p.name + " · Fall 2026 Cohort";
-        profileBox.innerHTML = `<header class="who-head"><h1>${esc(p.name)}</h1>
-            ${p.owner ? '<span class="tag">Srijit</span>' : `<span class="lvl big">Level ${l.n} · ${esc(l.name)}</span>`}
-            <p class="muted">Joined ${day(p.joined)}${p.mine ? ` · this is you · <button type="button" class="linkish" data-rename>change name</button>` : ""}</p></header>
+        profileBox.innerHTML = `<header class="who-head"><h1>${esc(p.name)}</h1>${linkedin(p).replace('class="li"', 'class="li big"')}
+            ${p.owner ? "" : `<span class="lvl big">Level ${l.n} · ${esc(l.name)}</span>`}
+            <p class="muted">Joined ${day(p.joined)}${p.mine ? ` · this is you · <button type="button" class="linkish" data-rename>change name</button>` : ""}</p>
+            ${p.mine ? `<form class="li-form"><label>Your LinkedIn <input type="url" inputmode="url" placeholder="https://www.linkedin.com/in/your-name/" value="${esc(p.linkedin || "")}"></label>
+              <button type="submit" class="btn small">Save</button><span class="muted">An icon by your name links to it. Leave it empty to remove it.</span></form>` : ""}</header>
           <div class="stats-row">
             <div><b>${d.karma}</b><span>Math Karma</span></div>
             <div><b>${d.points}</b><span>points from claps</span></div>
@@ -491,6 +496,12 @@
             : `<p class="soon">${p.mine ? "No solutions yet. Open a problem, press Solve and share yours." : "No solutions yet."}</p>`}`;
         const rn = profileBox.querySelector("[data-rename]");
         if (rn) rn.onclick = async () => { await rename(); show(); };
+        const lf = profileBox.querySelector(".li-form");
+        if (lf) lf.onsubmit = async (e) => {
+          e.preventDefault();
+          try { const r = await call("POST", "/me", { linkedin: lf.querySelector("input").value }); me = r.me; auth.setMe(me); toast(me.linkedin ? "LinkedIn link saved." : "LinkedIn link removed."); show(); }
+          catch (err) { failed(err); }
+        };
       } catch (err) { profileBox.innerHTML = `<p class="soon">Couldn't find that profile.</p>`; }
     };
     window.addEventListener("hashchange", show);
@@ -501,7 +512,7 @@
   // -- leaderboard page and "latest discussion" on the home page ------------------------------------------
   function table(rows) {
     if (!rows.length) return `<p class="soon">No claps yet.</p>`;
-    return `<ol class="lb">${rows.map((r, k) => `<li><span class="rank">${k + 1}</span><a class="who" href="${BASE}profile/#${r.id}">${esc(r.name || "Learner")}</a>${lvl(r.level)}<span class="up">👏 ${r.points}</span></li>`).join("")}</ol>`;
+    return `<ol class="lb">${rows.map((r, k) => `<li><span class="rank">${k + 1}</span><a class="who" href="${BASE}profile/#${r.id}">${esc(r.name || "Learner")}</a>${linkedin(r)}${lvl(r.level)}<span class="up">👏 ${r.points}</span></li>`).join("")}</ol>`;
   }
   async function startBoard() {
     if (!(await signIn())) { board.innerHTML = `<p>Sign in to see the leaderboard.</p><button type="button" class="btn accent small">Sign in</button>`; board.querySelector("button").onclick = askToSignIn; return; }

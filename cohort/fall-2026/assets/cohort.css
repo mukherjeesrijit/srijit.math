@@ -102,8 +102,8 @@ main.cohort h1 { font-size: 34px; line-height: 1.2; letter-spacing: -.02em; marg
 /* discussion (community.js, Cloudflare): Srijit's solution pinned, then everyone's posts and replies */
 .discuss [hidden], .recent[hidden] { display: none !important; }
 .discuss { margin-top: 36px; border-top: 1.5px solid var(--ink); padding-top: 16px; display: grid; gap: 18px; }
-.discuss h2 { font-size: 22px; margin: 0; display: flex; align-items: center; gap: 10px; }
-.discuss h2::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+.discuss > h2 { font-size: 22px; margin: 0; display: flex; align-items: center; gap: 10px; }
+.discuss > h2::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
 .discuss .soon, .discuss .muted { color: var(--muted); }
 .discuss .muted { font-size: 14px; }
 .btn.small { font-size: 15px; padding: .4em 1.1em; }
@@ -165,6 +165,62 @@ main.cohort h1 { font-size: 34px; line-height: 1.2; letter-spacing: -.02em; marg
 .actions .love { margin-left: auto; border-color: var(--line); color: var(--muted); }
 .actions .love:hover { border-color: #d6336c; color: #d6336c; }
 .actions .love.on { border-color: #d6336c; background: #fff0f5; color: #d6336c; }
+
+/* people, claps, grades, the bell, profiles */
+a.who { font-weight: 700; text-decoration: none; color: var(--ink); }
+a.who:hover { color: var(--accent); }
+.lvl { font-size: 11px; font-weight: 600; color: #5b4bb7; background: #f1eefe; border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
+.lvl.big { font-size: 14px; padding: 3px 12px; }
+.tools .clap { font-size: 13px; }
+.tools .clap.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+.tools .clap small { font-weight: 400; color: var(--muted); }
+.tools .clap.pop { transform: scale(1.12); transition: transform .12s; }
+.tools .gradebtn { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.grade { margin: 8px 0 0; font-size: 15px; }
+.feedback { margin-top: 8px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 10px 10px 0; padding: 8px 14px; }
+.feedback .muted { margin: 0 0 4px; font-size: 13px; }
+.grading { display: grid; gap: 8px; margin: 10px 0; padding: 12px; border: 1.5px dashed var(--accent); border-radius: 12px; }
+.grading select { font: inherit; padding: 4px 8px; border-radius: 8px; border: 1.5px solid var(--line); margin-left: 6px; }
+.grading textarea { width: 100%; font: inherit; font-size: 15px; padding: .5em .7em; border: 1.5px solid var(--line); border-radius: 10px; }
+.grading .row { display: flex; justify-content: flex-end; gap: 10px; align-items: center; }
+.post.lit { box-shadow: 0 0 0 3px var(--accent-soft), 0 0 0 4px var(--accent); }
+.md h1, .md h2, .md h3 { font-size: 17px; margin: .6em 0 .3em; }
+.md ul, .md ol { padding-left: 1.4em; margin: .4em 0; }
+.md pre { background: var(--soft); padding: 8px 10px; border-radius: 8px; overflow-x: auto; }
+.md code { background: var(--soft); padding: 0 4px; border-radius: 4px; font-size: .92em; }
+.md blockquote { margin: .5em 0; padding-left: 12px; border-left: 3px solid var(--line); color: var(--muted); }
+.md table { border-collapse: collapse; } .md td, .md th { border: 1px solid var(--line); padding: 4px 8px; }
+.solve .hint { margin: 0; color: var(--ink); max-width: 720px; }
+.solve .mine-note { margin: 0; color: var(--ok, #237a47); font-size: 14px; font-weight: 600; }
+.bell { position: relative; margin-left: auto; margin-right: 10px; }
+.bellbtn { border: 1.5px solid var(--line); background: #fff; border-radius: 999px; width: 40px; height: 36px; font-size: 16px; position: relative; }
+.bellbtn .dot { position: absolute; top: -6px; right: -6px; background: var(--accent); color: #fff; font-size: 11px; font-weight: 700;
+  border-radius: 999px; min-width: 18px; height: 18px; line-height: 18px; padding: 0 4px; }
+.notes { position: absolute; right: 0; top: 44px; width: min(360px, calc(100vw - 32px)); max-height: 70vh; overflow-y: auto; background: #fff;
+  border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 12px 32px rgba(0, 0, 0, .12); z-index: 6; padding: 6px; }
+.notes a { display: grid; gap: 2px; padding: 9px 10px; border-radius: 10px; text-decoration: none; font-size: 14px; }
+.notes a:hover { background: var(--soft); }
+.notes a.new { background: var(--accent-soft); }
+.notes time { color: var(--muted); font-size: 12px; }
+.notes .muted { padding: 10px; margin: 0; font-size: 14px; color: var(--muted); }
+.profile .who-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+.profile .who-head h1 { margin: 0; }
+.profile .who-head p { flex-basis: 100%; margin: 0; }
+.stats-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 24px 0 12px; }
+.stats-row div { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; }
+.stats-row b { font-size: 26px; font-variant-numeric: tabular-nums; }
+.stats-row span { color: var(--muted); font-size: 13px; }
+.karma-bar { height: 8px; background: var(--soft); border-radius: 999px; overflow: hidden; }
+.karma-bar i { display: block; height: 100%; background: #5b4bb7; border-radius: 999px; }
+.profile .small { font-size: 13px; margin: 6px 0 0; }
+.profile h2 { font-size: 20px; margin: 32px 0 10px; }
+.solved { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.scard { display: grid; gap: 4px; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; text-decoration: none; }
+.scard:hover { border-color: var(--ink); }
+.scard .mod { font-size: 12px; color: var(--accent); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.scard .when, .scard .nums { font-size: 13px; color: var(--muted); }
+.lb li .lvl { margin-left: 8px; }
+@media (max-width: 640px) { .stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 /* "Your solution": the writing box under the problem */
 .solve { margin-top: 28px; display: grid; gap: 10px; }

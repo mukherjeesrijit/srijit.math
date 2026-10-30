@@ -127,18 +127,20 @@
       .then((d) => { if (!CF && d && d.ok && user && !d.signedIn) clear(); }).catch(() => {});
   }
 
-  // -- the learner count: live from the sheet, once it passes the published number ----------------------
+  // -- the learner count and "<name> joined": from Cloudflare (live, every 15 s), else from the sheet ---------
   const enrolled = document.querySelector("[data-enrolled]");
-  if (enrolled && API) {
-    get({ a: "attended" }).then((d) => {
-      if (d.enrolled > Number(enrolled.textContent.replace(/,/g, ""))) enrolled.textContent = d.enrolled.toLocaleString();
-    }).catch(() => {});
-  }
-
-  // -- "<name> joined": real first names from the learner list, one at a time ------------------------
   const ticker = document.querySelector("[data-ticker]");
-  if (ticker && API) {
-    get({ a: "learners" }).then((d) => {
+  const stats = () => fetch(CF + "/stats").then((r) => r.json()).catch(() => null);
+  const shown = () => Number(enrolled.textContent.replace(/,/g, "")) || 0;
+  const firstStats = CF && (enrolled || ticker) ? stats() : Promise.resolve(null);
+  if (enrolled && (CF || API)) {
+    const sheet = () => get({ a: "attended" }).then((d) => { if (d.enrolled > shown()) enrolled.textContent = d.enrolled.toLocaleString(); });
+    const live = (d) => { if (d && d.ok && d.learners >= shown()) enrolled.textContent = d.learners.toLocaleString(); return d; };
+    firstStats.then((d) => { if (!(d && d.ok && d.learners >= shown()) && API) return sheet(); live(d); }).catch(() => {});
+    if (CF) setInterval(() => stats().then(live), 15000);
+  }
+  if (ticker && (CF || API)) {
+    firstStats.then((d) => (d && d.ok && d.names && d.names.length >= 10 ? d : API ? get({ a: "learners" }) : { names: [] })).then((d) => {
       const names = (d.names || []).filter((n) => n.length >= 3); // no initials ("Kd")
       if (names.length < 2) return;
       const slot = ticker.querySelector("b");

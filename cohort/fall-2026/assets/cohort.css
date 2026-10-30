@@ -115,8 +115,8 @@ main.cohort h1 { font-size: 34px; line-height: 1.2; letter-spacing: -.02em; marg
 .post time, .comment time { color: var(--muted); font-size: 13px; }
 .post .body, .comment .body { overflow-x: auto; overflow-wrap: anywhere; }
 .post .body p, .comment .body p { margin: .5em 0; }
-.post.pinned { border: 1.5px solid var(--accent); background: var(--accent-soft); }
-.post.pinned h3 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 12px 0 2px; }
+.post.pinned { border-left: 3px solid var(--accent); }
+.post.pinned h3 { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 10px 0 2px; }
 .tag { font-size: 12px; font-weight: 700; color: var(--accent); background: #fff; border: 1px solid var(--accent); border-radius: 999px; padding: 0 8px; }
 .kind { font-size: 12px; font-weight: 600; border-radius: 999px; padding: 1px 8px; background: var(--soft); }
 .kind.question { background: #eef3ff; color: #2849a8; }
@@ -152,7 +152,14 @@ main.cohort h1 { font-size: 34px; line-height: 1.2; letter-spacing: -.02em; marg
 
 /* solution cards, votes, the love button */
 .post.solcard .body { position: relative; }
-.post.solcard:not(.open) .body { max-height: 8.5em; overflow: hidden; }
+.post.solcard:not(.open) .body { max-height: 6.2em; overflow: hidden; }
+.post.solcard:not(.open) .body.fits::after { display: none; }
+.post.solcard[data-card] { cursor: pointer; }
+.post.solcard[data-card]:hover { border-color: #c9c9cd; }
+.post.solcard.open { cursor: default; }
+.sumline { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+.sumline .open-hint { color: var(--accent); font-weight: 600; }
+.solve .owner label { display: grid; gap: 4px; font-weight: 600; font-size: 14px; }
 .post.solcard:not(.open) .body::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3em;
   background: linear-gradient(rgba(255, 255, 255, 0), #fff); }
 .post .more.linkish { display: inline-block; margin: 4px 0 2px; color: var(--accent); font-weight: 600; text-decoration: none; font-size: 15px; }

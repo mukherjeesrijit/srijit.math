@@ -85,15 +85,22 @@
   const opened = new Set(); // solution cards someone opened; kept open when the thread redraws
   const KIND = { solution: "Solution", question: "Question" };
 
+  let srijit = null; // Srijit's Idea + Solution for this problem
   function pinned(c) {
+    srijit = c;
     if (!c || !(c.story || c.solution)) {
-      return `<article class="post pinned"><header><b>Srijit</b><span class="tag">Srijit's solution</span></header>
+      return `<article class="post solcard pinned"><header><b>Srijit</b><span class="tag">Srijit's solution</span></header>
         <p class="soon">Srijit's solution for this problem is coming soon. Start the discussion below.</p></article>`;
     }
-    return `<article class="post pinned"><header><b>Srijit</b><span class="tag">Srijit's solution</span></header>
-      ${c.story ? `<h3>Idea</h3><div class="body">${paras(c.story)}</div>` : ""}
-      ${c.solution ? `<h3>Solution</h3><div class="body">${paras(c.solution)}</div>` : ""}</article>`;
+    const open = opened.has("pin");
+    return `<article class="post solcard pinned${open ? " open" : ""}" data-card="pin">
+      <header><b>Srijit</b><span class="tag">Srijit's solution</span></header>
+      <div class="body">${c.story ? `<h3>Idea</h3>${paras(c.story)}` : ""}${c.solution ? `<h3>Solution</h3>${paras(c.solution)}` : ""}</div>
+      ${open ? "" : `<p class="sumline">Click to read the whole solution</p>`}</article>`;
   }
+  function repaintPin() { const el = box && box.querySelector(".pin"); if (el) { el.innerHTML = pinned(srijit); math(el); fits(el); } }
+  // a closed card fades out only if its text is cut short
+  const fits = (root) => root.querySelectorAll(".solcard:not(.open) .body").forEach((b) => b.classList.toggle("fits", b.scrollHeight <= b.clientHeight + 2));
   function tools(kind, x) {
     const out = [];
     if (kind === "post" && x.kind === "solution") {
@@ -130,24 +137,26 @@
       ${hiddenNote(c)}<div class="body md">${md(c.body)}</div><div class="tools">${tools("comment", c)}</div></div>`;
   }
   function postHTML(p) {
-    const long = p.body.length > 320 || p.body.split("\n").length > 5;
-    const open = !long || opened.has(p.id);
-    return `<article class="post solcard${p.hidden ? " is-hidden" : ""}${open ? " open" : ""}" id="post-${p.id}" data-kind="post" data-id="${p.id}">
+    const open = opened.has(p.id);
+    const r = p.comments.length;
+    const summary = [p.kind === "solution" ? `👏 ${p.claps}` : `▲ ${p.score}`, `${r} repl${r === 1 ? "y" : "ies"}`]
+      .concat(p.grade != null ? [`Srijit 👏 ${p.grade}/10`] : []).join(" · ");
+    return `<article class="post solcard${p.hidden ? " is-hidden" : ""}${open ? " open" : ""}" id="post-${p.id}" data-kind="post" data-id="${p.id}" data-card="${p.id}">
       <header>${person(p.author)}<span class="kind ${p.kind}">${KIND[p.kind] || "Post"}</span><time>${ago(p.created)}</time>
         ${p.edited ? `<button class="muted linkish" data-act="history">edited</button>` : ""}</header>
       ${hiddenNote(p)}<div class="body md">${md(p.body)}</div>
-      ${long ? `<button class="more linkish" data-act="expand">${open ? "Show less" : p.kind === "solution" ? "Show the whole solution" : "Show all of it"}</button>` : ""}
-      ${graded(p)}
-      <div class="tools">${tools("post", p)}</div>
-      <div class="comments"${open ? "" : " hidden"}>${p.comments.map(commentHTML).join("")}</div>
-      <form class="reply" hidden><textarea maxlength="1000" rows="2" placeholder="Reply to ${esc(p.author.name)}…"></textarea>
-        <div class="row"><button type="submit" class="btn small">Reply</button></div></form></article>`;
+      ${open ? `${graded(p)}
+        <div class="tools">${tools("post", p)}</div>
+        <div class="comments">${p.comments.map(commentHTML).join("")}</div>
+        <form class="reply"><textarea maxlength="1000" rows="2" placeholder="Reply to ${esc(p.author.name)}…"></textarea>
+          <div class="row"><button type="submit" class="btn small">Reply</button></div></form>`
+      : `<p class="sumline">${summary} · <span class="open-hint">Click to open${p.kind === "solution" ? " the solution" : ""} and reply</span></p>`}</article>`;
   }
   function renderThread() {
     const list = box.querySelector(".posts");
     list.innerHTML = posts.length ? posts.map(postHTML).join("")
       : `<p class="soon">No posts yet. Be the first: press Solve to share your solution, or ask about the step where you got stuck.</p>`;
-    math(list);
+    math(list); fits(list);
     box.querySelector(".count").textContent = posts.length ? `${posts.length} post${posts.length > 1 ? "s" : ""}` : "";
     const n = posts.reduce((t, p) => t + 1 + p.comments.length, 0);
     if (talkBtn) talkBtn.textContent = n ? `Discuss · ${n}` : "Discuss";
@@ -187,7 +196,7 @@
     if (!(await signIn())) return signedOut();
     shell();
     const content = window.cohortContent ? window.cohortContent() : Promise.resolve(null);
-    content.then((c) => { const el = box.querySelector(".pin"); el.innerHTML = pinned(c); math(el); })
+    content.then((c) => { const el = box.querySelector(".pin"); el.innerHTML = pinned(c); math(el); fits(el); })
       .catch(() => { box.querySelector(".pin").innerHTML = pinned(null); });
     await loadThread().catch(failed);
     const m = location.hash.match(/^#post-(\d+)$/); // a link from the bell or a profile: open that post
@@ -230,7 +239,16 @@
     });
     box.addEventListener("click", async (e) => {
       const b = e.target.closest("button");
-      if (!b) return;
+      if (!b) {
+        const card = e.target.closest("[data-card]");
+        if (!card || e.target.closest("a, textarea, input, select, form, .comments") || getSelection().toString()) return;
+        const k = card.dataset.card === "pin" ? "pin" : Number(card.dataset.card);
+        opened.has(k) ? opened.delete(k) : opened.add(k);
+        if (k === "pin") return repaintPin();
+        renderThread();
+        if (opened.has(k)) { const el = document.getElementById("post-" + k); if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+        return;
+      }
       if (b.dataset.sort) { sort = b.dataset.sort; syncSort(); return loadThread().catch(failed); }
       const act = b.dataset.act;
       if (!act) return;
@@ -259,7 +277,7 @@
         } else if (act === "reply") {
           if (!opened.has(it.id)) { opened.add(it.id); renderThread(); }
           const node = box.querySelector(`.post[data-id="${it.id}"]`);
-          const f = node.querySelector("form.reply"); f.hidden = !f.hidden; if (!f.hidden) f.querySelector("textarea").focus();
+          node.querySelector("form.reply textarea").focus();
         } else if (act === "edit") {
           if (it.kind === "post" && it.item.kind === "solution" && solveBox) { only(solveBox, solveBtn, true); return; }
           const body = it.node.querySelector(":scope > .body");
@@ -354,7 +372,7 @@
     const key = "solve_draft_" + solveBox.dataset.solve;
     solveBox.innerHTML = `<h2>Your solution</h2>
       <p class="hint">Solve it by hand. Snap a photo and ask an AI like Claude or Gemini to turn your handwriting into Markdown,
-        then paste it here. Everyone in the cohort can read it under Discuss.</p>
+        then paste it here. Your peers can read it under Discuss.</p>
       <p class="mine-note" hidden></p>
       <form class="write">
         <textarea maxlength="8000" rows="8" placeholder="Paste your solution here. Markdown works, and maths between $ signs, e.g. $\\frac{1}{n}$."></textarea>
@@ -382,7 +400,7 @@
     });
   }
   function refreshSolve() { // once the thread is loaded: if I've posted my solution, the box edits it
-    if (!solveBox || !solveBox.querySelector("form.write")) return;
+    if (!solveBox || !solveBox.querySelector("form.write") || solveBox.querySelector("form.owner")) return;
     mySolution = posts.find((p) => p.mine && p.kind === "solution") || null;
     const note = solveBox.querySelector(".mine-note"), ta = solveBox.querySelector("textarea");
     const btn = solveBox.querySelector("button[type=submit]");
@@ -392,9 +410,38 @@
       if (!store.get("solve_draft_" + solveBox.dataset.solve)) { ta.value = mySolution.body; ta.dispatchEvent(new Event("input")); }
     } else { note.hidden = true; btn.textContent = "Post to the discussion"; }
   }
+  function ownerSolve() {
+    solveBox.innerHTML = `<h2>Your solution</h2>
+      <p class="hint">Your Idea and Solution for this problem. Everyone sees them as Srijit's solution under Discuss.</p>
+      <form class="write owner">
+        <label>Idea<textarea name="story" maxlength="8000" rows="5"></textarea></label>
+        <label>Solution<textarea name="solution" maxlength="8000" rows="8"></textarea></label>
+        <div class="preview"></div>
+        <div class="row"><span class="muted">Maths between $ signs.</span><button type="submit" class="btn accent small">Save</button></div></form>`;
+    const f = solveBox.querySelector("form"), st = f.querySelector("[name=story]"), so = f.querySelector("[name=solution]");
+    const pv = solveBox.querySelector(".preview");
+    const paint = () => { pv.innerHTML = (st.value.trim() ? `<h3>Idea</h3>${paras(st.value)}` : "") + (so.value.trim() ? `<h3>Solution</h3>${paras(so.value)}` : ""); math(pv); };
+    let t = null;
+    [st, so].forEach((x) => x.addEventListener("input", () => { clearTimeout(t); t = setTimeout(paint, 300); }));
+    (window.cohortContent ? window.cohortContent() : Promise.resolve(null)).then((c) => {
+      st.value = (c && c.story) || ""; so.value = (c && c.solution) || ""; paint();
+    });
+    f.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = f.querySelector("button[type=submit]"); btn.disabled = true;
+      try {
+        await call("POST", "/content", { problem: solveBox.dataset.solve, story: st.value, solution: so.value });
+        srijit = Object.assign({}, srijit || {}, { story: st.value.trim(), solution: so.value.trim() });
+        repaintPin(); toast("Saved. Your solution is updated under Discuss.");
+        openTalk(true);
+      } catch (err) { failed(err); } finally { btn.disabled = false; }
+    });
+  }
   async function startSolve() {
     if (!solveBox) return;
-    if (await signedInAny()) { solveShell(); refreshSolve(); } else solveSignedOut();
+    if (!(await signedInAny())) return solveSignedOut();
+    if (API && auth.me() && auth.me().owner) return ownerSolve();
+    solveShell(); refreshSolve();
   }
   if (solveBox) solveBox.addEventListener("click", (e) => { const b = e.target.closest('[data-act="join"]'); if (b) askToSignIn(); });
 
@@ -473,10 +520,10 @@
           ${p.owner ? "" : `<div class="karma-bar" title="${next ? `${next - d.karma} more Math Karma to the next level` : "Top level"}"><i style="width:${pct}%"></i></div>
           <p class="muted small">${next ? `${next - d.karma} more Math Karma to the next level.` : "The top level."} Karma: +10 for each problem you solve, +3 for a question, +2 for each reply.</p>`}
           <h2>Solved</h2>
-          ${d.solved.length ? `<div class="solved">${d.solved.map((s) => `<a class="scard" href="${BASE}${encodeURIComponent(s.problem)}/#post-${s.id}">
+          ${d.solved.length ? `<div class="solved">${d.solved.map((s) => `<a class="scard" href="${BASE}${encodeURIComponent(s.problem)}/${s.id ? `#post-${s.id}` : ""}">
               <span class="mod">${esc(s.module)} · ${s.lesson}.${s.n}</span><b>${esc(s.title)}</b>
-              <span class="when">Solved ${day(s.created)}</span>
-              <span class="nums">👏 ${s.claps}${s.grade != null ? ` · Srijit 👏 ${s.grade}/10` : ""} · ${s.replies} repl${s.replies === 1 ? "y" : "ies"}</span></a>`).join("")}</div>`
+              <span class="when">${s.created ? `Solved ${day(s.created)}` : "Srijit's solution"}</span>
+              ${s.id ? `<span class="nums">👏 ${s.claps}${s.grade != null ? ` · Srijit 👏 ${s.grade}/10` : ""} · ${s.replies} repl${s.replies === 1 ? "y" : "ies"}</span>` : ""}</a>`).join("")}</div>`
             : `<p class="soon">${p.mine ? "No solutions yet. Open a problem, press Solve and share yours." : "No solutions yet."}</p>`}`;
         const rn = profileBox.querySelector("[data-rename]");
         if (rn) rn.onclick = async () => { await rename(); show(); };

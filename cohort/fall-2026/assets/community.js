@@ -510,6 +510,9 @@
       board.innerHTML = `<div class="lb-grid"><section><h2>This week</h2>${table(d.week)}</section><section><h2>All time</h2>${table(d.all)}</section></div>`;
     } catch (err) { board.innerHTML = `<p class="soon">Couldn't load the leaderboard. Please reload.</p>`; }
   }
+  // a post as one plain line: Markdown marks and LaTeX commands dropped, maths kept readable
+  const plainLine = (t) => String(t).replace(/[#*_>`]+/g, "").replace(/\$+/g, "").replace(/\\(frac|dfrac)\{([^{}]*)\}\{([^{}]*)\}/g, "$2/$3")
+    .replace(/\\(left|right|displaystyle|mathrm|text|quad|,)/g, "").replace(/\\([a-zA-Z]+)/g, "$1 ").replace(/[{}]/g, "").replace(/\s+/g, " ").trim();
   async function startRecent() {
     if (!(await signIn())) return;
     try {
@@ -517,9 +520,9 @@
       if (!d.items.length) return;
       latest.innerHTML = `<h2>Latest in the discussion</h2><ul>${d.items.map((r) => `<li><a href="${BASE}${encodeURIComponent(r.problem)}/#post-${r.post}">
           <span class="what"><b>${esc(r.name || "Learner")}</b> ${r.type === "comment" ? "replied on" : r.kind === "question" ? "asked about" : "shared a solution to"} <b>${esc(r.title)}</b></span>
-          <span class="snip">${esc(r.body.replace(/\s+/g, " "))}</span><time>${ago(r.created)}</time></a></li>`).join("")}</ul>
+          <span class="snip">${esc(plainLine(r.body))}</span><time>${ago(r.created)}</time></a></li>`).join("")}</ul>
         <p><a class="quiet" href="${BASE}leaderboard/">Leaderboard →</a></p>`;
-      latest.hidden = false; math(latest);
+      latest.hidden = false; // previews are one plain line: no rendered maths (it would not fit a phone)
     } catch (err) { /* the home page is fine without it */ }
   }
 

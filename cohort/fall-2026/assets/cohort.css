@@ -247,7 +247,7 @@ a.who:hover { color: var(--accent); }
 .recent { margin-top: 56px; }
 .recent h2 { font-size: 22px; margin: 0 0 8px; }
 .recent ul { list-style: none; padding: 0; margin: 0; border-top: 1.5px solid var(--ink); }
-.recent li a { display: grid; gap: 2px; padding: 12px 0; border-bottom: 1px solid var(--line); text-decoration: none; }
+.recent li a { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; padding: 12px 0; border-bottom: 1px solid var(--line); text-decoration: none; min-width: 0; }
 .recent li a:hover .what b:last-child { color: var(--accent); }
 .recent .snip { color: var(--muted); font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .recent time { color: var(--muted); font-size: 13px; }
@@ -305,4 +305,28 @@ a.who:hover { color: var(--accent); }
 }
 @media (max-width: 520px) {
   .top { padding: 10px 16px; }
+}
+
+/* phones (checked at 390 px) */
+.modules small { white-space: nowrap; }
+@media (max-width: 600px) {
+  .top { gap: 8px; }
+  .brand { font-size: 15px; line-height: 1.25; }
+  .enrol { padding: .35em .9em; font-size: 15px; }
+  .bell { margin-right: 0; }
+  .bellbtn { width: 36px; height: 34px; font-size: 15px; }
+  .notes { position: fixed; left: 12px; right: 12px; top: calc(60px + env(safe-area-inset-top, 0px)); width: auto; max-height: 70vh; }
+  main.cohort h1 { font-size: 24px; margin-bottom: 14px; }
+  .statement { padding: 14px 16px; border-radius: 10px; }
+  .actions { gap: 8px; }
+  .actions button { padding: .4em .95em; font-size: 15px; }
+  .actions .love { padding: .4em .8em; }
+  .post { padding: 12px 14px; }
+  .discuss > h2 { font-size: 20px; }
+  .solve textarea, .reply textarea, .editing textarea { font-size: 16px; } /* 16px keeps iPhones from zooming in */
+  .side::before { content: "All problems"; display: block; font-size: 13px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--accent); margin: 4px 0 10px; }
+  .pager { font-size: 14px; }
+  .lb-page h1 { font-size: 32px; }
+  .stats-row b { font-size: 22px; }
 }

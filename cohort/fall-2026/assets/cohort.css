@@ -150,6 +150,22 @@ main.cohort h1 { font-size: 34px; line-height: 1.2; letter-spacing: -.02em; marg
 .side .cnt { display: inline-block; min-width: 18px; padding: 0 5px; border-radius: 999px; background: var(--accent-soft); color: var(--accent);
   font-size: 12px; font-weight: 700; text-align: center; margin-left: 4px; }
 
+/* solution cards, votes, the love button */
+.post.solcard .body { position: relative; }
+.post.solcard:not(.open) .body { max-height: 8.5em; overflow: hidden; }
+.post.solcard:not(.open) .body::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3em;
+  background: linear-gradient(rgba(255, 255, 255, 0), #fff); }
+.post .more.linkish { display: inline-block; margin: 4px 0 2px; color: var(--accent); font-weight: 600; text-decoration: none; font-size: 15px; }
+.votes { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.votes button { border: 0 !important; border-radius: 0 !important; background: none; padding: 2px 9px; font-size: 12px; color: var(--muted); }
+.votes button:hover:not(:disabled) { color: var(--ink); background: var(--soft); }
+.votes .score { font-size: 13px; min-width: 18px; text-align: center; font-variant-numeric: tabular-nums; }
+.votes .up.on { color: var(--accent); background: var(--accent-soft); }
+.votes .down.on { color: #2849a8; background: #eef3ff; }
+.actions .love { margin-left: auto; border-color: var(--line); color: var(--muted); }
+.actions .love:hover { border-color: #d6336c; color: #d6336c; }
+.actions .love.on { border-color: #d6336c; background: #fff0f5; color: #d6336c; }
+
 /* "Your solution": the writing box under the problem */
 .solve { margin-top: 28px; display: grid; gap: 10px; }
 .solve h2 { font-size: 20px; margin: 0; }
@@ -162,7 +178,7 @@ main.cohort h1 { font-size: 34px; line-height: 1.2; letter-spacing: -.02em; marg
 .solve .preview:empty { display: none; }
 .solve .preview p { margin: 0 0 .6em; }
 .solve .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
-.discuss[hidden] { display: none !important; }
+.discuss[hidden], .solve[hidden], .comments[hidden] { display: none !important; }
 
 /* home: the latest posts; and the leaderboard page */
 .recent { margin-top: 56px; }

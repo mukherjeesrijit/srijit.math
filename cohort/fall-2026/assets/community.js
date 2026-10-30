@@ -7,6 +7,8 @@
   const box = document.querySelector("[data-discuss]");
   const solveBox = document.querySelector("[data-solve]");
   const talkBtn = document.querySelector('.actions [data-gate="discuss"]');
+  const solveBtn = document.querySelector('.actions [data-gate="solve"]');
+  const loveBtn = document.querySelector(".actions [data-love]");
   const board = document.querySelector("[data-leaderboard]");
   const latest = document.querySelector("[data-recent]");
   if (!(box || board || latest)) return;
@@ -71,8 +73,9 @@
   }
   function who(a) { return `<b>${esc(a.name)}</b>${a.owner ? '<span class="tag">Srijit</span>' : ""}`; }
   function tools(kind, x) {
-    const out = [`<button class="up${x.voted ? " on" : ""}" data-act="vote" aria-pressed="${x.voted}" ${x.mine ? "disabled" : ""} title="Upvote">▲ ${x.score}</button>`];
-    if (kind === "post") out.push(`<button data-act="reply">Reply${x.comments.length ? ` · ${x.comments.length}` : ""}</button>`);
+    const out = [`<span class="votes"><button class="up${x.voted === 1 ? " on" : ""}" data-act="up" aria-pressed="${x.voted === 1}" ${x.mine ? "disabled" : ""} title="Upvote" aria-label="Upvote">▲</button>`
+      + `<b class="score">${x.score}</b><button class="down${x.voted === -1 ? " on" : ""}" data-act="down" aria-pressed="${x.voted === -1}" ${x.mine ? "disabled" : ""} title="Downvote" aria-label="Downvote">▼</button></span>`];
+    if (kind === "post") out.push(`<button data-act="reply">${x.comments.length ? `${x.comments.length} repl${x.comments.length > 1 ? "ies" : "y"} · ` : ""}Reply</button>`);
     if (x.editable) out.push(`<button data-act="edit">Edit</button>`);
     if (x.mine || (me && me.owner)) out.push(`<button data-act="delete">Delete</button>`);
     if (!x.mine && !x.flagged) out.push(`<button data-act="flag">Flag</button>`);
@@ -90,13 +93,17 @@
       <div class="meta">${who(c.author)} <time>${ago(c.created)}</time>${c.edited ? ' <span class="muted">edited</span>' : ""}</div>
       ${hiddenNote(c)}<div class="body">${paras(c.body)}</div><div class="tools">${tools("comment", c)}</div></div>`;
   }
+  const opened = new Set(); // cards someone opened; kept open when the thread redraws
   function postHTML(p) {
-    return `<article class="post${p.hidden ? " is-hidden" : ""}" data-kind="post" data-id="${p.id}">
+    const long = p.body.length > 320 || p.body.split("\n").length > 5;
+    const open = !long || opened.has(p.id);
+    return `<article class="post solcard${p.hidden ? " is-hidden" : ""}${open ? " open" : ""}" data-kind="post" data-id="${p.id}">
       <header>${who(p.author)}<span class="kind ${p.kind}">${KIND[p.kind] || "Post"}</span><time>${ago(p.created)}</time>
         ${p.edited ? `<button class="muted linkish" data-act="history">edited</button>` : ""}</header>
       ${hiddenNote(p)}<div class="body">${paras(p.body)}</div>
+      ${long ? `<button class="more linkish" data-act="expand">${open ? "Show less" : p.kind === "solution" ? "Show the whole solution" : "Show all of it"}</button>` : ""}
       <div class="tools">${tools("post", p)}</div>
-      <div class="comments">${p.comments.map(commentHTML).join("")}</div>
+      <div class="comments"${open ? "" : " hidden"}>${p.comments.map(commentHTML).join("")}</div>
       <form class="reply" hidden><textarea maxlength="1000" rows="2" placeholder="Reply to ${esc(p.author.name)}…"></textarea>
         <div class="row"><button type="submit" class="btn small">Reply</button></div></form></article>`;
   }
@@ -113,6 +120,7 @@
     const d = await call("GET", "/thread?p=" + encodeURIComponent(box.dataset.discuss) + "&sort=" + sort);
     me = d.me; auth.setMe(me);
     posts = d.posts; renderThread();
+    paintLove(d.loves, d.loved);
   }
 
   function shell() {
@@ -190,13 +198,21 @@
       if (!it) return;
       const path = it.kind === "post" ? "posts" : "comments";
       try {
-        if (act === "vote") {
-          const on = !it.item.voted;
-          const d = await call("POST", "/vote", { kind: it.kind, id: it.id, on });
-          it.item.voted = on; it.item.score = d.score;
-          b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); b.textContent = "▲ " + d.score;
+        if (act === "up" || act === "down") {
+          const want = act === "up" ? 1 : -1, value = it.item.voted === want ? 0 : want; // clicking again takes it back
+          const d = await call("POST", "/vote", { kind: it.kind, id: it.id, value });
+          it.item.voted = value; it.item.score = d.score;
+          const v = b.parentElement;
+          v.querySelector(".score").textContent = d.score;
+          v.querySelector(".up").classList.toggle("on", value === 1); v.querySelector(".up").setAttribute("aria-pressed", value === 1);
+          v.querySelector(".down").classList.toggle("on", value === -1); v.querySelector(".down").setAttribute("aria-pressed", value === -1);
+        } else if (act === "expand") {
+          opened.has(it.id) ? opened.delete(it.id) : opened.add(it.id);
+          renderThread();
         } else if (act === "reply") {
-          const f = it.node.querySelector("form.reply"); f.hidden = !f.hidden; if (!f.hidden) f.querySelector("textarea").focus();
+          if (!opened.has(it.id)) { opened.add(it.id); renderThread(); }
+          const node = box.querySelector(`.post[data-id="${it.id}"]`);
+          const f = node.querySelector("form.reply"); f.hidden = !f.hidden; if (!f.hidden) f.querySelector("textarea").focus();
         } else if (act === "edit") {
           const body = it.node.querySelector(":scope > .body");
           body.innerHTML = `<form class="editing"><textarea maxlength="${it.kind === "post" ? 8000 : 1000}" rows="4"></textarea>
@@ -227,20 +243,40 @@
       } catch (err) { failed(err); }
     });
   }
-  function openTalk(show) {
-    if (!box) return;
-    box.hidden = !show;
-    if (talkBtn) talkBtn.setAttribute("aria-expanded", String(show));
-    if (show) {
-      const panel = document.querySelector(".panel"), vid = document.querySelector('.actions [data-gate="video"]');
-      if (panel) panel.hidden = true;
-      if (vid) vid.setAttribute("aria-expanded", "false");
-      box.scrollIntoView({ behavior: "smooth", block: "start" });
+  function only(sec, btn, show) { // Solve, Discuss and Video: one open at a time
+    const all = [[document.querySelector(".panel"), document.querySelector('.actions [data-gate="video"]')],
+                 [box, talkBtn], [solveBox, solveBtn]];
+    for (const [s, b] of all) {
+      const on = s === sec && show;
+      if (s) s.hidden = !on;
+      if (b) b.setAttribute("aria-expanded", String(on));
     }
+    if (show && sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+  const openTalk = (show) => box && only(box, talkBtn, show);
   if (talkBtn) talkBtn.addEventListener("click", async () => {
     if (!(await signedInAny())) return askToSignIn();
     openTalk(box.hidden);
+  });
+  if (solveBtn) solveBtn.addEventListener("click", async () => {
+    if (!(await signedInAny())) return askToSignIn();
+    only(solveBox, solveBtn, solveBox.hidden);
+    if (!solveBox.hidden) { const ta = solveBox.querySelector("textarea"); if (ta) ta.focus(); }
+  });
+
+  // -- ♥ on the problem -----------------------------------------------------------------------------------
+  let loved = false;
+  function paintLove(n, on) {
+    if (!loveBtn) return;
+    loved = on;
+    loveBtn.classList.toggle("on", on); loveBtn.setAttribute("aria-pressed", String(on));
+    loveBtn.textContent = n ? `♥ ${n}` : "♥";
+    loveBtn.title = on ? "You love this problem (click to take it back)" : "Love this problem";
+  }
+  if (loveBtn) loveBtn.addEventListener("click", async () => {
+    if (!(await signedInAny()) || !API) return askToSignIn();
+    try { const d = await call("POST", "/love", { problem: box.dataset.discuss, on: !loved }); paintLove(d.loves, d.loved); }
+    catch (err) { failed(err); }
   });
   async function signedInAny() { // with the Worker: its token; without it: the older Apps Script sign-in
     if (!auth) return false;

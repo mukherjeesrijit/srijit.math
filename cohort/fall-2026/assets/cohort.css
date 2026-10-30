@@ -339,3 +339,7 @@ a.who:hover { color: var(--accent); }
 }
 
 .brand .nw { white-space: nowrap; } /* on a phone: "Mathematics for" / "Machine Learning" */
+
+/* the notice across the top (build_site.py NOTICE) */
+.notice { background: var(--accent-soft); color: var(--ink); border-bottom: 1px solid var(--accent);
+  padding: 10px max(16px, env(safe-area-inset-left, 0px)); text-align: center; font-size: 14px; font-weight: 600; line-height: 1.4; }

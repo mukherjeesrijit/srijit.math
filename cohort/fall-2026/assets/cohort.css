@@ -348,5 +348,3 @@ a.who:hover { color: var(--accent); }
 .hint .copy { display: inline-block; border: 1.5px solid var(--ink); background: var(--bg); color: var(--ink); border-radius: 999px;
   padding: 0 10px; font: inherit; font-size: 13px; font-weight: 600; line-height: 1.6; cursor: pointer; white-space: nowrap; vertical-align: baseline; }
 .hint .copy:hover { background: var(--ink); color: var(--bg); }
-.solve .prompt-text { width: 100%; box-sizing: border-box; margin: 0 0 12px; font: 13px/1.5 ui-monospace, Menlo, monospace; color: var(--ink);
-  background: var(--soft); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; resize: vertical; }

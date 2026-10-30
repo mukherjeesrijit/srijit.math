@@ -391,14 +391,12 @@
     "- Leave out anything I crossed out. For a drawing or a graph, write [figure].",
     "- Reply with the Markdown only: no code block, no title, no comments before or after.",
   ].join("\n");
-  function copyPrompt(btn, box) { // the clipboard; where the browser refuses, the prompt shows, selected, to copy by hand
+  function copyPrompt(btn) { // the clipboard, or a hidden textarea where the browser refuses it (the prompt itself is never shown)
     const done = () => { btn.textContent = "Prompt copied ✓"; setTimeout(() => (btn.textContent = "Copy prompt"), 2000); };
     const old = () => {
       const t = Object.assign(document.createElement("textarea"), { value: PROMPT }); t.style.cssText = "position:fixed;opacity:0";
       document.body.appendChild(t); t.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (e) { /* refused */ } t.remove();
-      if (ok) return done();
-      box.hidden = false; box.focus(); box.select();
-      toast("Copy the prompt shown below the line.");
+      ok ? done() : toast("Couldn't copy. Please try again.");
     };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(PROMPT).then(done, old);
     else old();
@@ -408,14 +406,13 @@
     solveBox.innerHTML = `<h2>Your solution</h2>
       <p class="hint">Solve it by hand, photograph it and give the photo to your AI (Claude, Gemini, ChatGPT) with this prompt
         <button type="button" class="copy" data-act="copy-prompt">Copy prompt</button>, then paste its reply below.</p>
-      <textarea class="prompt-text" readonly rows="9" hidden>${esc(PROMPT)}</textarea>
       <p class="mine-note" hidden></p>
       <form class="write">
         <textarea maxlength="8000" rows="8" placeholder="Paste what your AI gave back here. You can also type: Markdown works, and maths between $ signs, e.g. $\\frac{1}{n}$."></textarea>
         <div class="preview md"></div>
         <div class="row"><span class="muted">One solution per problem. You can edit it any time.</span>
           <button type="submit" class="btn accent small">Post to the discussion</button></div></form>`;
-    solveBox.querySelector('[data-act="copy-prompt"]').addEventListener("click", (e) => copyPrompt(e.currentTarget, solveBox.querySelector(".prompt-text")));
+    solveBox.querySelector('[data-act="copy-prompt"]').addEventListener("click", (e) => copyPrompt(e.currentTarget));
     const ta = solveBox.querySelector("form.write textarea"), pv = solveBox.querySelector(".preview");
     ta.value = store.get(key) || "";
     let t = null;

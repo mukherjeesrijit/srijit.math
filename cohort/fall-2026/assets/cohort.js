@@ -40,7 +40,8 @@
   let googleReady = false;
   function onGoogle(resp) {
     cf("/auth/google", { credential: resp.credential }).then((d) => {
-      if (!d.ok) { toast("Google sign-in didn't work. Please try again."); return; }
+      if (!d.ok) { toast(d.error === "resting" ? "Sign-in is taking a short break. Please try again in a little while."
+        : "Google sign-in didn't work. Please try again."); return; }
       keep(d); modal.hidden = true; location.reload(); // every part of the page redraws signed in
     }).catch(() => toast("Couldn't reach the server. Please try again."));
   }

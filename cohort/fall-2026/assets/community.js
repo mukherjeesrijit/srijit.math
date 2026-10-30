@@ -447,7 +447,7 @@
     const btn = wrap.querySelector(".bellbtn"), dot = wrap.querySelector(".dot"), list = wrap.querySelector(".notes");
     let items = [];
     const paint = (d) => {
-      items = d.items;
+      items = d.items; shown = d.unseen;
       dot.hidden = !d.unseen; dot.textContent = d.unseen > 9 ? "9+" : d.unseen;
       list.innerHTML = items.length ? items.map((n) => `<a class="${n.seen ? "" : "new"}" href="${BASE}${encodeURIComponent(n.problem || "")}/#post-${n.post_id}">
           <span>${noteText(n)}</span><time>${ago(n.created)}</time></a>`).join("")
@@ -455,12 +455,14 @@
       math(list);
     };
     const load = () => call("GET", "/notifications").then(paint).catch(() => {});
+    let shown = null; // the check every 2 min asks only how many are new; the list loads when that changes
+    const check = () => call("GET", "/notifications/unseen").then((d) => { if (d.unseen !== shown) { shown = d.unseen; if (d.unseen) load(); else dot.hidden = true; } }).catch(() => {});
     btn.addEventListener("click", async () => {
       list.hidden = !list.hidden; btn.setAttribute("aria-expanded", String(!list.hidden));
-      if (!list.hidden && !dot.hidden) { await call("POST", "/notifications/seen", {}).catch(() => {}); dot.hidden = true; }
+      if (!list.hidden && !dot.hidden) { await call("POST", "/notifications/seen", {}).catch(() => {}); dot.hidden = true; shown = 0; }
     });
     document.addEventListener("click", (e) => { if (!wrap.contains(e.target)) { list.hidden = true; btn.setAttribute("aria-expanded", "false"); } });
-    load(); setInterval(() => { if (!document.hidden) load(); }, 120000); // every 2 min, only while the tab is in view
+    load(); setInterval(() => { if (!document.hidden) check(); }, 120000); // every 2 min, only while the tab is in view
   }
   // your name at the top opens your profile
   function nameToProfile() {

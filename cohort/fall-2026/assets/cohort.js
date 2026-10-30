@@ -75,17 +75,17 @@
     document.querySelectorAll("[data-guard]").forEach((el) => el.classList.toggle("locked", !signedIn()));
   }
 
-  // -- visits (private analytics, in Cloudflare) -------------------------------------------------------------
-  if (CF) cf("/visit", { vid, page: location.pathname }, true).catch(() => {});
-
-  // -- the learner count and "<name> joined": from Cloudflare (refreshed every 2 minutes) ---------------------
+  // -- visits (private analytics, in Cloudflare); the same request brings the learner count on pages that show it --
   const enrolled = document.querySelector("[data-enrolled]");
   const ticker = document.querySelector("[data-ticker]");
+  const visited = CF ? cf("/visit", { vid, page: location.pathname, stats: !!(enrolled || ticker) }, true).catch(() => null) : null;
+
+  // -- the learner count and "<name> joined" (refreshed every 5 minutes) -------------------------------------
   const stats = () => cf("/stats").catch(() => null);
   const shown = () => Number(enrolled.textContent.replace(/,/g, "")) || 0;
   const live = (d) => { if (enrolled && d && d.ok && d.learners >= shown()) enrolled.textContent = d.learners.toLocaleString(); return d; };
   if (CF && (enrolled || ticker)) {
-    stats().then(live).then((d) => {
+    visited.then(live).then((d) => {
       const names = ((d && d.names) || []).filter((n) => n.length >= 3); // no initials ("Kd")
       if (!ticker || names.length < 2) return;
       const slot = ticker.querySelector("b");
@@ -97,7 +97,7 @@
         setTimeout(() => { k = (k + 1) % names.length; slot.textContent = names[k]; slot.classList.remove("fade"); }, 350);
       }, 2600);
     });
-    if (enrolled) setInterval(() => { if (!document.hidden) stats().then(live); }, 120000); // every 2 min, only while the tab is in view
+    if (enrolled) setInterval(() => { if (!document.hidden) stats().then(live); }, 300000); // every 5 min, only while the tab is in view
   }
 
   // -- Srijit's solution and video for this problem (pinned in the discussion; Video opens below) ------------

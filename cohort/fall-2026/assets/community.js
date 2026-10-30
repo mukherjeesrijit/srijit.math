@@ -195,7 +195,9 @@
     if (!API) return pinnedOnly(); // no Worker configured: Srijit's solution still shows for signed-in learners
     if (!(await signIn())) return signedOut();
     shell();
-    await loadThread().catch(failed);
+    await loadThread().catch((err) => { // say it in the page, not only in a passing note
+      box.querySelector(".posts").innerHTML = `<p class="soon">${esc(ERR[err.message] || "Couldn't load the discussion. Please reload the page.")}</p>`;
+    });
     const m = location.hash.match(/^#post-(\d+)$/); // a link from the bell or a profile: open that post
     if (m) {
       opened.add(Number(m[1])); renderThread(); openTalk(true);

@@ -22,7 +22,9 @@
     const t = Object.assign(document.createElement("div"), { className: "toast", textContent: msg });
     document.body.appendChild(t); setTimeout(() => t.remove(), 3200);
   };
-  function signOut() { user = null; store.set("cohort_user", null); refresh(); }
+  function signOut() {
+    user = null; store.set("cohort_user", null); store.set("community_token", null); store.set("community_me", null); refresh();
+  }
 
   // -- enrolment: ask for name + email, email a sign-in link ------------------------------------------
   const modal = document.querySelector(".modal");
@@ -70,6 +72,7 @@
     }
     refresh();
   }).catch(() => {}) : Promise.resolve();
+  window.cohortReady = signingIn; // community.js waits for the emailed link to finish signing in
 
   function refresh() {
     document.querySelectorAll("[data-enrol]").forEach((b) => {
@@ -157,6 +160,7 @@
     }
     return loading;
   }
+  window.cohortContent = () => (actions && user && API ? load() : Promise.resolve(null)); // Srijit's solution, for the discussion
   if (actions && user && API) signingIn.then(() => user && load());
   if (actions) {
     actions.addEventListener("click", (e) => {

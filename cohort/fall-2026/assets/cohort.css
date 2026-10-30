@@ -99,6 +99,76 @@ main.cohort h1 { font-size: 34px; line-height: 1.2; letter-spacing: -.02em; marg
 .pager a { text-decoration: none; font-weight: 600; }
 .pager a:hover { color: var(--accent); }
 
+/* discussion (community.js, Cloudflare): Srijit's solution pinned, then everyone's posts and replies */
+.discuss [hidden], .recent[hidden] { display: none !important; }
+.discuss { margin-top: 36px; border-top: 1.5px solid var(--ink); padding-top: 16px; display: grid; gap: 18px; }
+.discuss h2 { font-size: 22px; margin: 0; display: flex; align-items: center; gap: 10px; }
+.discuss h2::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+.discuss .soon, .discuss .muted { color: var(--muted); }
+.discuss .muted { font-size: 14px; }
+.btn.small { font-size: 15px; padding: .4em 1.1em; }
+.linkish { background: none; border: 0; padding: 0; color: var(--muted); text-decoration: underline; font-size: 14px; }
+.join { border: 1px dashed var(--line); border-radius: 12px; padding: 18px 20px; display: grid; gap: 12px; justify-items: start; }
+.join p { margin: 0; }
+.post { border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; min-width: 0; }
+.post header, .comment .meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; font-size: 15px; }
+.post time, .comment time { color: var(--muted); font-size: 13px; }
+.post .body, .comment .body { overflow-x: auto; overflow-wrap: anywhere; }
+.post .body p, .comment .body p { margin: .5em 0; }
+.post.pinned { border: 1.5px solid var(--accent); background: var(--accent-soft); }
+.post.pinned h3 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 12px 0 2px; }
+.tag { font-size: 12px; font-weight: 700; color: var(--accent); background: #fff; border: 1px solid var(--accent); border-radius: 999px; padding: 0 8px; }
+.kind { font-size: 12px; font-weight: 600; border-radius: 999px; padding: 1px 8px; background: var(--soft); }
+.kind.question { background: #eef3ff; color: #2849a8; }
+.tools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; }
+.tools button { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 2px 10px; font-size: 13px; color: var(--ink); }
+.tools button:hover { border-color: var(--ink); }
+.tools button:disabled { opacity: .5; cursor: default; }
+.tools .up.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+.comments { display: grid; gap: 4px; margin-top: 10px; }
+.comments:empty { display: none; }
+.comment { border-left: 2px solid var(--line); padding: 4px 0 4px 12px; font-size: 15px; }
+.is-hidden { opacity: .6; }
+.hidden-note { margin: 6px 0 0; font-size: 13px; color: var(--accent); }
+.compose, .reply, .editing { display: grid; gap: 8px; }
+.reply { margin-top: 8px; }
+.compose textarea, .reply textarea, .editing textarea { width: 100%; font: inherit; font-size: 16px; padding: .6em .8em; border: 1.5px solid var(--line);
+  border-radius: 10px; resize: vertical; color: var(--ink); background: #fff; }
+.compose textarea:focus, .reply textarea:focus, .editing textarea:focus { outline: none; border-color: var(--ink); }
+.compose .row, .reply .row, .editing .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.reply .row, .editing .row { justify-content: flex-end; }
+.kinds { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 15px; }
+.kinds input { accent-color: var(--accent); }
+.sortbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; }
+.sortbar button { border: 1px solid var(--line); background: #fff; padding: 2px 12px; font-size: 14px; }
+.sortbar button:first-child { border-radius: 999px 0 0 999px; }
+.sortbar button:last-child { border-radius: 0 999px 999px 0; border-left: 0; }
+.sortbar button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.posts { display: grid; gap: 12px; }
+.history { border-top: 1px dashed var(--line); margin-top: 8px; padding-top: 6px; font-size: 14px; color: var(--muted); }
+.history .ver { margin-top: 6px; }
+.side .cnt { display: inline-block; min-width: 18px; padding: 0 5px; border-radius: 999px; background: var(--accent-soft); color: var(--accent);
+  font-size: 12px; font-weight: 700; text-align: center; margin-left: 4px; }
+
+/* home: the latest posts; and the leaderboard page */
+.recent { margin-top: 56px; }
+.recent h2 { font-size: 22px; margin: 0 0 8px; }
+.recent ul { list-style: none; padding: 0; margin: 0; border-top: 1.5px solid var(--ink); }
+.recent li a { display: grid; gap: 2px; padding: 12px 0; border-bottom: 1px solid var(--line); text-decoration: none; }
+.recent li a:hover .what b:last-child { color: var(--accent); }
+.recent .snip { color: var(--muted); font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recent time { color: var(--muted); font-size: 13px; }
+.lb-page { max-width: 820px; margin: 0 auto; padding: 48px 24px 96px; }
+.lb-page h1 { font-size: 40px; letter-spacing: -.03em; margin: 0 0 6px; }
+.lb-page > p { color: var(--muted); margin: 0 0 28px; }
+.lb-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
+.lb-grid h2 { font-size: 18px; margin: 0 0 8px; }
+.lb { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--ink); }
+.lb li { display: flex; align-items: baseline; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.lb .rank { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 22px; }
+.lb .up { margin-left: auto; color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) { .lb-grid { grid-template-columns: minmax(0, 1fr); } .lb-page { padding: 32px 16px 64px; } }
+
 /* modal + toast */
 .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff;
   padding: 9px 18px; border-radius: 999px; font-size: 15px; z-index: 9; }

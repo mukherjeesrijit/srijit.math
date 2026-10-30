@@ -1,0 +1,285 @@
+// Discussion on the Fall 2026 problem pages, plus the leaderboard and "latest discussion" lists. The backend is the
+// Cloudflare Worker (window.COHORT.community). Sign-in stays the cohort's emailed link: the cohort session is traded
+// once for a community token. Srijit's own solution (Idea + Solution, from the Apps Script) is pinned on top.
+(function () {
+  const C = window.COHORT || {};
+  const API = C.community;
+  const box = document.querySelector("[data-discuss]");
+  const board = document.querySelector("[data-leaderboard]");
+  const latest = document.querySelector("[data-recent]");
+  if (!(box || board || latest)) return;
+
+  const store = {
+    get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+    set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode */ } },
+  };
+  const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  const math = (el) => el && window.renderMathInElement && renderMathInElement(el, {
+    delimiters: [{ left: "$$", right: "$$", display: true }, { left: "\\[", right: "\\]", display: true },
+                 { left: "$", right: "$", display: false }, { left: "\\(", right: "\\)", display: false }],
+    throwOnError: false });
+  const toast = (msg) => {
+    const t = Object.assign(document.createElement("div"), { className: "toast", textContent: msg });
+    document.body.appendChild(t); setTimeout(() => t.remove(), 3200);
+  };
+  const paras = (text) => esc(text).split(/\n\s*\n/).map((p) => "<p>" + p.replace(/\n/g, "<br>") + "</p>").join("");
+  function ago(ms) {
+    const s = Math.max(1, Math.round((Date.now() - ms) / 1000));
+    if (s < 60) return "just now";
+    const m = Math.round(s / 60); if (m < 60) return m + " min ago";
+    const h = Math.round(m / 60); if (h < 24) return h + " h ago";
+    const d = Math.round(h / 24); if (d < 30) return d + (d === 1 ? " day ago" : " days ago");
+    return new Date(ms).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+  }
+  const ERR = { limit: "You've reached today's limit for that. Try again tomorrow.", locked: "This can't be edited any more.",
+    "too long": "That's too long.", empty: "Write something first.", own: "You can't do that on your own post." };
+
+  // -- sign-in: cohort session -> community token --------------------------------------------------------
+  const cohortUser = () => { const u = store.get("cohort_user"); return u && u.session ? u : null; };
+  let token = store.get("community_token"), me = store.get("community_me");
+  if (!cohortUser() || (me && me.email && cohortUser().email && me.email !== cohortUser().email)) { token = null; me = null; }
+  async function signIn() {
+    await (window.cohortReady || Promise.resolve());
+    const u = cohortUser();
+    if (!u) return false;
+    if (token && me) return true;
+    const d = await fetch(API + "/auth", { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ session: u.session }) }).then((r) => r.json()).catch(() => null);
+    if (!d || !d.ok) { token = null; me = null; store.set("community_token", null); store.set("community_me", null); return false; }
+    token = d.token; me = d.me; store.set("community_token", token); store.set("community_me", me);
+    return true;
+  }
+  async function call(method, path, body, retried) {
+    const r = await fetch(API + path, { method, headers: { "content-type": "application/json", authorization: "Bearer " + token },
+      body: body ? JSON.stringify(body) : undefined });
+    const d = await r.json().catch(() => ({ ok: false, error: "server" }));
+    if (r.status === 401 && !retried) {
+      token = null; me = null; store.set("community_token", null);
+      if (await signIn()) return call(method, path, body, true);
+    }
+    if (!d.ok) throw new Error(d.error || "server");
+    return d;
+  }
+  const failed = (e) => toast(ERR[e.message] || "Something went wrong. Please try again.");
+  const askToSignIn = () => { const b = document.querySelector(".top [data-enrol]"); if (b) b.click(); };
+
+  // -- the discussion on a problem page ------------------------------------------------------------------
+  let sort = "top", posts = [];
+  const KIND = { solution: "Solution", question: "Question" };
+
+  function pinned(c) {
+    if (!c || !(c.story || c.solution)) {
+      return `<article class="post pinned"><header><b>Srijit</b><span class="tag">Srijit's solution</span></header>
+        <p class="soon">Srijit's solution for this problem is coming soon. Start the discussion below.</p></article>`;
+    }
+    return `<article class="post pinned"><header><b>Srijit</b><span class="tag">Srijit's solution</span></header>
+      ${c.story ? `<h3>Idea</h3><div class="body">${paras(c.story)}</div>` : ""}
+      ${c.solution ? `<h3>Solution</h3><div class="body">${paras(c.solution)}</div>` : ""}</article>`;
+  }
+  function who(a) { return `<b>${esc(a.name)}</b>${a.owner ? '<span class="tag">Srijit</span>' : ""}`; }
+  function tools(kind, x) {
+    const out = [`<button class="up${x.voted ? " on" : ""}" data-act="vote" aria-pressed="${x.voted}" ${x.mine ? "disabled" : ""} title="Upvote">▲ ${x.score}</button>`];
+    if (kind === "post") out.push(`<button data-act="reply">Reply${x.comments.length ? ` · ${x.comments.length}` : ""}</button>`);
+    if (x.editable) out.push(`<button data-act="edit">Edit</button>`);
+    if (x.mine || (me && me.owner)) out.push(`<button data-act="delete">Delete</button>`);
+    if (!x.mine && !x.flagged) out.push(`<button data-act="flag">Flag</button>`);
+    if (x.flagged) out.push(`<span class="muted">Flagged</span>`);
+    if (me && me.owner) out.push(x.hidden ? `<button data-act="restore">Restore</button>` : `<button data-act="hide">Hide</button>`);
+    return out.join("");
+  }
+  function hiddenNote(x) {
+    if (!x.hidden) return "";
+    return `<p class="hidden-note">${me && me.owner ? `Hidden${x.flags ? ` · ${x.flags} flag${x.flags > 1 ? "s" : ""}` : ""}. Only you can see it.`
+      : "Hidden until Srijit reviews it. Only you can see it."}</p>`;
+  }
+  function commentHTML(c) {
+    return `<div class="comment${c.hidden ? " is-hidden" : ""}" data-kind="comment" data-id="${c.id}">
+      <div class="meta">${who(c.author)} <time>${ago(c.created)}</time>${c.edited ? ' <span class="muted">edited</span>' : ""}</div>
+      ${hiddenNote(c)}<div class="body">${paras(c.body)}</div><div class="tools">${tools("comment", c)}</div></div>`;
+  }
+  function postHTML(p) {
+    return `<article class="post${p.hidden ? " is-hidden" : ""}" data-kind="post" data-id="${p.id}">
+      <header>${who(p.author)}<span class="kind ${p.kind}">${KIND[p.kind] || "Post"}</span><time>${ago(p.created)}</time>
+        ${p.edited ? `<button class="muted linkish" data-act="history">edited</button>` : ""}</header>
+      ${hiddenNote(p)}<div class="body">${paras(p.body)}</div>
+      <div class="tools">${tools("post", p)}</div>
+      <div class="comments">${p.comments.map(commentHTML).join("")}</div>
+      <form class="reply" hidden><textarea maxlength="1000" rows="2" placeholder="Reply to ${esc(p.author.name)}…"></textarea>
+        <div class="row"><button type="submit" class="btn small">Reply</button></div></form></article>`;
+  }
+  function renderThread() {
+    const list = box.querySelector(".posts");
+    list.innerHTML = posts.length ? posts.map(postHTML).join("")
+      : `<p class="soon">No posts yet. Be the first: share how you solved it, or ask about the step where you got stuck.</p>`;
+    math(list);
+    box.querySelector(".count").textContent = posts.length ? `${posts.length} post${posts.length > 1 ? "s" : ""}` : "";
+  }
+  async function loadThread() {
+    const d = await call("GET", "/thread?p=" + encodeURIComponent(box.dataset.discuss) + "&sort=" + sort);
+    me = d.me; store.set("community_me", me);
+    posts = d.posts; renderThread();
+  }
+
+  function shell() {
+    box.innerHTML = `<h2>Discussion</h2>
+      <div class="pin"><p class="soon">Loading Srijit's solution…</p></div>
+      <form class="compose">
+        <div class="kinds" role="radiogroup" aria-label="Kind of post">
+          <label><input type="radio" name="kind" value="solution" checked> My solution</label>
+          <label><input type="radio" name="kind" value="question"> A question</label></div>
+        <textarea maxlength="8000" rows="4" placeholder="Share how you solved it, where you got stuck, or ask a question. Maths between $ signs, e.g. $\\frac{1}{n}$."></textarea>
+        <div class="row"><span class="muted">Posting as <b class="me-name"></b> · <button type="button" class="linkish" data-act="rename">change name</button></span>
+          <button type="submit" class="btn accent small">Post</button></div></form>
+      <div class="sortbar"><span class="count"></span>
+        <span><button type="button" data-sort="top" aria-pressed="true">Top</button><button type="button" data-sort="new" aria-pressed="false">New</button></span></div>
+      <div class="posts"><p class="soon">Loading the discussion…</p></div>`;
+    box.querySelector(".me-name").textContent = me ? me.name : "";
+  }
+  async function pinnedOnly() {
+    await (window.cohortReady || Promise.resolve());
+    if (!cohortUser()) return signedOut();
+    box.innerHTML = `<h2>Discussion</h2><div class="pin"><p class="soon">Loading Srijit's solution…</p></div>`;
+    const c = await (window.cohortContent ? window.cohortContent() : Promise.resolve(null)).catch(() => null);
+    const el = box.querySelector(".pin"); el.innerHTML = pinned(c); math(el);
+  }
+  function signedOut() {
+    box.innerHTML = `<h2>Discussion</h2><div class="join"><p>Sign in to read Srijit's solution and talk it through with everyone in the cohort.</p>
+      <button type="button" class="btn accent small" data-act="join">Sign in to join</button></div>`;
+  }
+
+  async function startDiscussion() {
+    if (!API) return pinnedOnly(); // no Worker configured: Srijit's solution still shows for signed-in learners
+    if (!(await signIn())) return signedOut();
+    shell();
+    const content = window.cohortContent ? window.cohortContent() : Promise.resolve(null);
+    content.then((c) => { const el = box.querySelector(".pin"); el.innerHTML = pinned(c); math(el); })
+      .catch(() => { box.querySelector(".pin").innerHTML = pinned(null); });
+    loadThread().catch(failed);
+  }
+
+  function itemOf(el) {
+    const node = el.closest("[data-kind]");
+    if (!node) return null;
+    const kind = node.dataset.kind, id = Number(node.dataset.id);
+    const post = kind === "post" ? posts.find((p) => p.id === id) : posts.find((p) => p.comments.some((c) => c.id === id));
+    const item = kind === "post" ? post : post && post.comments.find((c) => c.id === id);
+    return { node, kind, id, post, item };
+  }
+
+  function bindDiscussion() {
+    box.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const f = e.target, btn = f.querySelector("button[type=submit]"), ta = f.querySelector("textarea");
+      if (!ta.value.trim()) return toast(ERR.empty);
+      btn.disabled = true;
+      try {
+        if (f.classList.contains("compose")) {
+          await call("POST", "/posts", { problem: box.dataset.discuss, kind: f.querySelector("input[name=kind]:checked").value, body: ta.value });
+          ta.value = ""; sort = "new"; syncSort(); toast("Posted.");
+        } else if (f.classList.contains("reply")) {
+          await call("POST", `/posts/${itemOf(f).id}/comments`, { body: ta.value });
+        } else if (f.classList.contains("editing")) {
+          const it = itemOf(f);
+          await call("PATCH", `/${it.kind === "post" ? "posts" : "comments"}/${it.id}`, { body: ta.value });
+        }
+        await loadThread();
+      } catch (err) { failed(err); } finally { btn.disabled = false; }
+    });
+    box.addEventListener("click", async (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      if (b.dataset.sort) { sort = b.dataset.sort; syncSort(); return loadThread().catch(failed); }
+      const act = b.dataset.act;
+      if (!act) return;
+      if (act === "join") return askToSignIn();
+      if (act === "rename") return rename();
+      const it = itemOf(b);
+      if (!it) return;
+      const path = it.kind === "post" ? "posts" : "comments";
+      try {
+        if (act === "vote") {
+          const on = !it.item.voted;
+          const d = await call("POST", "/vote", { kind: it.kind, id: it.id, on });
+          it.item.voted = on; it.item.score = d.score;
+          b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); b.textContent = "▲ " + d.score;
+        } else if (act === "reply") {
+          const f = it.node.querySelector("form.reply"); f.hidden = !f.hidden; if (!f.hidden) f.querySelector("textarea").focus();
+        } else if (act === "edit") {
+          const body = it.node.querySelector(":scope > .body");
+          body.innerHTML = `<form class="editing"><textarea maxlength="${it.kind === "post" ? 8000 : 1000}" rows="4"></textarea>
+            <div class="row"><button type="button" class="linkish" data-act="cancel">Cancel</button><button type="submit" class="btn small">Save</button></div></form>`;
+          body.querySelector("textarea").value = it.item.body; body.querySelector("textarea").focus();
+        } else if (act === "cancel") {
+          renderThread();
+        } else if (act === "delete") {
+          if (b.dataset.sure !== "1") { b.dataset.sure = "1"; b.textContent = "Click again to delete"; setTimeout(() => { b.dataset.sure = ""; b.textContent = "Delete"; }, 3000); return; }
+          await call("DELETE", `/${path}/${it.id}`); await loadThread();
+        } else if (act === "flag") {
+          const tools = b.parentElement;
+          tools.innerHTML = `<span class="muted">Flag as:</span><button data-act="flagged" data-reason="ai">Looks AI-written</button>
+            <button data-act="flagged" data-reason="rude">Rude</button><button data-act="flagged" data-reason="spam">Spam</button>
+            <button data-act="cancel">Cancel</button>`;
+        } else if (act === "flagged") {
+          const d = await call("POST", "/flag", { kind: it.kind, id: it.id, reason: b.dataset.reason });
+          toast(d.hidden ? "Thanks. It's hidden until Srijit reviews it." : "Thanks for flagging it.");
+          await loadThread();
+        } else if (act === "hide" || act === "restore") {
+          await call("POST", "/moderate", { kind: it.kind, id: it.id, action: act }); await loadThread();
+        } else if (act === "history") {
+          const d = await call("GET", `/posts/${it.id}/versions`);
+          const el = document.createElement("div"); el.className = "history";
+          el.innerHTML = `<p class="muted">Earlier versions</p>` + d.versions.map((v) => `<div class="ver"><time>${ago(v.created)}</time>${paras(v.body)}</div>`).join("");
+          it.node.querySelector(":scope > .body").after(el); math(el); b.disabled = true;
+        }
+      } catch (err) { failed(err); }
+    });
+  }
+  function syncSort() { box.querySelectorAll("[data-sort]").forEach((x) => x.setAttribute("aria-pressed", x.dataset.sort === sort)); }
+  async function rename() {
+    const name = window.prompt ? window.prompt("The name people see:", me ? me.name : "") : null;
+    if (!name || !name.trim()) return;
+    try { const d = await call("POST", "/me", { name }); me = d.me; store.set("community_me", me); box.querySelector(".me-name").textContent = me.name; await loadThread(); }
+    catch (err) { failed(err); }
+  }
+
+  // -- the sidebar: how many posts each problem has --------------------------------------------------------
+  function sidebarCounts() {
+    const links = document.querySelectorAll(".side li a");
+    if (!links.length) return;
+    call("GET", "/counts").then((d) => {
+      links.forEach((a) => {
+        const slug = a.getAttribute("href").split("/").filter(Boolean).pop(), n = d.counts[slug];
+        if (n && !a.querySelector(".cnt")) a.insertAdjacentHTML("beforeend", ` <span class="cnt" title="posts and replies">${n}</span>`);
+      });
+    }).catch(() => {});
+  }
+
+  // -- leaderboard page and "latest discussion" on the home page ------------------------------------------
+  function table(rows) {
+    if (!rows.length) return `<p class="soon">No upvotes yet.</p>`;
+    return `<ol class="lb">${rows.map((r, k) => `<li><span class="rank">${k + 1}</span><b>${esc(r.name || "Learner")}</b><span class="up">▲ ${r.up}</span></li>`).join("")}</ol>`;
+  }
+  async function startBoard() {
+    if (!(await signIn())) { board.innerHTML = `<p>Sign in to see the leaderboard.</p><button type="button" class="btn accent small">Sign in</button>`; board.querySelector("button").onclick = askToSignIn; return; }
+    try {
+      const d = await call("GET", "/leaderboard");
+      board.innerHTML = `<div class="lb-grid"><section><h2>This week</h2>${table(d.week)}</section><section><h2>All time</h2>${table(d.all)}</section></div>`;
+    } catch (err) { board.innerHTML = `<p class="soon">Couldn't load the leaderboard. Please reload.</p>`; }
+  }
+  async function startRecent() {
+    if (!(await signIn())) return;
+    try {
+      const d = await call("GET", "/recent");
+      if (!d.items.length) return;
+      latest.innerHTML = `<h2>Latest in the discussion</h2><ul>${d.items.map((r) => `<li><a href="${C.base || "/cohort/fall-2026/"}${encodeURIComponent(r.problem)}/">
+          <span class="what"><b>${esc(r.name || "Learner")}</b> ${r.type === "comment" ? "replied on" : r.kind === "question" ? "asked about" : "shared a solution to"} <b>${esc(r.title)}</b></span>
+          <span class="snip">${esc(r.body.replace(/\s+/g, " "))}</span><time>${ago(r.created)}</time></a></li>`).join("")}</ul>
+        <p><a class="quiet" href="${C.base || "/cohort/fall-2026/"}leaderboard/">Leaderboard →</a></p>`;
+      latest.hidden = false; math(latest);
+    } catch (err) { /* the home page is fine without it */ }
+  }
+
+  if (box) { bindDiscussion(); startDiscussion().then(() => API && sidebarCounts()).catch(() => signedOut()); }
+  if (board && API) startBoard();
+  if (latest && API) startRecent();
+})();

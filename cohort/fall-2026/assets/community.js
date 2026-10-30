@@ -526,10 +526,17 @@
   const plainLine = (t) => String(t).replace(/[#*_>`]+/g, "").replace(/\$+/g, "").replace(/\\(frac|dfrac)\{([^{}]*)\}\{([^{}]*)\}/g, "$2/$3")
     .replace(/\\(left|right|displaystyle|mathrm|text|quad|,)/g, "").replace(/\\([a-zA-Z]+)/g, "$1 ").replace(/[{}]/g, "").replace(/\s+/g, " ").trim();
   async function startRecent() {
-    if (!(await signIn())) return;
+    if (!(await signIn())) {
+      latest.innerHTML = `<h2>Latest in the discussion</h2><div class="join"><p>Sign in to read everyone's solutions and join the discussion.</p>
+        <button type="button" class="btn accent small">Sign in to join</button></div>`;
+      latest.querySelector("button").onclick = askToSignIn; latest.hidden = false; return;
+    }
     try {
       const d = await call("GET", "/recent");
-      if (!d.items.length) return;
+      if (!d.items.length) {
+        latest.innerHTML = `<h2>Latest in the discussion</h2><p class="soon">Nothing yet. Open a problem, solve it by hand and share your solution.</p>`;
+        latest.hidden = false; return;
+      }
       latest.innerHTML = `<h2>Latest in the discussion</h2><ul>${d.items.map((r) => `<li><a href="${BASE}${encodeURIComponent(r.problem)}/#post-${r.post}">
           <span class="what"><b>${esc(r.name || "Learner")}</b> ${r.type === "comment" ? "replied on" : r.kind === "question" ? "asked about" : "shared a solution to"} <b>${esc(r.title)}</b></span>
           <span class="snip">${esc(plainLine(r.body))}</span><time>${ago(r.created)}</time></a></li>`).join("")}</ul>

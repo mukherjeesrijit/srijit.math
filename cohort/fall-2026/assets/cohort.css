@@ -343,3 +343,16 @@ a.who:hover { color: var(--accent); }
 /* the notice across the top (build_site.py NOTICE) */
 .notice { background: var(--accent-soft); color: var(--ink); border-bottom: 1px solid var(--accent);
   padding: 10px max(16px, env(safe-area-inset-left, 0px)); text-align: center; font-size: 14px; font-weight: 600; line-height: 1.4; }
+
+/* the Solve box: steps, the prompt for the learner's own AI (with a Copy button) and an example */
+.solve .steps { margin: 0 0 12px; padding-left: 1.3em; display: grid; gap: 4px; }
+.prompt { border: 1px solid var(--line); border-radius: 12px; background: var(--soft); margin: 0 0 10px; min-width: 0; }
+.prompt-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px 0; font-size: 14px; }
+.prompt .copy { border: 1.5px solid var(--ink); background: var(--bg); color: var(--ink); border-radius: 999px; padding: 2px 12px;
+  font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.prompt .copy:hover { background: var(--ink); color: var(--bg); }
+.prompt pre, .example pre { margin: 0; padding: 8px 12px 12px; white-space: pre-wrap; word-break: break-word; font-size: 13px; line-height: 1.5; }
+.example { margin: 0 0 14px; font-size: 15px; }
+.example summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+.example pre { background: var(--soft); border-radius: 8px; padding: 8px 12px; }
+.example .example-look { border: 1px dashed var(--line); border-radius: 8px; padding: 8px 12px; }

@@ -380,17 +380,55 @@
     solveBox.innerHTML = `<h2>Your solution</h2><div class="join"><p>Solve it by hand first. Then share it with the cohort.</p>
       <button type="button" class="btn accent small" data-act="join">Sign in to solve</button></div>`;
   }
+  // the prompt learners give their own AI with the photo: a copy of the page, exactly as written, in our Markdown
+  const PROMPT = [
+    "Copy my handwritten solution in the attached photo into Markdown, exactly as I wrote it.",
+    "",
+    "- Keep every word, symbol, step and line, in my order. Do not fix mistakes, add missing steps, reword, shorten or solve anything, even if it is wrong.",
+    "- Write all maths in LaTeX between dollar signs: $...$ inside a sentence, and $$...$$ on its own line for a displayed equation. Never use \\( \\) or \\[ \\].",
+    "- Start a new line wherever I did. Use a list only where I wrote one.",
+    "- If you can't read a word or symbol, write [unclear] instead of guessing.",
+    "- Leave out anything I crossed out. For a drawing or a graph, write [figure].",
+    "- Reply with the Markdown only: no code block, no title, no comments before or after.",
+  ].join("\n");
+  const EXAMPLE = [
+    "The roots satisfy $x^2 - 5x + 6 = 0$, so",
+    "",
+    "$$(x-2)(x-3) = 0.$$",
+    "",
+    "Hence $x = 2$ or $x = 3$, and the [unclear] root is $3$.",
+  ].join("\n");
+  function copyPrompt(btn, pre) {
+    const done = () => { btn.textContent = "Copied ✓"; setTimeout(() => (btn.textContent = "Copy"), 1800); };
+    const select = () => { const r = document.createRange(); r.selectNodeContents(pre); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      toast("Selected. Press Ctrl+C (or ⌘C) to copy."); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(PROMPT).then(done, select);
+    else select();
+  }
   function solveShell() {
     const key = "solve_draft_" + solveBox.dataset.solve;
     solveBox.innerHTML = `<h2>Your solution</h2>
-      <p class="hint">Solve it by hand. Snap a photo and ask an AI like Claude or Gemini to turn your handwriting into Markdown,
-        then paste it here. Your peers can read it under Discuss.</p>
+      <ol class="steps">
+        <li>Solve it by hand, on paper.</li>
+        <li>Take a photo and open your AI: Claude, Gemini or ChatGPT.</li>
+        <li>Attach the photo, paste this prompt and send it.</li>
+        <li>Paste what it gives back below. Check it against your page, then post. Your peers read it under Discuss.</li>
+      </ol>
+      <div class="prompt"><div class="prompt-head"><b>The prompt</b><button type="button" class="copy" data-act="copy-prompt">Copy</button></div>
+        <pre>${esc(PROMPT)}</pre></div>
+      <details class="example"><summary>See an example</summary>
+        <p class="muted">For a page that reads “The roots satisfy x² − 5x + 6 = 0, so (x − 2)(x − 3) = 0. Hence x = 2 or x = 3 …”
+          with one word too smudged to read, the AI should give back exactly this:</p>
+        <pre>${esc(EXAMPLE)}</pre>
+        <p class="muted">which shows on the site as:</p><div class="md example-look"></div></details>
       <p class="mine-note" hidden></p>
       <form class="write">
-        <textarea maxlength="8000" rows="8" placeholder="Paste your solution here. Markdown works, and maths between $ signs, e.g. $\\frac{1}{n}$."></textarea>
+        <textarea maxlength="8000" rows="8" placeholder="Paste what your AI gave back here. You can also type: Markdown works, and maths between $ signs, e.g. $\\frac{1}{n}$."></textarea>
         <div class="preview md"></div>
         <div class="row"><span class="muted">One solution per problem. You can edit it any time.</span>
           <button type="submit" class="btn accent small">Post to the discussion</button></div></form>`;
+    const look = solveBox.querySelector(".example-look"); look.innerHTML = md(EXAMPLE); math(look);
+    solveBox.querySelector('[data-act="copy-prompt"]').addEventListener("click", (e) => copyPrompt(e.currentTarget, solveBox.querySelector(".prompt pre")));
     const ta = solveBox.querySelector("textarea"), pv = solveBox.querySelector(".preview");
     ta.value = store.get(key) || "";
     let t = null;

@@ -361,32 +361,26 @@ a.who:hover { color: var(--accent); }
 @media (prefers-reduced-motion: reduce) { .swap > span { transform: none !important; } } /* fade only */
 .sub .nw { white-space: nowrap; }
 
-/* the adaptive path (path.js): suggestions under a problem's buttons, and on the home page */
-.next { margin: 18px 0 0; border: 1.5px solid var(--accent); background: var(--accent-soft); border-radius: 12px; padding: 14px 18px; }
-.next h2 { font-size: 17px; margin: 0 0 4px; }
-.next .muted { color: var(--muted); font-size: 14px; margin: 0 0 6px; }
-.next ul { list-style: none; padding: 0; margin: 0; }
-.next li { padding: 7px 0; border-top: 1px solid rgba(232, 89, 12, .2); }
-.next li:first-child { border-top: 0; }
-.next li a { font-weight: 600; text-decoration: none; }
-.next li a:hover { color: var(--accent); }
-.next small { display: block; color: var(--muted); font-size: 13px; }
+/* "Keep practising" (build_site.py more(); path.js orders the groups for a signed-in learner) and "Next for you" */
+.more { margin-top: 34px; display: flex; flex-direction: column; gap: 16px; }
+.more h2 { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; order: -3; }
+.more .why { margin: -6px 0 0; color: var(--muted); font-size: 15px; order: -2; }
+.group h3 { font-size: 15px; margin: 0 0 8px; }
+.group.first h3::after { content: " · for you"; color: var(--accent); font-weight: 600; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 10px; }
+.pcard { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px;
+  text-decoration: none; background: var(--bg); min-width: 0; }
+.pcard:hover { border-color: var(--ink); }
+.pcard b { font-size: 15px; line-height: 1.35; }
+.pcard .meta { color: var(--muted); font-size: 13px; }
+.pcard .tag { font-size: 12px; font-weight: 600; color: var(--muted); }
+.pcard.done { background: var(--soft); }
+.pcard.done b { color: var(--muted); }
 .home-path { margin: 0 0 28px; }
+.home-path h2 { font-size: 22px; margin: 0 0 10px; }
 .dots { color: var(--accent); font-size: 10px; letter-spacing: 1px; white-space: nowrap; vertical-align: 1px; }
 .actions .stuck { border-color: var(--line); color: var(--muted); }
-.actions .stuck:hover { border-color: var(--accent); color: var(--accent); }
-.actions .stuck.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
-
-/* "Around this problem": the graph's neighbours, under the pager */
-.related { margin-top: 30px; }
-.related h2 { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
-.related .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px 28px; }
-.related h3 { font-size: 15px; margin: 0 0 4px; }
-.related ul { list-style: none; padding: 0; margin: 0; }
-.related li { padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
-.related li a { text-decoration: none; }
-.related li a:hover { color: var(--accent); }
-@media (max-width: 600px) {
-  .next { padding: 12px 14px; }
-  .actions .stuck { padding: .4em .8em; }
+.actions .stuck:hover { border-color: var(--ink); color: var(--ink); }
+.actions .stuck.on { border-color: var(--ink); color: var(--ink); }
+@media (max-width: 600px) { .actions .stuck { padding: .4em .8em; } }
 }

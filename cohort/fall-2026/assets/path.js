@@ -1,18 +1,19 @@
-// The adaptive path (2026-10-30): what to solve next, from the problem graph and what you have done.
-// The graph is a static file (/problems/graph.json, written by build_site.py from data/path.csv): for each public
-// problem its title, difficulty (1-3), skills, the public problems it builds on, and its place in the cohort. Your record
-// (your solutions with Srijit's grades, and "Stuck?") comes with the page's one request (/hello, want "path").
-// Everything is worked out here in the browser: the server is asked nothing more, except when you press "Stuck?".
-// The graph (27 KB) is fetched only for a signed-in learner, or when "Stuck?" is pressed: never for a passing visitor.
+// The adaptive path (2026-10-30), kept quiet: nothing appears under a problem's buttons. At the bottom of every problem
+// page, "Keep practising" (built into the page by build_site.py) shows problem cards: simpler problems, similar ones,
+// a step up. For a signed-in learner this script only puts the right group first, says why in one line, and ticks what
+// they've solved. Your record (your solutions with Srijit's grades, and "Stuck?") comes with the page's one request
+// (/hello, want "path"); nothing else is asked of the server, except when you press "Stuck?". The home page's
+// "Next for you" also needs the graph (/problems/graph.json, 27 KB), fetched only there and only when signed in.
+// Srijit (the teacher) sees none of it.
 (function () {
   const C = window.COHORT || {};
   const API = C.community, PAGES = C.problems || "/problems/";
-  const box = document.querySelector("[data-next]"); // a problem page: suggestions for this problem
-  const home = document.querySelector("[data-path]"); // the home page: where to go next overall
+  const more = document.querySelector("[data-more]"); // a problem page: "Keep practising"
+  const home = document.querySelector("[data-path]"); // the home page: "Next for you"
   const actions = document.querySelector(".actions");
   const here = actions && actions.dataset.slug;
   const stuckBtn = actions && actions.querySelector("[data-stuck]");
-  if (!API || !(box || home)) return;
+  if (!API || !(more || home || stuckBtn)) return;
   const auth = window.srijitAuth;
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   const toast = (msg) => {
@@ -20,111 +21,65 @@
     document.body.appendChild(t); setTimeout(() => t.remove(), 3200);
   };
 
-  let G = null; // id -> {t, d, s, a, c, o}
-  let loading = null;
-  function loadGraph() {
-    if (!loading) {
-      loading = fetch(PAGES + "graph.json?v=" + (C.v || "")).then((r) => r.json()).then((graph) => {
-        G = graph;
-        Object.keys(G).forEach((id) => G[id].a.forEach((x) => { (leadsTo[x] = leadsTo[x] || []).push(id); }));
-      });
-      loading.catch(() => { loading = null; });
-    }
-    return loading;
-  }
-  let solved = {}, stuck = new Set(); // id -> Srijit's grade (null until graded); ids marked "Stuck?"
-  const leadsTo = {}; // id -> the public problems that build on it
+  let solved = {}, stuck = new Set(), ready = false; // id -> Srijit's grade (null until graded); ids marked "Stuck?"
+  const isStuck = (id) => stuck.has(id) && !(id in solved);
 
-  // -- the engine -------------------------------------------------------------------------------------------
-  // How well you know one problem, 0 to 1: Srijit's grade out of 10; a posted solution he hasn't graded yet counts
-  // as 0.6 for now; "Stuck?" counts as 0; untried is unknown.
-  function mastery(id) {
-    if (stuck.has(id) && !(id in solved)) return 0;
-    if (!(id in solved)) return null;
-    return solved[id] == null ? 0.6 : solved[id] / 10;
-  }
-  const done = (id) => { const m = mastery(id); return m != null && m >= 0.5; };
-  // Your level on each skill: the average of how well you know the problems that use it.
-  function levels() {
-    const sum = {}, n = {};
-    Object.keys(G).forEach((id) => {
-      const m = mastery(id);
-      if (m == null) return;
-      G[id].s.forEach((s) => { sum[s] = (sum[s] || 0) + m; n[s] = (n[s] || 0) + 1; });
-    });
-    return Object.fromEntries(Object.keys(sum).map((s) => [s, sum[s] / n[s]]));
-  }
-  const open = (id) => G[id] && !done(id) && !stuck.has(id);
-  const byEase = (a, b) => G[a].d - G[b].d || (G[a].o ?? 1e9) - (G[b].o ?? 1e9);
-  // easier problems that lead to this one; if you've done those, the ones a step further back
-  function feeders(id) {
-    let out = G[id].a.filter(open);
-    if (!out.length) out = [...new Set(G[id].a.flatMap((x) => (G[x] ? G[x].a : [])))].filter(open);
-    return out.sort(byEase);
-  }
-  const followers = (id) => (leadsTo[id] || []).filter((x) => open(x) && G[x].d >= G[id].d).sort(byEase);
-  // problems on the same skills at the same level, your weakest skill first
-  function sameIdea(id) {
-    const L = levels(), skills = G[id].s;
-    const weak = (x) => Math.min(...G[x].s.filter((s) => skills.includes(s)).map((s) => L[s] ?? 0.5));
-    return Object.keys(G).filter((x) => x !== id && open(x) && G[x].d === G[id].d && G[x].s.some((s) => skills.includes(s)))
-      .sort((a, b) => weak(a) - weak(b) || byEase(a, b));
-  }
-  // the first problem of the course you haven't done, after this one if it's in the course
-  function nextInCourse(id) {
-    const from = id && G[id] && G[id].o != null ? G[id].o : -1;
-    const course = Object.keys(G).filter((x) => G[x].o != null).sort((a, b) => G[a].o - G[b].o);
-    return course.find((x) => G[x].o > from && open(x)) || course.find(open);
-  }
-  const skillOf = (x, id) => G[x].s.find((s) => G[id].s.includes(s));
-
-  function forProblem(id) {
+  // -- a problem page: which group first, and why ------------------------------------------------------------
+  // Stuck, or graded 0-3: simpler first. Graded 4-6: similar first. Graded 7-10: a step up first. Otherwise the order
+  // stays simpler, similar, step up, with no line.
+  function plan(id) {
     const g = solved[id];
-    if (stuck.has(id) && !(id in solved)) {
-      return { title: "Stuck? Try these first", note: "Easier problems that lead here. Come back when you've solved one.",
-               items: feeders(id).slice(0, 3).map((x) => [x, "builds up to this one"]) };
-    }
-    if (!(id in solved)) return null;
-    const course = nextInCourse(id);
-    const plus = (list) => (course && !list.some(([x]) => x === course) ? [...list, [course, "next in the course"]] : list);
-    if (g == null) {
-      return { title: "While Srijit grades yours", items: plus(followers(id).slice(0, 1).map((x) => [x, "builds on this one"])) };
-    }
-    if (g >= 7) return { title: "Well done. A step up", items: plus(followers(id).slice(0, 2).map((x) => [x, "builds on this one"])) };
-    if (g >= 4) {
-      return { title: "Practise the same idea", items: plus(sameIdea(id).slice(0, 2).map((x) => [x, `same idea: ${skillOf(x, id) || "practice"}`])) };
-    }
-    return { title: "Strengthen the basics first", note: "Easier problems that lead here, then try this one again.",
-             items: feeders(id).slice(0, 3).map((x) => [x, "builds up to this one"]) };
+    if (isStuck(id)) return ["simpler", "Stuck? Start with a simpler problem that leads here."];
+    if (!(id in solved) || g == null) return [null, ""];
+    if (g >= 7) return ["harder", `Srijit gave you ${g}/10 here. Ready for a step up.`];
+    if (g >= 4) return ["similar", `Srijit gave you ${g}/10 here. A similar problem will make it stick.`];
+    return ["simpler", `Srijit gave you ${g}/10 here. A simpler problem first, then try this one again.`];
   }
-  function forHome() {
+  function paintMore() {
+    if (!more || !ready) return;
+    const [first, why] = plan(here);
+    const groups = [...more.querySelectorAll(".group")];
+    groups.forEach((g) => { g.style.order = g.dataset.g === first ? "-1" : ""; g.classList.toggle("first", g.dataset.g === first); });
+    const line = more.querySelector("[data-why]");
+    line.textContent = why; line.hidden = !why;
+    more.querySelectorAll(".pcard").forEach((a) => {
+      const id = a.dataset.p, g = solved[id];
+      a.classList.toggle("done", id in solved);
+      let tag = a.querySelector(".tag");
+      const text = id in solved ? (g == null ? "✓ solved" : `✓ ${g}/10`) : isStuck(id) ? "stuck" : "";
+      if (text && !tag) { tag = document.createElement("span"); tag.className = "tag"; a.appendChild(tag); }
+      if (tag) { tag.textContent = text; tag.hidden = !text; }
+    });
+  }
+  function paintStuck() {
+    if (!stuckBtn) return;
+    const on = stuck.has(here);
+    stuckBtn.classList.toggle("on", on); stuckBtn.setAttribute("aria-pressed", String(on));
+    stuckBtn.textContent = on ? "Stuck ✓" : "Stuck?";
+  }
+
+  // -- the home page: "Next for you" ---------------------------------------------------------------------------
+  let G = null;
+  function nextForYou() {
+    const leadsTo = {};
+    Object.keys(G).forEach((id) => G[id].a.forEach((x) => { (leadsTo[x] = leadsTo[x] || []).push(id); }));
+    const done = (id) => id in solved && (solved[id] == null || solved[id] >= 5);
+    const open = (id) => G[id] && !done(id) && !isStuck(id);
+    const byEase = (a, b) => G[a].d - G[b].d || (G[a].o ?? 1e9) - (G[b].o ?? 1e9);
+    const course = Object.keys(G).filter((x) => G[x].o != null).sort((a, b) => G[a].o - G[b].o);
     const items = [], seen = new Set();
     const add = (x, why) => { if (x && !seen.has(x)) { seen.add(x); items.push([x, why]); } };
     const tried = Object.keys(G).filter((id) => id in solved || stuck.has(id));
-    tried.filter((id) => stuck.has(id) && !(id in solved) || (solved[id] != null && solved[id] <= 3))
-      .forEach((id) => add(feeders(id)[0], `fills a gap before ${G[id].t}`));
-    add(nextInCourse(null), tried.length ? "next in the course" : "start here");
-    tried.filter((id) => solved[id] != null && solved[id] >= 7).forEach((id) => add(followers(id)[0], `a step up from ${G[id].t}`));
-    return { title: tried.length ? "Next for you" : "Where to start", items: items.slice(0, 3) };
-  }
-
-  // -- the page ---------------------------------------------------------------------------------------------
-  const dots = (d) => `<span class="dots" title="difficulty ${d} of 3">${"●".repeat(d)}${"○".repeat(3 - d)}</span>`;
-  function paint(el, s) {
-    if (!s || !s.items.length) { el.hidden = true; return; }
-    el.innerHTML = `<h2>${esc(s.title)}</h2>${s.note ? `<p class="muted">${esc(s.note)}</p>` : ""}<ul>${s.items.map(([x, why]) =>
-      `<li><a href="${PAGES}${encodeURIComponent(x)}/">${esc(G[x].t)}</a> ${dots(G[x].d)}<small>${esc(why)}${G[x].c ? ` · ${esc(G[x].c)}` : ""}</small></li>`).join("")}</ul>`;
-    el.hidden = false;
-  }
-  function render() {
-    if (!G) return;
-    if (box && here && G[here]) paint(box, forProblem(here));
-    if (home) paint(home, forHome());
-    if (stuckBtn) {
-      const on = stuck.has(here);
-      stuckBtn.classList.toggle("on", on); stuckBtn.setAttribute("aria-pressed", String(on));
-      stuckBtn.textContent = on ? "Stuck ✓" : "Stuck?";
-    }
+    tried.filter((id) => isStuck(id) || (solved[id] != null && solved[id] <= 3))
+      .forEach((id) => add(G[id].a.filter(open).sort(byEase)[0], `simpler, before ${G[id].t}`));
+    add(course.find(open), tried.length ? "next in the course" : "start here");
+    tried.filter((id) => solved[id] != null && solved[id] >= 7)
+      .forEach((id) => add((leadsTo[id] || []).filter(open).sort(byEase)[0], `a step up from ${G[id].t}`));
+    if (!items.length) return;
+    const dots = (d) => `<span class="dots" title="difficulty ${d} of 3">${"●".repeat(d)}${"○".repeat(3 - d)}</span>`;
+    home.innerHTML = `<h2>${tried.length ? "Next for you" : "Where to start"}</h2><div class="cards">${items.slice(0, 3).map(([x, why]) =>
+      `<a class="pcard" href="${PAGES}${encodeURIComponent(x)}/"><b>${esc(G[x].t)}</b><span class="meta">${dots(G[x].d)} ${esc(why)}</span></a>`).join("")}</div>`;
+    home.hidden = false;
   }
 
   if (stuckBtn) stuckBtn.addEventListener("click", async () => {
@@ -136,17 +91,19 @@
         headers: { "content-type": "application/json", authorization: "Bearer " + auth.token() } }).then((x) => x.json());
       if (!r.ok) throw new Error(r.error);
       on ? stuck.add(here) : stuck.delete(here);
-      await loadGraph().catch(() => {});
-      render();
-      if (on && box && !box.hidden) box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      ready = true; paintStuck(); paintMore();
+      if (on) toast(more && more.querySelector('[data-g="simpler"]') ? "Simpler problems that lead here are at the bottom of the page."
+        : "Noted. Try the similar problems at the bottom of the page.");
     } catch (err) { toast(err.message === "resting" ? "The site is taking a short break. Please try again in a little while." : "Couldn't save that. Please try again."); }
     finally { stuckBtn.disabled = false; }
   });
 
   (window.cohortHello || Promise.resolve(null)).then((hello) => {
-    if (!(hello && hello.signedIn && hello.path)) return; // signed out: no path (the "Around this problem" links stay)
+    if (!(hello && hello.signedIn && hello.path)) return; // signed out: the cards stay as built
+    if (hello.me && hello.me.owner) { if (stuckBtn) stuckBtn.hidden = true; return; } // the teacher
     hello.path.solved.forEach((r) => { solved[r.p] = r.g; });
     stuck = new Set(hello.path.stuck);
-    return loadGraph().then(render);
+    ready = true; paintStuck(); paintMore();
+    if (home) return fetch(PAGES + "graph.json?v=" + (C.v || "")).then((r) => r.json()).then((g) => { G = g; nextForYou(); });
   }).catch(() => { /* the page works without it */ });
 })();

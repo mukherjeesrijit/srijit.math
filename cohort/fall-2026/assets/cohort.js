@@ -86,7 +86,7 @@
   if (enrolled || ticker) want.push("stats");
   if (document.querySelector(".side li a")) want.push("counts");
   if (document.querySelector("[data-recent]")) want.push("recent");
-  if (document.querySelector("[data-next], [data-path]")) want.push("path"); // what I've solved, my grades, "Stuck?"
+  if (document.querySelector("[data-more], [data-path], [data-stuck]")) want.push("path"); // what I've solved, my grades, "Stuck?"
   const hello = !CF ? Promise.resolve(null) : cf("/hello", { want,
       problem: discuss ? discuss.dataset.discuss : undefined }, true)
     .then((d) => { if (d.ok && token && !d.signedIn) clear(); return d.ok ? d : null; }) // a sign-in that has run out

@@ -3,6 +3,7 @@
 // problem its title, difficulty (1-3), skills, the public problems it builds on, and its place in the cohort. Your record
 // (your solutions with Srijit's grades, and "Stuck?") comes with the page's one request (/hello, want "path").
 // Everything is worked out here in the browser: the server is asked nothing more, except when you press "Stuck?".
+// The graph (27 KB) is fetched only for a signed-in learner, or when "Stuck?" is pressed: never for a passing visitor.
 (function () {
   const C = window.COHORT || {};
   const API = C.community, PAGES = C.problems || "/problems/";
@@ -20,6 +21,17 @@
   };
 
   let G = null; // id -> {t, d, s, a, c, o}
+  let loading = null;
+  function loadGraph() {
+    if (!loading) {
+      loading = fetch(PAGES + "graph.json?v=" + (C.v || "")).then((r) => r.json()).then((graph) => {
+        G = graph;
+        Object.keys(G).forEach((id) => G[id].a.forEach((x) => { (leadsTo[x] = leadsTo[x] || []).push(id); }));
+      });
+      loading.catch(() => { loading = null; });
+    }
+    return loading;
+  }
   let solved = {}, stuck = new Set(); // id -> Srijit's grade (null until graded); ids marked "Stuck?"
   const leadsTo = {}; // id -> the public problems that build on it
 
@@ -124,21 +136,17 @@
         headers: { "content-type": "application/json", authorization: "Bearer " + auth.token() } }).then((x) => x.json());
       if (!r.ok) throw new Error(r.error);
       on ? stuck.add(here) : stuck.delete(here);
+      await loadGraph().catch(() => {});
       render();
       if (on && box && !box.hidden) box.scrollIntoView({ behavior: "smooth", block: "nearest" });
     } catch (err) { toast(err.message === "resting" ? "The site is taking a short break. Please try again in a little while." : "Couldn't save that. Please try again."); }
     finally { stuckBtn.disabled = false; }
   });
 
-  Promise.all([
-    fetch(PAGES + "graph.json?v=" + (C.v || "")).then((r) => r.json()),
-    window.cohortHello || Promise.resolve(null),
-  ]).then(([graph, hello]) => {
-    G = graph;
-    Object.keys(G).forEach((id) => G[id].a.forEach((x) => { (leadsTo[x] = leadsTo[x] || []).push(id); }));
+  (window.cohortHello || Promise.resolve(null)).then((hello) => {
     if (!(hello && hello.signedIn && hello.path)) return; // signed out: no path (the "Around this problem" links stay)
     hello.path.solved.forEach((r) => { solved[r.p] = r.g; });
     stuck = new Set(hello.path.stuck);
-    render();
+    return loadGraph().then(render);
   }).catch(() => { /* the page works without it */ });
 })();

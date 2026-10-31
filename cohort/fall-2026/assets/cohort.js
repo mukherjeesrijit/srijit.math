@@ -1,4 +1,4 @@
-// Fall 2026 cohort pages: sign-in ("Continue with Google"), visits, the learner count and a rotating "<name> joined.",
+// Fall 2026 cohort pages: sign-in ("Continue with Google"), the learner count and a rotating "<name> joined.",
 // and the Video panel. Everything goes through the Cloudflare Worker (window.COHORT.community); the Apps Script is no
 // longer used (2026-10-30). Other scripts use window.srijitAuth (ready, token, me, signIn, clear, setMe).
 (function () {
@@ -11,8 +11,7 @@
   let token = store.get("community_token"), me = store.get("community_me"); // the Worker's sign-in
   if (!token || !me) { token = null; me = null; }
   store.set("cohort_user", null); // the old Apps Script sign-in: no longer used
-  let vid = store.get("cohort_vid");
-  if (!vid) { vid = Math.random().toString(36).slice(2) + Date.now().toString(36); store.set("cohort_vid", vid); }
+  store.set("cohort_vid", null); // the old visitor number: visits are no longer logged (2026-10-30)
 
   const math = (el) => el && window.renderMathInElement && renderMathInElement(el, {
     delimiters: [{ left: "$$", right: "$$", display: true }, { left: "\\[", right: "\\]", display: true },
@@ -76,7 +75,7 @@
     document.querySelectorAll("[data-guard]").forEach((el) => el.classList.toggle("locked", !signedIn()));
   }
 
-  // -- one request per page ("/hello"): the visit (private analytics) and everything this page shows -----------
+  // -- one request per page ("/hello"): everything this page shows -----------------------------------------------
   // (the learner count, the sidebar counts, the latest posts, the bell's number, the problem's ♥ and my solution).
   // community.js reads it from window.cohortHello. Nothing polls: Cloudflare counts every request.
   const enrolled = document.querySelector("[data-enrolled]");
@@ -86,7 +85,7 @@
   if (enrolled || ticker) want.push("stats");
   if (document.querySelector(".side li a")) want.push("counts");
   if (document.querySelector("[data-recent]")) want.push("recent");
-  const hello = !CF ? Promise.resolve(null) : cf("/hello", { vid, page: location.pathname, want,
+  const hello = !CF ? Promise.resolve(null) : cf("/hello", { want,
       problem: discuss ? discuss.dataset.discuss : undefined }, true)
     .then((d) => { if (d.ok && token && !d.signedIn) clear(); return d.ok ? d : null; }) // a sign-in that has run out
     .catch(() => null);

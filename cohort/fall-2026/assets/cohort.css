@@ -389,8 +389,8 @@ a.who:hover { color: var(--accent); }
 .rmbtn:hover { color: var(--accent); }
 .roadmap { max-width: 820px; margin: 0 auto; padding: 48px 24px 80px; }
 .roadmap h1 { font-size: clamp(34px, 6vw, 56px); letter-spacing: -.035em; margin: 0 0 10px; }
-.roadmap .sub { color: var(--muted); margin: 0 0 8px; max-width: 560px; }
-.roadmap .legend { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 22px; }
+.roadmap .sub { color: var(--muted); margin: 0 0 22px; max-width: 560px; }
+.roadmap .legend { display: flex; flex-wrap: wrap; gap: 6px; margin: 28px 0 0; }
 .roadmap .chip { font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 999px; border: 1px solid rgba(11, 11, 12, .12); }
 .rm { pointer-events: none; user-select: none; }
 .rm svg { display: block; width: 100%; height: auto; }

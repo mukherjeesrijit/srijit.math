@@ -1,1 +1,1 @@
-window.COHORT = {"community": "https://srijitmath-community.srijitmath.workers.dev", "google": "32456809169-eaoh4vgfo8usr74l1qk1it6lutacavp7.apps.googleusercontent.com", "base": "/cohort/fall-2026/", "problems": "/problems/", "v": "a6aaf6f8f3"};
+window.COHORT = {"community": "https://srijitmath-community.srijitmath.workers.dev", "google": "32456809169-eaoh4vgfo8usr74l1qk1it6lutacavp7.apps.googleusercontent.com", "base": "/cohort/fall-2026/", "problems": "/problems/", "v": "7839f7477c"};

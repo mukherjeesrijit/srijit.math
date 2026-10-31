@@ -350,21 +350,15 @@ a.who:hover { color: var(--accent); }
 .hint .copy:hover { background: var(--ink); color: var(--bg); }
 
 /* the headline: "Machine Learning" and "Quant Finance" take turns word by word (each pair in one grid cell, so nothing jumps) */
+/* cohort.js toggles .alt on the same clock as "<name> joined." (every 2.6 s) */
 .swap { display: inline-grid; }
-.swap > span { grid-area: 1 / 1; animation: swap 6s ease-in-out infinite; }
-.swap > span + span { animation-delay: -3s; opacity: 0; }
-.swap.two > span { animation-delay: .12s; } /* the second word follows a beat later */
-.swap.two > span + span { animation-delay: -2.88s; }
+.swap > span { grid-area: 1 / 1; transition: opacity .35s ease, transform .35s ease; }
+.swap > span + span, .swap.alt > span:first-child { opacity: 0; transform: translateY(.18em); }
+.swap.alt > span:first-child { transform: translateY(-.18em); }
+.swap.alt > span + span { opacity: 1; transform: none; }
 .hero .narrow { display: none; } /* the phone's word-by-word version */
 @media (max-width: 600px) { .hero .wide { display: none; } .hero .narrow { display: inline; } }
-@keyframes swap {
-  0%, 42% { opacity: 1; transform: none; }
-  50% { opacity: 0; transform: translateY(-.18em); }
-  51%, 92% { opacity: 0; transform: translateY(.18em); }
-  100% { opacity: 1; transform: none; }
-}
-@media (prefers-reduced-motion: reduce) { .swap > span { animation-name: swapfade; animation-duration: 8s; } }
-@keyframes swapfade { 0%, 45% { opacity: 1; } 50%, 95% { opacity: 0; } 100% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .swap > span { transform: none !important; } } /* fade only */
 .sub .nw { white-space: nowrap; }
 
 /* the adaptive path (path.js): suggestions under a problem's buttons, and on the home page */

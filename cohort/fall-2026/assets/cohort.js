@@ -93,6 +93,12 @@
     .catch(() => null);
   window.cohortHello = hello;
 
+  // -- one clock for everything that takes turns: "Machine Learning" / "Quant Finance" (headline and header, .swap)
+  // and "<name> joined.", so they change at the same moment, every 2.6 s ------------------------------------------
+  const EVERY = 2600;
+  const onTick = [() => document.querySelectorAll(".swap").forEach((s) => s.classList.toggle("alt"))];
+  setInterval(() => onTick.forEach((f) => f()), EVERY);
+
   // -- the learner count and "<name> joined" ------------------------------------------------------------------
   const shown = () => Number(enrolled.textContent.replace(/,/g, "")) || 0;
   const live = (d) => { if (enrolled && d && d.ok && d.learners >= shown()) enrolled.textContent = d.learners.toLocaleString(); return d; };
@@ -104,10 +110,10 @@
       let k = 0;
       slot.textContent = names[0];
       ticker.hidden = false;
-      setInterval(() => {
+      onTick.push(() => { // on the shared clock, with the headline
         slot.classList.add("fade");
         setTimeout(() => { k = (k + 1) % names.length; slot.textContent = names[k]; slot.classList.remove("fade"); }, 350);
-      }, 2600);
+      });
     });
   }
 

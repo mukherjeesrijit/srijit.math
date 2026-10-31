@@ -5,7 +5,7 @@
 // discussion on the home page. Sign-in is cohort.js (window.srijitAuth). Posts are Markdown with maths in $...$.
 (function () {
   const C = window.COHORT || {};
-  const API = C.community, BASE = C.base || "/cohort/fall-2026/";
+  const API = C.community, BASE = C.base || "/cohort/fall-2026/", PAGES = C.problems || "/problems/"; // a problem's page: PAGES + its id
   const box = document.querySelector("[data-discuss]");
   const solveBox = document.querySelector("[data-solve]");
   const talkBtn = document.querySelector('.actions [data-gate="discuss"]');
@@ -485,7 +485,7 @@
     const paint = (d) => {
       items = d.items;
       dot.hidden = !d.unseen; dot.textContent = d.unseen > 9 ? "9+" : d.unseen;
-      list.innerHTML = items.length ? items.map((n) => `<a class="${n.seen ? "" : "new"}" href="${BASE}${encodeURIComponent(n.problem || "")}/#post-${n.post_id}">
+      list.innerHTML = items.length ? items.map((n) => `<a class="${n.seen ? "" : "new"}" href="${PAGES}${encodeURIComponent(n.problem || "")}/#post-${n.post_id}">
           <span>${noteText(n)}</span><time>${ago(n.created)}</time></a>`).join("")
         : `<p class="muted">Nothing yet. Claps, grades and replies to your posts show up here.</p>`;
       math(list);
@@ -535,8 +535,8 @@
           ${p.owner ? "" : `<div class="karma-bar" title="${next ? `${next - d.karma} more Math Karma to the next level` : "Top level"}"><i style="width:${pct}%"></i></div>
           <p class="muted small">${next ? `${next - d.karma} more Math Karma to the next level.` : "The top level."} Karma: +10 for each problem you solve, +3 for a question, +2 for each reply.</p>`}
           <h2>Solved</h2>
-          ${d.solved.length ? `<div class="solved">${d.solved.map((s) => `<a class="scard" href="${BASE}${encodeURIComponent(s.problem)}/${s.id ? `#post-${s.id}` : ""}">
-              <span class="mod">${esc(s.module)} · ${s.lesson}.${s.n}</span><b>${esc(s.title)}</b>
+          ${d.solved.length ? `<div class="solved">${d.solved.map((s) => `<a class="scard" href="${PAGES}${encodeURIComponent(s.problem)}/${s.id ? `#post-${s.id}` : ""}">
+              <span class="mod">${s.module ? `${esc(s.module)} · ${s.lesson}.${s.n}` : "Practice"}</span><b>${esc(s.title)}</b>
               <span class="when">${s.created ? `Solved ${day(s.created)}` : "Srijit's solution"}</span>
               ${s.id ? `<span class="nums">👏 ${s.claps}${s.grade != null ? ` · Srijit 👏 ${s.grade}/10` : ""} · ${s.replies} repl${s.replies === 1 ? "y" : "ies"}</span>` : ""}</a>`).join("")}</div>`
             : `<p class="soon">${p.mine ? "No solutions yet. Open a problem, press Solve and share yours." : "No solutions yet."}</p>`}`;
@@ -582,7 +582,7 @@
         latest.innerHTML = `<h2>Latest in the discussion</h2><p class="soon">Nothing yet. Open a problem, solve it by hand and share your solution.</p>`;
         latest.hidden = false; return;
       }
-      latest.innerHTML = `<h2>Latest in the discussion</h2><ul>${d.items.map((r) => `<li><a href="${BASE}${encodeURIComponent(r.problem)}/#post-${r.post}">
+      latest.innerHTML = `<h2>Latest in the discussion</h2><ul>${d.items.map((r) => `<li><a href="${PAGES}${encodeURIComponent(r.problem)}/#post-${r.post}">
           <span class="what"><b>${esc(r.name || "Learner")}</b> ${r.type === "comment" ? "replied on" : r.kind === "question" ? "asked about" : "shared a solution to"} <b>${esc(r.title)}</b></span>
           <span class="snip">${esc(plainLine(r.body))}</span><time>${ago(r.created)}</time></a></li>`).join("")}</ul>
         <p><a class="quiet" href="${BASE}leaderboard/">Leaderboard →</a></p>`;

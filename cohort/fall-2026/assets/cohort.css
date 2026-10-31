@@ -348,3 +348,48 @@ a.who:hover { color: var(--accent); }
 .hint .copy { display: inline-block; border: 1.5px solid var(--ink); background: var(--bg); color: var(--ink); border-radius: 999px;
   padding: 0 10px; font: inherit; font-size: 13px; font-weight: 600; line-height: 1.6; cursor: pointer; white-space: nowrap; vertical-align: baseline; }
 .hint .copy:hover { background: var(--ink); color: var(--bg); }
+
+/* the headline: "Machine Learning" and "Quant Finance" take turns (both sit in one grid cell, so nothing jumps) */
+.swap { display: inline-grid; }
+.swap > span { grid-area: 1 / 1; animation: swap 6s ease-in-out infinite; }
+.swap > span + span { animation-delay: -3s; opacity: 0; }
+@keyframes swap {
+  0%, 42% { opacity: 1; transform: none; }
+  50% { opacity: 0; transform: translateY(-.18em); }
+  51%, 92% { opacity: 0; transform: translateY(.18em); }
+  100% { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) { .swap > span { animation-name: swapfade; animation-duration: 8s; } }
+@keyframes swapfade { 0%, 45% { opacity: 1; } 50%, 95% { opacity: 0; } 100% { opacity: 1; } }
+.sub .nw { white-space: nowrap; }
+@media (max-width: 600px) { .hero h1 { font-size: min(38px, 9.8vw); } } /* "Machine Learning" stays on one line */
+
+/* the adaptive path (path.js): suggestions under a problem's buttons, and on the home page */
+.next { margin: 18px 0 0; border: 1.5px solid var(--accent); background: var(--accent-soft); border-radius: 12px; padding: 14px 18px; }
+.next h2 { font-size: 17px; margin: 0 0 4px; }
+.next .muted { color: var(--muted); font-size: 14px; margin: 0 0 6px; }
+.next ul { list-style: none; padding: 0; margin: 0; }
+.next li { padding: 7px 0; border-top: 1px solid rgba(232, 89, 12, .2); }
+.next li:first-child { border-top: 0; }
+.next li a { font-weight: 600; text-decoration: none; }
+.next li a:hover { color: var(--accent); }
+.next small { display: block; color: var(--muted); font-size: 13px; }
+.home-path { margin: 0 0 28px; }
+.dots { color: var(--accent); font-size: 10px; letter-spacing: 1px; white-space: nowrap; vertical-align: 1px; }
+.actions .stuck { border-color: var(--line); color: var(--muted); }
+.actions .stuck:hover { border-color: var(--accent); color: var(--accent); }
+.actions .stuck.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+
+/* "Around this problem": the graph's neighbours, under the pager */
+.related { margin-top: 30px; }
+.related h2 { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+.related .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px 28px; }
+.related h3 { font-size: 15px; margin: 0 0 4px; }
+.related ul { list-style: none; padding: 0; margin: 0; }
+.related li { padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+.related li a { text-decoration: none; }
+.related li a:hover { color: var(--accent); }
+@media (max-width: 600px) {
+  .next { padding: 12px 14px; }
+  .actions .stuck { padding: .4em .8em; }
+}

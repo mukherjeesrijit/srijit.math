@@ -76,7 +76,8 @@
   }
 
   // -- one request per page ("/hello"): everything this page shows -----------------------------------------------
-  // (the learner count, the sidebar counts, the latest posts, the bell's number, the problem's ♥ and my solution).
+  // (the learner count, the sidebar counts, the latest posts, the bell's number, the problem's ♥ and my solution,
+  // and for the adaptive path, my record).
   // community.js reads it from window.cohortHello. Nothing polls: Cloudflare counts every request.
   const enrolled = document.querySelector("[data-enrolled]");
   const ticker = document.querySelector("[data-ticker]");
@@ -85,6 +86,7 @@
   if (enrolled || ticker) want.push("stats");
   if (document.querySelector(".side li a")) want.push("counts");
   if (document.querySelector("[data-recent]")) want.push("recent");
+  if (document.querySelector("[data-next], [data-path]")) want.push("path"); // what I've solved, my grades, "Stuck?"
   const hello = !CF ? Promise.resolve(null) : cf("/hello", { want,
       problem: discuss ? discuss.dataset.discuss : undefined }, true)
     .then((d) => { if (d.ok && token && !d.signedIn) clear(); return d.ok ? d : null; }) // a sign-in that has run out

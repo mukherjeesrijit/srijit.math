@@ -355,6 +355,8 @@ a.who:hover { color: var(--accent); }
 .swap > span + span { animation-delay: -3s; opacity: 0; }
 .swap.two > span { animation-delay: .12s; } /* the second word follows a beat later */
 .swap.two > span + span { animation-delay: -2.88s; }
+.hero .narrow { display: none; } /* the phone's word-by-word version */
+@media (max-width: 600px) { .hero .wide { display: none; } .hero .narrow { display: inline; } }
 @keyframes swap {
   0%, 42% { opacity: 1; transform: none; }
   50% { opacity: 0; transform: translateY(-.18em); }

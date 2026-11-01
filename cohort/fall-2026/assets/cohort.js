@@ -102,8 +102,8 @@
   setInterval(() => onTick.forEach((f) => f()), EVERY);
 
   // -- the learner count and "<name> joined" ------------------------------------------------------------------
-  // rounded down, so the line never overstates: 2,370 -> "2.3k", 116 -> "110+"
-  const short = (n) => (n >= 1000 ? Math.floor(n / 100) / 10 + "k" : String(n));
+  // rounded down, so the line never overstates: 2,370 -> "2.3k+" (2.4k+ from 2,400), 116 -> "110+"
+  const short = (n) => (n >= 1000 ? Math.floor(n / 100) / 10 + "k+" : String(n));
   const shown = () => Number(enrolled.dataset.n) || 0;
   const live = (d) => {
     if (enrolled && d && d.ok && d.learners >= shown()) { enrolled.dataset.n = d.learners; enrolled.textContent = short(d.learners); }

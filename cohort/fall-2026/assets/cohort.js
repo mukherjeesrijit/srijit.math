@@ -83,7 +83,9 @@
   const ticker = document.querySelector("[data-ticker]");
   const discuss = document.querySelector("[data-discuss]");
   const want = [];
+  const talk = document.querySelector("[data-talk]");
   if (enrolled || ticker) want.push("stats");
+  if (talk) want.push("counts"); // the sidebar's cached counts: their total is the "discussions" number
   if (document.querySelector(".side li a")) want.push("counts");
   if (document.querySelector("[data-recent]")) want.push("recent");
   if (document.querySelector("[data-more], [data-path], [data-stuck]")) want.push("path"); // what I've solved, my grades, "Stuck?"
@@ -100,8 +102,21 @@
   setInterval(() => onTick.forEach((f) => f()), EVERY);
 
   // -- the learner count and "<name> joined" ------------------------------------------------------------------
-  const shown = () => Number(enrolled.textContent.replace(/,/g, "")) || 0;
-  const live = (d) => { if (enrolled && d && d.ok && d.learners >= shown()) enrolled.textContent = d.learners.toLocaleString(); return d; };
+  // rounded down, so the line never overstates: 2,370 -> "2.3k", 116 -> "110+"
+  const short = (n) => (n >= 1000 ? Math.floor(n / 100) / 10 + "k" : String(n));
+  const shown = () => Number(enrolled.dataset.n) || 0;
+  const live = (d) => {
+    if (enrolled && d && d.ok && d.learners >= shown()) { enrolled.dataset.n = d.learners; enrolled.textContent = short(d.learners); }
+    return d;
+  };
+  if (CF && talk) {
+    hello.then((d) => {
+      const n = d && d.counts ? Object.values(d.counts).reduce((a, b) => a + b, 0) : 0;
+      if (!n) return;
+      talk.querySelector("b").textContent = n >= 10 ? Math.floor(n / 10) * 10 + "+" : String(n);
+      talk.hidden = false;
+    });
+  }
   if (CF && (enrolled || ticker)) {
     hello.then(live).then((d) => {
       const names = ((d && d.names) || []).filter((n) => n.length >= 3); // no initials ("Kd")

@@ -359,7 +359,7 @@ a.who:hover { color: var(--accent); }
 .hero .narrow { display: none; } /* the phone's word-by-word version */
 @media (max-width: 600px) { .hero .wide { display: none; } .hero .narrow { display: inline; } }
 @media (prefers-reduced-motion: reduce) { .swap > span { transform: none !important; } } /* fade only */
-.sub .nw { white-space: nowrap; }
+.sub .nw, .proof .nw { white-space: nowrap; }
 
 /* "Keep practising" (build_site.py more(); path.js orders the groups for a signed-in learner) and "Next for you" */
 .more { margin-top: 34px; display: flex; flex-direction: column; gap: 16px; }

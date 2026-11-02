@@ -387,6 +387,7 @@ a.who:hover { color: var(--accent); }
 /* the Roadmap button and page (build_site.py roadmap_page): nothing to click; a glow runs down the lines, over and over */
 /* the ☰ menu in the header: Dashboard, Roadmap, Books (cohort.js opens and closes it) */
 .menu { position: relative; margin-left: auto; }
+.menu, .msgbtn, .bell, .enrol { flex-shrink: 0; } /* nothing in the header gets squeezed */
 .menubtn { border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 10px;
   width: 38px; height: 34px; font-size: 17px; line-height: 1; padding: 0; }
 .menubtn:hover, .menubtn[aria-expanded="true"] { border-color: var(--ink); }
@@ -395,7 +396,7 @@ a.who:hover { color: var(--accent); }
 .menulist[hidden] { display: none; } /* closed on phones (a PC shows the links below) */
 .menulist a { padding: 9px 12px; border-radius: 8px; text-decoration: none; font-weight: 600; }
 .menulist a:hover { background: var(--soft); color: var(--accent); }
-@media (min-width: 601px) { /* a PC: the links sit in the header; the ☰ button is for phones */
+@media (min-width: 901px) { /* a PC: the links sit in the header; below 900 px (phones, tablets) it's ☰ · 💬 · 🔔 */
   .menubtn { display: none; }
   .menu .menulist { display: flex !important; position: static; flex-direction: row; gap: 2px; min-width: 0; padding: 0;
     border: 0; box-shadow: none; background: none; }

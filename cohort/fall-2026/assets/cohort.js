@@ -63,6 +63,16 @@
   modal.addEventListener("click", (e) => { if (e.target === modal) modal.hidden = true; });
   document.querySelectorAll("[data-enrol]").forEach((b) => (b.onclick = () => !signedIn() && askToEnrol()));
 
+  // -- the ☰ menu: Dashboard, Roadmap, Books -------------------------------------------------------------------
+  const menuBtn = document.querySelector("[data-menu]"), menuList = document.querySelector(".menulist");
+  if (menuBtn && menuList) {
+    const close = () => { menuList.hidden = true; menuBtn.setAttribute("aria-expanded", "false"); };
+    menuBtn.onclick = (e) => { e.stopPropagation(); const open = menuList.hidden; menuList.hidden = !open; menuBtn.setAttribute("aria-expanded", String(open)); };
+    document.addEventListener("click", (e) => { if (!menuList.hidden && !e.target.closest(".menu")) close(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+    menuList.querySelector("a").addEventListener("click", (e) => { if (!signedIn()) { e.preventDefault(); close(); askToEnrol(); } }); // Dashboard
+  }
+
   const ready = Promise.resolve().then(() => refresh());
   window.cohortReady = ready;
 

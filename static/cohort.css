@@ -469,4 +469,6 @@ a.who:hover { color: var(--accent); }
 .inbox time { color: var(--muted); font-size: 13px; grid-column: 2; grid-row: 1; }
 .inbox .snip { grid-column: 1 / -1; color: var(--muted); font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .foot { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 12px 0 0; }
+.foot.links { gap: 8px; margin: 16px 0 4px; } /* the dashboard: three matching buttons */
+.foot.links .btn { font-size: 14px; padding: .45em 1.1em; }
 @media (max-width: 600px) { .msgbtn { width: 36px; height: 34px; font-size: 15px; margin-right: 4px; } .msgs { max-height: 58vh; } }

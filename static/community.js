@@ -549,10 +549,10 @@
             <div><b>${d.replies}</b><span>replies</span></div></div>
           ${p.owner ? "" : `<div class="karma-bar" title="${next ? `${next - d.karma} more Math Karma to the next level` : "Top level"}"><i style="width:${pct}%"></i></div>
           <p class="muted small">${next ? `${next - d.karma} more Math Karma to the next level.` : "The top level."} Karma: +10 for each problem you solve, +3 for a question, +2 for each reply.</p>`}
-          <p class="foot">${p.mine && !p.owner ? `<a class="btn accent small" href="/messages/">💬 Message Srijit</a>` : ""}
-            ${p.mine && p.owner ? `<a class="quiet" href="/messages/">💬 Messages →</a>` : ""}
-            <a class="quiet" href="/leaderboard/">Leaderboard →</a>
-            <a class="quiet" href="https://srijitmukherjee.com/" target="_blank" rel="noopener">About Teacher →</a></p>
+          <p class="foot links">${p.mine && !p.owner ? `<a class="btn accent small" href="/messages/">💬 Message Srijit</a>` : ""}
+            ${p.mine && p.owner ? `<a class="btn accent small" href="/messages/">💬 Messages</a>` : ""}
+            <a class="btn ghost small" href="/leaderboard/">Leaderboard</a>
+            <a class="btn ghost small" href="https://srijitmukherjee.com/" target="_blank" rel="noopener">About Teacher</a></p>
           <h2>Solved</h2>
           ${d.solved.length ? `<div class="solved">${d.solved.map((s) => `<a class="scard" href="${PAGES}${encodeURIComponent(s.problem)}/${s.id ? `#post-${s.id}` : ""}">
               <span class="mod">${s.module ? `${esc(s.module)} · ${s.lesson}.${s.n}` : "Practice"}</span><b>${esc(s.title)}</b>

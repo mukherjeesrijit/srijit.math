@@ -81,6 +81,7 @@
       const header = b.classList.contains("enrol");
       b.classList.toggle("done", signedIn());
       b.textContent = signedIn() ? (header ? shownName() : "You're enrolled ✓") : (header ? "Enroll" : "Enroll in Fall 2026");
+      if (header) b.hidden = signedIn(); // signed in, "Dashboard" in the menu goes to the same place
     });
     document.querySelectorAll("[data-guard]").forEach((el) => el.classList.toggle("locked", !signedIn()));
   }

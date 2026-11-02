@@ -484,7 +484,7 @@
     wrap.innerHTML = `<button type="button" class="bellbtn" aria-label="Notifications" aria-expanded="false">🔔<span class="dot" hidden></span></button>
       <div class="notes" hidden></div>`;
     anchor.before(wrap);
-    const chat = Object.assign(document.createElement("a"), { className: "msgbtn", href: BASE + "messages/", textContent: "💬",
+    const chat = Object.assign(document.createElement("a"), { className: "msgbtn", href: "/messages/", textContent: "💬",
       title: me && me.owner ? "Messages from learners" : "Message Srijit" }); // a new message shows on the bell
     chat.setAttribute("aria-label", chat.title);
     wrap.before(chat);
@@ -493,7 +493,7 @@
     const paint = (d) => {
       items = d.items;
       dot.hidden = !d.unseen; dot.textContent = d.unseen > 9 ? "9+" : d.unseen;
-      const link = (n) => (n.type === "message" ? `${BASE}messages/${me && me.owner ? `#u${n.from_user}` : ""}`
+      const link = (n) => (n.type === "message" ? `/messages/${me && me.owner ? `#u${n.from_user}` : ""}`
         : `${PAGES}${encodeURIComponent(n.problem || "")}/#post-${n.post_id}`);
       list.innerHTML = items.length ? items.map((n) => `<a class="${n.seen ? "" : "new"}" href="${link(n)}">
           <span>${noteText(n)}</span><time>${ago(n.created)}</time></a>`).join("")
@@ -544,8 +544,8 @@
             <div><b>${d.replies}</b><span>replies</span></div></div>
           ${p.owner ? "" : `<div class="karma-bar" title="${next ? `${next - d.karma} more Math Karma to the next level` : "Top level"}"><i style="width:${pct}%"></i></div>
           <p class="muted small">${next ? `${next - d.karma} more Math Karma to the next level.` : "The top level."} Karma: +10 for each problem you solve, +3 for a question, +2 for each reply.</p>`}
-          <p class="foot">${p.mine && !p.owner ? `<a class="btn accent small" href="${BASE}messages/">💬 Message Srijit</a>` : ""}
-            ${p.mine && p.owner ? `<a class="quiet" href="${BASE}messages/">💬 Messages →</a>` : ""}
+          <p class="foot">${p.mine && !p.owner ? `<a class="btn accent small" href="/messages/">💬 Message Srijit</a>` : ""}
+            ${p.mine && p.owner ? `<a class="quiet" href="/messages/">💬 Messages →</a>` : ""}
             <a class="quiet" href="${BASE}leaderboard/">Leaderboard →</a>
             <a class="quiet" href="https://srijitmukherjee.com/" target="_blank" rel="noopener">About Teacher →</a></p>
           <h2>Solved</h2>

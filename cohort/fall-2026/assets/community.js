@@ -22,6 +22,8 @@
     get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
     set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode */ } },
   };
+  // a name as it is shown: each word with a capital first letter, the rest small ("JAYANT" -> "Jayant")
+  const nm = (s) => String(s || "").replace(/\S+/g, (w) => w[0].toUpperCase() + w.slice(1).toLowerCase());
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   const math = (el) => el && window.renderMathInElement && renderMathInElement(el, {
     delimiters: [{ left: "$$", right: "$$", display: true }, { left: "\\[", right: "\\]", display: true },
@@ -84,8 +86,8 @@
   const lvl = (l) => (l ? `<span class="lvl" title="Level ${l.n}">Lv ${l.n} · ${esc(l.name)}</span>` : "");
   const LI_SVG = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="#0A66C2" d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>';
   const linkedin = (a) => (a.linkedin && /^https:\/\/([a-z]{2,3}\.)?linkedin\.com\/in\//.test(a.linkedin)
-    ? `<a class="li" href="${esc(a.linkedin)}" target="_blank" rel="noopener nofollow" title="${esc(a.name)} on LinkedIn" aria-label="${esc(a.name)} on LinkedIn">${LI_SVG}</a>` : "");
-  const person = (a) => `<a class="who" href="${BASE}profile/#${a.id}">${esc(a.name)}</a>${linkedin(a)}${a.owner ? "" : lvl(a.level)}`;
+    ? `<a class="li" href="${esc(a.linkedin)}" target="_blank" rel="noopener nofollow" title="${esc(nm(a.name))} on LinkedIn" aria-label="${esc(nm(a.name))} on LinkedIn">${LI_SVG}</a>` : "");
+  const person = (a) => `<a class="who" href="${BASE}profile/#${a.id}">${esc(nm(a.name))}</a>${linkedin(a)}${a.owner ? "" : lvl(a.level)}`;
 
   // -- the discussion on a problem page ------------------------------------------------------------------
   let sort = "top", posts = [];
@@ -155,7 +157,7 @@
       ${open ? `${graded(p)}
         <div class="tools">${tools("post", p)}</div>
         <div class="comments">${p.comments.map(commentHTML).join("")}</div>
-        <form class="reply"><textarea maxlength="1000" rows="2" placeholder="Reply to ${esc(p.author.name)}…"></textarea>
+        <form class="reply"><textarea maxlength="1000" rows="2" placeholder="Reply to ${esc(nm(p.author.name))}…"></textarea>
           <div class="row"><button type="submit" class="btn small">Reply</button></div></form>`
       : `<p class="sumline">${summary} · <span class="open-hint">Click to open${p.kind === "solution" ? " the solution" : ""} and reply</span></p>`}</article>`;
   }
@@ -193,7 +195,7 @@
       <div class="sortbar"><span class="count"></span>
         <span><button type="button" data-sort="top" aria-pressed="true">Top</button><button type="button" data-sort="new" aria-pressed="false">New</button></span></div>
       <div class="posts"><p class="soon">Loading the discussion…</p></div>`;
-    box.querySelector(".me-name").textContent = me ? me.name : "";
+    box.querySelector(".me-name").textContent = me ? nm(me.name) : "";
   }
   async function pinnedOnly() {
     await (window.cohortReady || Promise.resolve());
@@ -333,7 +335,7 @@
   async function rename() {
     const name = window.prompt ? window.prompt("The name people see:", me ? me.name : "") : null;
     if (!name || !name.trim()) return;
-    try { const d = await call("POST", "/me", { name }); me = d.me; auth.setMe(me); if (box) box.querySelector(".me-name").textContent = me.name; await (box ? loadThread() : Promise.resolve()); }
+    try { const d = await call("POST", "/me", { name }); me = d.me; auth.setMe(me); if (box) box.querySelector(".me-name").textContent = nm(me.name); await (box ? loadThread() : Promise.resolve()); }
     catch (err) { failed(err); }
   }
 
@@ -466,7 +468,7 @@
 
   // -- the bell: claps, grades, feedback and replies --------------------------------------------------------
   function noteText(n) {
-    const on = `<b>${esc(n.title || "a problem")}</b>`, who = `<b>${esc(n.from_name || "Someone")}</b>`;
+    const on = `<b>${esc(n.title || "a problem")}</b>`, who = `<b>${esc(nm(n.from_name) || "Someone")}</b>`;
     if (n.type === "clap") return `${who} clapped 👏 ${n.n} for your solution to ${on}`;
     if (n.type === "grade") return `Srijit graded your solution to ${on}: 👏 ${n.n}/10`;
     if (n.type === "feedback") return `Srijit left feedback on your solution to ${on} (👏 ${n.n}/10)`;
@@ -529,8 +531,8 @@
         const d = await call("GET", "/profile?u=" + encodeURIComponent(who));
         const p = d.person, l = d.level, next = l.next;
         const pct = next ? Math.round(100 * (d.karma - (LEVEL_FLOOR[l.n - 1] || 0)) / (next - (LEVEL_FLOOR[l.n - 1] || 0))) : 100;
-        document.title = p.name + " · Fall 2026 Cohort";
-        profileBox.innerHTML = `<header class="who-head"><h1>${esc(p.name)}</h1>${linkedin(p).replace('class="li"', 'class="li big"')}
+        document.title = nm(p.name) + " · Fall 2026 Cohort";
+        profileBox.innerHTML = `<header class="who-head"><h1>${esc(nm(p.name))}</h1>${linkedin(p).replace('class="li"', 'class="li big"')}
             ${p.owner ? "" : `<span class="lvl big">Level ${l.n} · ${esc(l.name)}</span>`}
             <p class="muted">Joined ${day(p.joined)}${p.mine ? ` · this is you · <button type="button" class="linkish" data-rename>change name</button>` : ""}</p>
             ${p.mine ? `<form class="li-form"><label>Your LinkedIn <input type="url" inputmode="url" placeholder="https://www.linkedin.com/in/your-name/" value="${esc(p.linkedin || "")}"></label>
@@ -542,7 +544,10 @@
             <div><b>${d.replies}</b><span>replies</span></div></div>
           ${p.owner ? "" : `<div class="karma-bar" title="${next ? `${next - d.karma} more Math Karma to the next level` : "Top level"}"><i style="width:${pct}%"></i></div>
           <p class="muted small">${next ? `${next - d.karma} more Math Karma to the next level.` : "The top level."} Karma: +10 for each problem you solve, +3 for a question, +2 for each reply.</p>`}
-          <p class="foot"><a class="quiet" href="${BASE}leaderboard/">Leaderboard →</a></p>
+          <p class="foot">${p.mine && !p.owner ? `<a class="btn accent small" href="${BASE}messages/">💬 Message Srijit</a>` : ""}
+            ${p.mine && p.owner ? `<a class="quiet" href="${BASE}messages/">💬 Messages →</a>` : ""}
+            <a class="quiet" href="${BASE}leaderboard/">Leaderboard →</a>
+            <a class="quiet" href="https://srijitmukherjee.com/" target="_blank" rel="noopener">About Teacher →</a></p>
           <h2>Solved</h2>
           ${d.solved.length ? `<div class="solved">${d.solved.map((s) => `<a class="scard" href="${PAGES}${encodeURIComponent(s.problem)}/${s.id ? `#post-${s.id}` : ""}">
               <span class="mod">${s.module ? `${esc(s.module)} · ${s.lesson}.${s.n}` : "Practice"}</span><b>${esc(s.title)}</b>
@@ -567,10 +572,10 @@
   // -- leaderboard page and "latest discussion" on the home page ------------------------------------------
   function table(rows) {
     if (!rows.length) return `<p class="soon">No claps yet.</p>`;
-    return `<ol class="lb">${rows.map((r, k) => `<li><span class="rank">${k + 1}</span><a class="who" href="${BASE}profile/#${r.id}">${esc(r.name || "Learner")}</a>${linkedin(r)}${lvl(r.level)}<span class="up">👏 ${r.points}</span></li>`).join("")}</ol>`;
+    return `<ol class="lb">${rows.map((r, k) => `<li><span class="rank">${k + 1}</span><a class="who" href="${BASE}profile/#${r.id}">${esc(nm(r.name) || "Learner")}</a>${linkedin(r)}${lvl(r.level)}<span class="up">👏 ${r.points}</span></li>`).join("")}</ol>`;
   }
   async function startBoard() {
-    if (!(await signIn())) { board.innerHTML = `<p>Sign in to see the leaderboard.</p><button type="button" class="btn accent small">Sign in</button>`; board.querySelector("button").onclick = askToSignIn; return; }
+    await signIn(); // anyone can see it; signing in only adds the links' context
     try {
       const d = await call("GET", "/leaderboard");
       board.innerHTML = `<div class="lb-grid"><section><h2>This week</h2>${table(d.week)}</section><section><h2>All time</h2>${table(d.all)}</section></div>`;
@@ -590,7 +595,7 @@
         latest.hidden = false; return;
       }
       latest.innerHTML = `<h2>Latest in the discussion</h2><ul>${d.items.map((r) => `<li><a href="${PAGES}${encodeURIComponent(r.problem)}/#post-${r.post}">
-          <span class="what"><b>${esc(r.name || "Learner")}</b> ${r.type === "comment" ? "replied on" : r.kind === "question" ? "asked about" : "shared a solution to"} <b>${esc(r.title)}</b></span>
+          <span class="what"><b>${esc(nm(r.name) || "Learner")}</b> ${r.type === "comment" ? "replied on" : r.kind === "question" ? "asked about" : "shared a solution to"} <b>${esc(r.title)}</b></span>
           ${r.body ? `<span class="snip">${esc(plainLine(r.body))}</span>` : ""}<time>${ago(r.created)}</time></a></li>`).join("")}</ul>
         ${yes ? "" : `<p class="muted">Sign in to read them and join in.</p>`}${foot}`;
       latest.hidden = false; // previews are one plain line: no rendered maths (it would not fit a phone)
@@ -610,7 +615,7 @@
       chatBox.innerHTML = `<h1>Messages</h1><p class="soon">Loading…</p>`;
       const d = await call("GET", "/messages");
       chatBox.innerHTML = `<h1>Messages</h1>${d.inbox.length ? `<ul class="inbox">${d.inbox.map((t) => `<li><a href="#u${t.id}">
-          <b>${esc(t.name || "Learner")}${t.unread ? ` <span class="cnt">${t.unread}</span>` : ""}</b><time>${ago(t.at)}</time>
+          <b>${esc(nm(t.name) || "Learner")}${t.unread ? ` <span class="cnt">${t.unread}</span>` : ""}</b><time>${ago(t.at)}</time>
           <span class="snip">${t.mine ? "You: " : ""}${esc(plainLine(t.body))}</span></a></li>`).join("")}</ul>`
         : `<p class="soon">No messages yet. When a learner writes to you, it shows up here and on the bell.</p>`}`;
     }
@@ -618,7 +623,7 @@
       chatBox.innerHTML = `<p class="soon">Loading…</p>`;
       const d = await call("GET", "/messages" + (uid ? `?u=${uid}` : ""));
       const owner = !!(me && me.owner);
-      chatBox.innerHTML = `<header class="chat-head">${owner ? `<a class="quiet" href="#">← All</a>` : ""}<h1>${esc(owner ? d.with.name : "Srijit")}</h1>
+      chatBox.innerHTML = `<header class="chat-head">${owner ? `<a class="quiet" href="#">← All</a>` : ""}<h1>${esc(owner ? nm(d.with.name) : "Srijit")}</h1>
           <button type="button" class="linkish" data-reload title="Check for new messages">↻</button></header>
         <div class="msgs">${d.messages.length ? d.messages.map((m) => bubble(m, owner)).join("")
           : `<p class="soon">${owner ? "No messages yet." : "Ask Srijit anything about the problems. He'll reply here, and you'll see it on the bell."}</p>`}</div>

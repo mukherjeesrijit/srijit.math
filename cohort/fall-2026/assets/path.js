@@ -15,6 +15,16 @@
   const stuckBtn = actions && actions.querySelector("[data-stuck]");
   if (!API || !(more || home || stuckBtn)) return;
   const auth = window.srijitAuth;
+  // "Keep practising" is for signed-in learners: everyone else is asked to sign in (the page renders it hidden)
+  function gate(signed) {
+    if (!more) return;
+    if (signed) { more.hidden = false; return; }
+    more.innerHTML = `<h2>Keep practising</h2><div class="join"><p>Sign in to see simpler, similar and harder problems around this one.</p>
+      <button type="button" class="btn accent small">Sign in</button></div>`;
+    more.querySelector("button").onclick = () => auth && auth.signIn();
+    more.hidden = false;
+  }
+  gate(!!(auth && auth.token()));
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   const toast = (msg) => {
     const t = Object.assign(document.createElement("div"), { className: "toast", textContent: msg });
@@ -99,7 +109,8 @@
   });
 
   (window.cohortHello || Promise.resolve(null)).then((hello) => {
-    if (!(hello && hello.signedIn && hello.path)) return; // signed out: the cards stay as built
+    if (hello && !hello.signedIn && more && more.querySelector(".pcard")) gate(false); // a sign-in that has run out
+    if (!(hello && hello.signedIn && hello.path)) return;
     if (hello.me && hello.me.owner) { if (stuckBtn) stuckBtn.hidden = true; return; } // the teacher
     hello.path.solved.forEach((r) => { solved[r.p] = r.g; });
     stuck = new Set(hello.path.stuck);

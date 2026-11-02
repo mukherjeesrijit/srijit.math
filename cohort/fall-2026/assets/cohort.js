@@ -25,7 +25,8 @@
     document.body.appendChild(t); setTimeout(() => t.remove(), 3200);
   };
   const signedIn = () => !!token;
-  const shownName = () => (me && me.name) || "You";
+  const nm = (s) => String(s || "").replace(/\S+/g, (w) => w[0].toUpperCase() + w.slice(1).toLowerCase()); // "JAYANT" -> "Jayant"
+  const shownName = () => (me && nm(me.name)) || "You";
   function keep(d) { token = d.token; me = d.me; store.set("community_token", token); store.set("community_me", me); }
   function clear() {
     token = null; me = null;
@@ -130,7 +131,7 @@
   }
   if (CF && (enrolled || ticker)) {
     hello.then(live).then((d) => {
-      const names = ((d && d.names) || []).filter((n) => n.length >= 3); // no initials ("Kd")
+      const names = ((d && d.names) || []).filter((n) => n.length >= 3).map(nm); // no initials ("Kd")
       if (!ticker || names.length < 2) return;
       const slot = ticker.querySelector("b");
       let k = 0;

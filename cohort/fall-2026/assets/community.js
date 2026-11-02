@@ -14,6 +14,7 @@
   const board = document.querySelector("[data-leaderboard]");
   const latest = document.querySelector("[data-recent]");
   const profileBox = document.querySelector("[data-profile]");
+  const chatBox = document.querySelector("[data-messages]");
   // what cohort.js's one request per page already brought; each part falls back to its own request
   const hello = (key, fallback) => (window.cohortHello || Promise.resolve(null)).then((h) => (h && h[key] != null ? h : fallback()));
 
@@ -471,6 +472,7 @@
     if (n.type === "feedback") return `Srijit left feedback on your solution to ${on} (👏 ${n.n}/10)`;
     if (n.type === "reply") return `${who} replied to your post on ${on}`;
     if (n.type === "solution") return `${who} posted a solution to ${on}. Open it to grade it.`;
+    if (n.type === "message") return `💬 ${who} sent you ${n.n > 1 ? `${n.n} messages` : "a message"}`;
     return `News on ${on}`;
   }
   function startBell() {
@@ -480,14 +482,20 @@
     wrap.innerHTML = `<button type="button" class="bellbtn" aria-label="Notifications" aria-expanded="false">🔔<span class="dot" hidden></span></button>
       <div class="notes" hidden></div>`;
     anchor.before(wrap);
+    const chat = Object.assign(document.createElement("a"), { className: "msgbtn", href: BASE + "messages/", textContent: "💬",
+      title: me && me.owner ? "Messages from learners" : "Message Srijit" }); // a new message shows on the bell
+    chat.setAttribute("aria-label", chat.title);
+    wrap.before(chat);
     const btn = wrap.querySelector(".bellbtn"), dot = wrap.querySelector(".dot"), list = wrap.querySelector(".notes");
     let items = [];
     const paint = (d) => {
       items = d.items;
       dot.hidden = !d.unseen; dot.textContent = d.unseen > 9 ? "9+" : d.unseen;
-      list.innerHTML = items.length ? items.map((n) => `<a class="${n.seen ? "" : "new"}" href="${PAGES}${encodeURIComponent(n.problem || "")}/#post-${n.post_id}">
+      const link = (n) => (n.type === "message" ? `${BASE}messages/${me && me.owner ? `#u${n.from_user}` : ""}`
+        : `${PAGES}${encodeURIComponent(n.problem || "")}/#post-${n.post_id}`);
+      list.innerHTML = items.length ? items.map((n) => `<a class="${n.seen ? "" : "new"}" href="${link(n)}">
           <span>${noteText(n)}</span><time>${ago(n.created)}</time></a>`).join("")
-        : `<p class="muted">Nothing yet. Claps, grades and replies to your posts show up here.</p>`;
+        : `<p class="muted">Nothing yet. Claps, grades, replies and messages show up here.</p>`;
       math(list);
     };
     const load = () => call("GET", "/notifications").then(paint).catch(() => {});
@@ -534,6 +542,7 @@
             <div><b>${d.replies}</b><span>replies</span></div></div>
           ${p.owner ? "" : `<div class="karma-bar" title="${next ? `${next - d.karma} more Math Karma to the next level` : "Top level"}"><i style="width:${pct}%"></i></div>
           <p class="muted small">${next ? `${next - d.karma} more Math Karma to the next level.` : "The top level."} Karma: +10 for each problem you solve, +3 for a question, +2 for each reply.</p>`}
+          <p class="foot"><a class="quiet" href="${BASE}leaderboard/">Leaderboard →</a></p>
           <h2>Solved</h2>
           ${d.solved.length ? `<div class="solved">${d.solved.map((s) => `<a class="scard" href="${PAGES}${encodeURIComponent(s.problem)}/${s.id ? `#post-${s.id}` : ""}">
               <span class="mod">${s.module ? `${esc(s.module)} · ${s.lesson}.${s.n}` : "Practice"}</span><b>${esc(s.title)}</b>
@@ -570,24 +579,74 @@
   // a post as one plain line: Markdown marks and LaTeX commands dropped, maths kept readable
   const plainLine = (t) => String(t).replace(/[#*_>`]+/g, "").replace(/\$+/g, "").replace(/\\(frac|dfrac)\{([^{}]*)\}\{([^{}]*)\}/g, "$2/$3")
     .replace(/\\(left|right|displaystyle|mathrm|text|quad|,)/g, "").replace(/\\([a-zA-Z]+)/g, "$1 ").replace(/[{}]/g, "").replace(/\s+/g, " ").trim();
-  async function startRecent() {
-    if (!(await signIn())) {
-      latest.innerHTML = `<h2>Latest in the discussion</h2><div class="join"><p>Sign in to read everyone's solutions and join the discussion.</p>
-        <button type="button" class="btn accent small">Sign in to join</button></div>`;
-      latest.querySelector("button").onclick = askToSignIn; latest.hidden = false; return;
-    }
+  async function startRecent() { // everyone sees what's happening; opening a post asks to sign in
+    const yes = await signIn();
+    const foot = `<p class="foot"><a class="quiet" href="${BASE}leaderboard/">Leaderboard →</a>
+      <a class="quiet" href="https://srijitmukherjee.com/" target="_blank" rel="noopener">About Teacher →</a></p>`;
     try {
-      const d = await hello("items", () => call("GET", "/recent"));
+      const d = await hello("items", () => (yes ? call("GET", "/recent") : Promise.resolve({ items: [] })));
       if (!d.items.length) {
-        latest.innerHTML = `<h2>Latest in the discussion</h2><p class="soon">Nothing yet. Open a problem, solve it by hand and share your solution.</p>`;
+        latest.innerHTML = `<h2>Latest in the discussion</h2><p class="soon">Nothing yet. Open a problem, solve it by hand and share your solution.</p>${foot}`;
         latest.hidden = false; return;
       }
       latest.innerHTML = `<h2>Latest in the discussion</h2><ul>${d.items.map((r) => `<li><a href="${PAGES}${encodeURIComponent(r.problem)}/#post-${r.post}">
           <span class="what"><b>${esc(r.name || "Learner")}</b> ${r.type === "comment" ? "replied on" : r.kind === "question" ? "asked about" : "shared a solution to"} <b>${esc(r.title)}</b></span>
-          <span class="snip">${esc(plainLine(r.body))}</span><time>${ago(r.created)}</time></a></li>`).join("")}</ul>
-        <p><a class="quiet" href="${BASE}leaderboard/">Leaderboard →</a></p>`;
+          ${r.body ? `<span class="snip">${esc(plainLine(r.body))}</span>` : ""}<time>${ago(r.created)}</time></a></li>`).join("")}</ul>
+        ${yes ? "" : `<p class="muted">Sign in to read them and join in.</p>`}${foot}`;
       latest.hidden = false; // previews are one plain line: no rendered maths (it would not fit a phone)
     } catch (err) { /* the home page is fine without it */ }
+  }
+
+  // -- 💬 messages with Srijit, like WhatsApp: loads when opened, nothing polls ----------------------------------
+  async function startChat() {
+    if (!(await signIn())) {
+      chatBox.innerHTML = `<h1>Messages</h1><div class="join"><p>Sign in to message Srijit.</p>
+        <button type="button" class="btn accent small">Sign in</button></div>`;
+      chatBox.querySelector("button").onclick = askToSignIn; return;
+    }
+    const when = (ms) => new Date(ms).toLocaleString(undefined, { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+    const bubble = (m, mineIsOwner) => `<div class="bub ${!!m.owner === mineIsOwner ? "me" : "them"}"><div class="txt">${md(m.body)}</div><time>${when(m.created)}</time></div>`;
+    async function inbox() {
+      chatBox.innerHTML = `<h1>Messages</h1><p class="soon">Loading…</p>`;
+      const d = await call("GET", "/messages");
+      chatBox.innerHTML = `<h1>Messages</h1>${d.inbox.length ? `<ul class="inbox">${d.inbox.map((t) => `<li><a href="#u${t.id}">
+          <b>${esc(t.name || "Learner")}${t.unread ? ` <span class="cnt">${t.unread}</span>` : ""}</b><time>${ago(t.at)}</time>
+          <span class="snip">${t.mine ? "You: " : ""}${esc(plainLine(t.body))}</span></a></li>`).join("")}</ul>`
+        : `<p class="soon">No messages yet. When a learner writes to you, it shows up here and on the bell.</p>`}`;
+    }
+    async function thread(uid) {
+      chatBox.innerHTML = `<p class="soon">Loading…</p>`;
+      const d = await call("GET", "/messages" + (uid ? `?u=${uid}` : ""));
+      const owner = !!(me && me.owner);
+      chatBox.innerHTML = `<header class="chat-head">${owner ? `<a class="quiet" href="#">← All</a>` : ""}<h1>${esc(owner ? d.with.name : "Srijit")}</h1>
+          <button type="button" class="linkish" data-reload title="Check for new messages">↻</button></header>
+        <div class="msgs">${d.messages.length ? d.messages.map((m) => bubble(m, owner)).join("")
+          : `<p class="soon">${owner ? "No messages yet." : "Ask Srijit anything about the problems. He'll reply here, and you'll see it on the bell."}</p>`}</div>
+        <form class="say"><textarea rows="1" maxlength="1000" placeholder="${owner ? "Reply" : "Message Srijit"}"></textarea><button type="submit" class="btn accent small">Send</button></form>`;
+      const msgs = chatBox.querySelector(".msgs"), ta = chatBox.querySelector("textarea"), form = chatBox.querySelector("form");
+      math(msgs); msgs.scrollTop = msgs.scrollHeight;
+      chatBox.querySelector("[data-reload]").onclick = () => thread(uid);
+      ta.addEventListener("input", () => { ta.style.height = "auto"; ta.style.height = Math.min(ta.scrollHeight, 160) + "px"; });
+      ta.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey && !matchMedia("(max-width: 600px)").matches) { e.preventDefault(); form.requestSubmit(); } });
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const body = ta.value.trim(); if (!body) return;
+        const b = form.querySelector("button"); b.disabled = true;
+        try {
+          const r = await call("POST", "/messages", owner ? { body, to: uid } : { body });
+          const empty = msgs.querySelector(".soon"); if (empty) empty.remove();
+          msgs.insertAdjacentHTML("beforeend", bubble(r.message, owner)); math(msgs.lastElementChild);
+          ta.value = ""; ta.style.height = "auto"; msgs.scrollTop = msgs.scrollHeight;
+        } catch (err) { failed(err); } finally { b.disabled = false; ta.focus(); }
+      });
+    }
+    const route = () => {
+      const m = location.hash.match(/^#u(\d+)$/);
+      const go = me && me.owner ? (m ? thread(Number(m[1])) : inbox()) : thread(null);
+      go.catch((err) => { chatBox.innerHTML = `<p class="soon">${esc(ERR[err.message] || "Couldn't load the messages. Please reload the page.")}</p>`; });
+    };
+    window.addEventListener("hashchange", route);
+    route();
   }
 
   if (box) { bindDiscussion(); startDiscussion().then(() => API && sidebarCounts()).catch(() => signedOut()); }
@@ -596,4 +655,5 @@
   if (board && API) startBoard();
   if (latest && API) startRecent();
   if (profileBox && API) startProfile();
+  if (chatBox && API) startChat();
 })();

@@ -438,3 +438,31 @@ a.who:hover { color: var(--accent); }
 .shelf li i { font-style: normal; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
   color: var(--accent); border: 1px solid currentColor; border-radius: 999px; padding: 0 6px; margin-left: 4px; white-space: nowrap; }
 @media (max-width: 600px) { .books { padding: 26px 16px 48px; } }
+
+/* 💬 messages (community.js startChat): a learner and Srijit, like WhatsApp; the 💬 link sits beside the bell */
+.msgbtn { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 34px; margin-right: 6px;
+  border: 1.5px solid var(--line); border-radius: 10px; text-decoration: none; font-size: 16px; }
+.msgbtn:hover { border-color: var(--ink); }
+.chat { max-width: 720px; }
+.chat-head { display: flex; align-items: center; gap: 12px; margin: 0 0 10px; }
+.chat-head h1 { margin: 0; flex: 1; font-size: 26px; }
+.chat-head .linkish { font-size: 20px; text-decoration: none; }
+.msgs { display: flex; flex-direction: column; gap: 8px; max-height: 62vh; overflow-y: auto; padding: 12px; background: var(--soft);
+  border: 1px solid var(--line); border-radius: 14px; }
+.bub { max-width: 82%; padding: 8px 12px; border-radius: 14px; background: var(--bg); border: 1px solid var(--line); align-self: flex-start; }
+.bub.me { align-self: flex-end; background: var(--accent-soft); border-color: rgba(232, 89, 12, .3); }
+.bub .txt p { margin: 0 0 4px; } .bub .txt p:last-child { margin: 0; }
+.bub .txt { overflow-wrap: anywhere; }
+.bub time { display: block; font-size: 11px; color: var(--muted); text-align: right; margin-top: 2px; }
+.say { display: flex; gap: 8px; align-items: flex-end; margin-top: 10px; }
+.say textarea { flex: 1; resize: none; font: inherit; font-size: 16px; padding: 9px 12px; border: 1.5px solid var(--line); border-radius: 12px; min-height: 42px; }
+.say textarea:focus { outline: none; border-color: var(--ink); }
+.inbox { list-style: none; padding: 0; margin: 0; border-top: 1.5px solid var(--ink); }
+.inbox a { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 12px 2px; border-bottom: 1px solid var(--line); text-decoration: none; }
+.inbox a:hover b { color: var(--accent); }
+.inbox .cnt { display: inline-block; min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--accent); color: #fff;
+  font-size: 12px; text-align: center; vertical-align: 2px; }
+.inbox time { color: var(--muted); font-size: 13px; grid-column: 2; grid-row: 1; }
+.inbox .snip { grid-column: 1 / -1; color: var(--muted); font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.foot { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 12px 0 0; }
+@media (max-width: 600px) { .msgbtn { width: 36px; height: 34px; font-size: 15px; margin-right: 4px; } .msgs { max-height: 58vh; } }

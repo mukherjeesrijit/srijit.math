@@ -45,6 +45,7 @@ button.quiet { background: none; border: 0; border-bottom: 1.5px solid var(--lin
 .quiet[aria-expanded="true"] { border-color: var(--accent); }
 /* the two levels (2026-11-03): the choice under "Start solving", and the switch at the top of every problem */
 .pick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; max-width: 720px; margin: 28px 0 0; }
+.pick[hidden] { display: none; } /* display: grid would otherwise override hidden */
 .lvcard { display: flex; flex-direction: column; gap: 4px; padding: 18px 20px; border: 1.5px solid var(--line);
   border-radius: 14px; text-decoration: none; min-width: 0; }
 .lvcard:hover { border-color: var(--accent); }

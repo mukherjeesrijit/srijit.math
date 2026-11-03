@@ -22,6 +22,19 @@
     get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
     set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode */ } },
   };
+  // The last `max` copies of something this browser has shown (profiles, discussions), newest last, so a page it has
+  // seen before draws at once and the page's request only brings it up to date (2026-11-03). Cleared on sign-out.
+  const kept = (name, max) => ({
+    get(id) { const all = store.get(name); return all && all[id] ? all[id].v : null; },
+    set(id, v) {
+      const all = store.get(name) || {};
+      all[id] = { v, at: Date.now() };
+      const ids = Object.keys(all).sort((a, b) => all[a].at - all[b].at);
+      ids.slice(0, Math.max(0, ids.length - max)).forEach((k) => delete all[k]);
+      store.set(name, all);
+    },
+  });
+  const keptProfiles = kept("kept_profiles", 20), keptThreads = kept("kept_threads", 10);
   // a name as it is shown: each word with a capital first letter, the rest small ("JAYANT" -> "Jayant")
   const nm = (s) => String(s || "").replace(/\S+/g, (w) => w[0].toUpperCase() + w.slice(1).toLowerCase());
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -173,10 +186,13 @@
   }
   let loaded = false, mineFromPage = null; // the whole discussion loads when Discuss is first opened
   async function loadThread() {
+    const id = box.dataset.discuss + " " + sort;
+    if (!loaded) { const k = keptThreads.get(id); if (k) { posts = k.posts; renderThread(); } } // the last one, at once
     const d = await call("GET", "/thread?p=" + encodeURIComponent(box.dataset.discuss) + "&sort=" + sort);
     me = d.me; auth.setMe(me);
     posts = d.posts; loaded = true; renderThread();
     paintLove(d.loves, d.loved);
+    keptThreads.set(id, { posts: d.posts });
   }
   const threadFailed = (err) => { // say it in the page, not only in a passing note
     box.querySelector(".posts").innerHTML = `<p class="soon">${esc(ERR[err.message] || "Couldn't load the discussion. Please reload the page.")}</p>`;
@@ -494,27 +510,38 @@
       dot.hidden = !n || !!chatBox; dot.textContent = n > 9 ? "9+" : n; // on the messages page itself, it's being read
     }).catch(() => {});
     const btn = wrap.querySelector(".bellbtn"), dot = wrap.querySelector(".dot"), list = wrap.querySelector(".notes");
-    let items = [];
-    const paint = (d) => {
-      items = d.items;
-      dot.hidden = !d.unseen; dot.textContent = d.unseen > 9 ? "9+" : d.unseen;
+    // The bell (2026-11-03): this browser keeps the list it last showed (bell_<you>). Opening the bell shows it at once;
+    // only if the dot says there's something new does it ask, and then only for the items newer than the ones it has
+    // (?since=), which the Worker marks seen as it sends them. Nothing new: no request at all.
+    const key = "bell_" + (me && me.id);
+    let items = store.get(key) || null;
+    const paint = (list_) => {
       const link = (n) => (n.type === "message" ? `/messages/${me && me.owner ? `#u${n.from_user}` : ""}`
         : `${PAGES}${encodeURIComponent(n.problem || "")}/#post-${n.post_id}`);
-      list.innerHTML = items.length ? items.map((n) => `<a class="${n.seen ? "" : "new"}" href="${link(n)}">
+      list.innerHTML = list_.length ? list_.map((n) => `<a class="${n.seen ? "" : "new"}" href="${link(n)}">
           <span>${noteText(n)}</span><time>${ago(n.created)}</time></a>`).join("")
         : `<p class="muted">Nothing yet. Claps, grades and replies show up here.</p>`;
       math(list);
     };
-    const load = () => call("GET", "/notifications").then(paint).catch(() => {});
+    const load = async () => {
+      const since = items && items.length ? Math.max(...items.map((n) => n.created)) : 0;
+      const d = await call("GET", "/notifications" + (since ? "?since=" + since : ""));
+      const byId = new Map((items || []).map((n) => [n.id, { ...n, seen: 1 }])); // what it had: seen now
+      d.items.forEach((n) => byId.set(n.id, n)); // new ones, and a clap item that came again, replace theirs
+      const all = [...byId.values()].sort((a, b) => b.created - a.created).slice(0, 30);
+      paint(all);
+      items = all.map((n) => ({ ...n, seen: 1 })); store.set(key, items);
+      dot.hidden = true;
+    };
     // the number of new ones comes with the page (no polling); the list loads when the bell is opened
     const check = () => hello("unseen", () => call("GET", "/notifications/unseen")).then((d) => {
       dot.hidden = !d.unseen; dot.textContent = d.unseen > 9 ? "9+" : d.unseen; }).catch(() => {});
     btn.addEventListener("click", async () => {
       list.hidden = !list.hidden; btn.setAttribute("aria-expanded", String(!list.hidden));
       if (list.hidden) return;
-      if (!items.length) list.innerHTML = `<p class="muted">Loading…</p>`;
-      await load();
-      if (!dot.hidden) { await call("POST", "/notifications/seen", {}).catch(() => {}); dot.hidden = true; }
+      if (items) paint(items); else list.innerHTML = `<p class="muted">Loading…</p>`;
+      if (items && dot.hidden) return; // nothing new since this browser last looked: no request
+      await load().catch(() => { if (!items) list.innerHTML = `<p class="muted">Couldn't load. Please try again.</p>`; });
     });
     document.addEventListener("click", (e) => { if (!wrap.contains(e.target)) { list.hidden = true; btn.setAttribute("aria-expanded", "false"); } });
     check(); // every 2 min, only while the tab is in view
@@ -534,16 +561,16 @@
     const show = async () => {
       const who = location.hash.replace("#", "") || "me";
       const ask = () => call("GET", "/profile?u=" + encodeURIComponent(who));
+      // anyone's profile this browser has shown (yours too) draws at once from the last time, then is brought up to date
+      const pid = who === "me" ? String(me && me.id) : who;
+      const s = keptProfiles.get(pid);
       let drawn = false;
-      if (first && who === "me") { // your own dashboard: drawn at once from the last time, then brought up to date
-        const s = store.get("last_profile");
-        if (s && s.person && me && s.person.id === me.id) { paint(s); drawn = true; }
-      }
+      if (s && s.person) { paint(s); drawn = true; } else profileBox.innerHTML = `<p class="soon">Loading…</p>`;
       try {
         const d = first ? (await hello("profile", () => ask().then((profile) => ({ profile })))).profile : await ask();
         first = false;
         paint(d);
-        if (d.person.mine) store.set("last_profile", d);
+        keptProfiles.set(String(d.person.id), d);
       } catch (err) { first = false; if (!drawn) profileBox.innerHTML = `<p class="soon">Couldn't find that profile.</p>`; } // keep the last one
     };
     function paint(d) {
@@ -638,26 +665,58 @@
     }
     const when = (ms) => new Date(ms).toLocaleString(undefined, { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
     const bubble = (m, mineIsOwner) => `<div class="bub ${!!m.owner === mineIsOwner ? "me" : "them"}"><div class="txt">${md(m.body)}</div><time>${when(m.created)}</time></div>`;
+    // 💬 (2026-11-03): this browser keeps each conversation it has shown (chat_<you>_<them>) and the inbox (inbox_<you>),
+    // and draws them at once. The page's own request (cohort.js: hello, want "chat") then brings only the messages newer
+    // than the last one kept (usually none); ↻ asks the same way. Nothing is loaded twice.
+    let firstAsk = true;
+    const ask = (uid, after) => {
+      const get = () => call("GET", "/messages?" + new URLSearchParams({ ...(uid ? { u: uid } : {}), ...(after ? { after } : {}) }));
+      if (!firstAsk) return get();
+      firstAsk = false; // the first one came with the page's request
+      return hello("chat", () => get().then((chat) => ({ chat }))).then((h) => h.chat);
+    };
     async function inbox() {
-      chatBox.innerHTML = `<h1>Messages</h1><p class="soon">Loading…</p>`;
-      const d = await call("GET", "/messages");
-      chatBox.innerHTML = `<h1>Messages</h1>${d.inbox.length ? `<ul class="inbox">${d.inbox.map((t) => `<li><a href="#u${t.id}">
+      const key = `inbox_${me.id}`, saved = store.get(key);
+      const draw = (list) => {
+        chatBox.innerHTML = `<h1>Messages</h1>${list.length ? `<ul class="inbox">${list.map((t) => `<li><a href="#u${t.id}">
           <b>${esc(nm(t.name) || "Learner")}${t.unread ? ` <span class="cnt">${t.unread}</span>` : ""}</b><time>${ago(t.at)}</time>
           <span class="snip">${t.mine ? "You: " : ""}${esc(plainLine(t.body))}</span></a></li>`).join("")}</ul>`
         : `<p class="soon">No messages yet. When a learner writes to you, it shows up here and on 💬.</p>`}`;
+      };
+      if (Array.isArray(saved)) draw(saved); else chatBox.innerHTML = `<h1>Messages</h1><p class="soon">Loading…</p>`;
+      try {
+        const d = await ask(null, 0);
+        if (d && Array.isArray(d.inbox)) { draw(d.inbox); store.set(key, d.inbox); }
+      } catch (err) { if (!Array.isArray(saved)) throw err; } // keep the last one
     }
     async function thread(uid) {
-      chatBox.innerHTML = `<p class="soon">Loading…</p>`;
-      const d = await call("GET", "/messages" + (uid ? `?u=${uid}` : ""));
-      const owner = !!(me && me.owner);
-      chatBox.innerHTML = `<header class="chat-head">${owner ? `<a class="quiet" href="#">← All</a>` : ""}<h1>${esc(owner ? nm(d.with.name) : "Srijit")}</h1>
+      const owner = !!(me && me.owner), key = `chat_${me.id}_${uid || "srijit"}`, saved = store.get(key);
+      let list = saved && Array.isArray(saved.messages) ? saved.messages : null, who = saved && saved.with;
+      chatBox.innerHTML = `<header class="chat-head">${owner ? `<a class="quiet" href="#">← All</a>` : ""}<h1>${esc(owner ? nm((who && who.name) || "") : "Srijit")}</h1>
           <button type="button" class="linkish" data-reload title="Check for new messages">↻</button></header>
-        <div class="msgs">${d.messages.length ? d.messages.map((m) => bubble(m, owner)).join("")
-          : `<p class="soon">${owner ? "No messages yet." : "Ask Srijit anything about the problems. He'll reply here, and you'll see it on 💬."}</p>`}</div>
+        <div class="msgs">${list ? "" : `<p class="soon">Loading…</p>`}</div>
         <form class="say"><textarea rows="1" maxlength="1000" placeholder="${owner ? "Reply" : "Message Srijit"}"></textarea><button type="submit" class="btn accent small">Send</button></form>`;
       const msgs = chatBox.querySelector(".msgs"), ta = chatBox.querySelector("textarea"), form = chatBox.querySelector("form");
-      math(msgs); msgs.scrollTop = msgs.scrollHeight;
-      chatBox.querySelector("[data-reload]").onclick = () => thread(uid);
+      const head = chatBox.querySelector(".chat-head h1");
+      const draw = () => {
+        msgs.innerHTML = list.length ? list.map((m) => bubble(m, owner)).join("")
+          : `<p class="soon">${owner ? "No messages yet." : "Ask Srijit anything about the problems. He'll reply here, and you'll see it on 💬."}</p>`;
+        math(msgs); msgs.scrollTop = msgs.scrollHeight;
+      };
+      const keep = () => store.set(key, { with: who, messages: list.slice(-50) });
+      const fresh = async () => { // only what's newer than the last message kept
+        const after = list && list.length ? list[list.length - 1].id : 0;
+        const d = await ask(uid, after);
+        who = d.with; if (owner) head.textContent = nm(who.name);
+        if (d.after && list) {
+          const add = d.messages.filter((m) => !list.some((x) => x.id === m.id));
+          if (!add.length) return keep();
+          list = list.concat(add);
+        } else list = d.messages;
+        draw(); keep();
+      };
+      if (list) draw();
+      chatBox.querySelector("[data-reload]").onclick = () => fresh().catch(failed);
       ta.addEventListener("input", () => { ta.style.height = "auto"; ta.style.height = Math.min(ta.scrollHeight, 160) + "px"; });
       ta.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey && !matchMedia("(max-width: 600px)").matches) { e.preventDefault(); form.requestSubmit(); } });
       form.addEventListener("submit", async (e) => {
@@ -669,8 +728,10 @@
           const empty = msgs.querySelector(".soon"); if (empty) empty.remove();
           msgs.insertAdjacentHTML("beforeend", bubble(r.message, owner)); math(msgs.lastElementChild);
           ta.value = ""; ta.style.height = "auto"; msgs.scrollTop = msgs.scrollHeight;
+          list = (list || []).concat(r.message); keep();
         } catch (err) { failed(err); } finally { b.disabled = false; ta.focus(); }
       });
+      await fresh().catch((err) => { if (!list) throw err; }); // with a kept copy shown, keep it if this fails
     }
     const route = () => {
       const m = location.hash.match(/^#u(\d+)$/);

@@ -30,7 +30,8 @@
   function keep(d) { token = d.token; me = d.me; store.set("community_token", token); store.set("community_me", me); }
   function clear() {
     token = null; me = null;
-    ["community_token", "community_me", "last_profile", "last_latest_in"].forEach((k) => store.set(k, null)); // and what was signed-in only
+    ["community_token", "community_me", "last_latest_in", "kept_profiles", "kept_threads", "last_profile"].forEach((k) => store.set(k, null)); // and what was signed-in only:
+    try { Object.keys(localStorage).filter((k) => /^(bell|chat|inbox)_/.test(k)).forEach((k) => localStorage.removeItem(k)); } catch (e) { /* private mode */ }
     refresh();
     if (CF) loadGoogle(); // signed out now: they'll need the sign-in button
   }
@@ -127,8 +128,20 @@
   const profileBox = document.querySelector("[data-profile]");
   if (profileBox && token) want.push("profile"); // the dashboard comes with the page's request (2026-11-03), not a second one
   if (document.querySelector("[data-leaderboard]")) want.push("board"); // and so does the leaderboard
-  const hello = !CF ? Promise.resolve(null) : cf("/hello", { want,
-      problem: discuss ? discuss.dataset.discuss : undefined, u: profileBox ? location.hash.slice(1) || "me" : undefined }, true)
+  // 💬: the conversation on the messages page, only what's newer than the last message this browser kept (community.js)
+  let chatU, chatAfter;
+  if (document.querySelector("[data-messages]") && token && me) {
+    want.push("chat");
+    const m = location.hash.match(/^#u(\d+)$/);
+    chatU = me.owner && m ? m[1] : undefined;
+    const kept = !me.owner || chatU ? store.get(`chat_${me.id}_${chatU || "srijit"}`) : null; // Srijit's inbox: always whole
+    const last = kept && Array.isArray(kept.messages) && kept.messages[kept.messages.length - 1];
+    chatAfter = last ? last.id : undefined;
+  }
+  // a signed-out visitor on a page that shows nothing live (Start, Books, Roadmap, Privacy): no request at all
+  const hello = !CF || (!token && !want.length && !discuss) ? Promise.resolve(null) : cf("/hello", { want,
+      problem: discuss ? discuss.dataset.discuss : undefined, u: profileBox ? location.hash.slice(1) || "me" : undefined,
+      chat_u: chatU, chat_after: chatAfter }, true)
     .then((d) => { if (d.ok && token && !d.signedIn) clear(); return d.ok ? d : null; }) // a sign-in that has run out
     .catch(() => null);
   window.cohortHello = hello;

@@ -41,18 +41,17 @@ button { font: inherit; cursor: pointer; }
 .cta .btn { font-size: 18px; padding: .75em 1.7em; }
 .quiet { color: var(--ink); font-weight: 600; text-decoration: none; border-bottom: 1.5px solid var(--line); }
 .quiet:hover { border-color: var(--accent); }
-button.quiet { background: none; border: 0; border-bottom: 1.5px solid var(--line); border-radius: 0; padding: 0; }
-.quiet[aria-expanded="true"] { border-color: var(--accent); }
-/* the two levels (2026-11-03): the choice under "Start solving", and the switch at the top of every problem */
-.pick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; max-width: 720px; margin: 28px 0 0; }
-.pick[hidden] { display: none; } /* display: grid would otherwise override hidden */
-.lvcard { display: flex; flex-direction: column; gap: 4px; padding: 18px 20px; border: 1.5px solid var(--line);
-  border-radius: 14px; text-decoration: none; min-width: 0; }
-.lvcard:hover { border-color: var(--accent); }
-.lvcard b { font-size: 19px; }
-.lvcard span { color: var(--muted); font-size: 15px; line-height: 1.45; }
-.lvcard small { color: var(--accent); font-size: 13px; font-weight: 700; margin-top: 6px; }
-.pick .hint { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: 14px; }
+/* the two levels (2026-11-03): /start/ asks which one ("Start solving"); every problem has the switch at the top */
+.home.start { padding-top: clamp(40px, 12vh, 140px); } /* .home.start: the phones' .home padding comes later */
+.start h1 { font-size: clamp(34px, 5.4vw, 56px); line-height: 1.05; letter-spacing: -.035em; font-weight: 800; margin: 0 0 30px; }
+.pick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; max-width: 820px; }
+.lvcard { display: flex; flex-direction: column; gap: 8px; padding: 28px 28px 24px; border: 1.5px solid var(--line);
+  border-radius: 16px; text-decoration: none; min-width: 0; transition: border-color .15s, transform .15s; }
+.lvcard:hover { border-color: var(--accent); transform: translateY(-2px); }
+.lvcard b { font-size: 26px; letter-spacing: -.02em; }
+.lvcard span { color: var(--muted); font-size: 16px; line-height: 1.5; }
+.lvcard small { color: var(--accent); font-size: 15px; font-weight: 700; margin-top: auto; padding-top: 10px; }
+.start .hint { color: var(--muted); font-size: 14px; margin: 20px 0 0; }
 .levels { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 18px; }
 .seg { display: inline-flex; padding: 3px; border: 1px solid var(--line); border-radius: 999px; background: var(--soft); }
 .seg a { padding: .28em 1em; border-radius: 999px; text-decoration: none; font-size: 14px; font-weight: 600; color: var(--muted); }

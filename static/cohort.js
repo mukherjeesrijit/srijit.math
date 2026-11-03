@@ -32,12 +32,22 @@
     token = null; me = null;
     ["community_token", "community_me"].forEach((k) => store.set(k, null));
     refresh();
+    if (CF) loadGoogle(); // signed out now: they'll need the sign-in button
   }
 
   // -- signing in: "Continue with Google" ------------------------------------------------------------------
   const modal = document.querySelector(".modal");
   const gbox = modal.querySelector(".google");
   let googleReady = false;
+  // Google's sign-in script (2026-11-03): loaded only for someone who isn't signed in (or when a sign-in has run out),
+  // so a signed-in learner's pages don't fetch and run it at all
+  let googleScript = null;
+  function loadGoogle() {
+    if (googleScript || !GOOGLE || (window.google && window.google.accounts)) return;
+    googleScript = Object.assign(document.createElement("script"), { src: "https://accounts.google.com/gsi/client", async: true });
+    googleScript.onload = () => { if (!modal.hidden && !googleReady) askToEnrol(); }; // the button appears as soon as it can
+    document.head.appendChild(googleScript);
+  }
   function onGoogle(resp) {
     cf("/auth/google", { credential: resp.credential }).then((d) => {
       if (!d.ok) { toast(d.error === "resting" ? "Sign-in is taking a short break. Please try again in a little while."
@@ -49,7 +59,7 @@
     modal.hidden = false;
     if (!(CF && GOOGLE && window.google && window.google.accounts)) {
       gbox.querySelector(".gbtn").innerHTML = '<p class="soon">Loading Google sign-in… If it doesn\'t appear, reload the page.</p>';
-      setTimeout(() => { if (!googleReady && window.google && window.google.accounts) askToEnrol(); }, 1500);
+      loadGoogle(); // its onload shows the button
       return;
     }
     if (!googleReady) {
@@ -63,6 +73,7 @@
   modal.querySelectorAll("[data-close]").forEach((b) => (b.onclick = () => { modal.hidden = true; }));
   modal.addEventListener("click", (e) => { if (e.target === modal) modal.hidden = true; });
   document.querySelectorAll("[data-enrol]").forEach((b) => (b.onclick = () => !signedIn() && askToEnrol()));
+  if (!token && CF) loadGoogle(); // signed out: have the button ready for when they press Enroll
 
   // -- the ☰ menu: Dashboard, Roadmap, Books -------------------------------------------------------------------
   const menuBtn = document.querySelector("[data-menu]"), menuList = document.querySelector(".menulist");
@@ -113,8 +124,11 @@
   if (document.querySelector(".side li a")) want.push("counts");
   if (document.querySelector("[data-recent]")) want.push("recent");
   if (document.querySelector("[data-more], [data-path], [data-stuck]")) want.push("path"); // what I've solved, my grades, "Stuck?"
+  const profileBox = document.querySelector("[data-profile]");
+  if (profileBox && token) want.push("profile"); // the dashboard comes with the page's request (2026-11-03), not a second one
+  if (document.querySelector("[data-leaderboard]")) want.push("board"); // and so does the leaderboard
   const hello = !CF ? Promise.resolve(null) : cf("/hello", { want,
-      problem: discuss ? discuss.dataset.discuss : undefined }, true)
+      problem: discuss ? discuss.dataset.discuss : undefined, u: profileBox ? location.hash.slice(1) || "me" : undefined }, true)
     .then((d) => { if (d.ok && token && !d.signedIn) clear(); return d.ok ? d : null; }) // a sign-in that has run out
     .catch(() => null);
   window.cohortHello = hello;

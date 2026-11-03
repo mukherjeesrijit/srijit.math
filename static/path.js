@@ -25,6 +25,9 @@
     more.hidden = false;
   }
   gate(!!(auth && auth.token()));
+  // the home page's graph is a static file: fetch it at the same time as the page's request, not after (2026-11-03)
+  const graph = home && auth && auth.token() && !(auth.me() && auth.me().owner)
+    ? fetch(PAGES + "graph.json?v=" + (C.v || "")).then((r) => r.json()).catch(() => null) : null;
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   const toast = (msg) => {
     const t = Object.assign(document.createElement("div"), { className: "toast", textContent: msg });
@@ -117,6 +120,6 @@
     hello.path.solved.forEach((r) => { solved[r.p] = r.g; });
     stuck = new Set(hello.path.stuck);
     ready = true; paintStuck(); paintMore();
-    if (home) return fetch(PAGES + "graph.json?v=" + (C.v || "")).then((r) => r.json()).then((g) => { G = g; nextForYou(); });
+    if (graph) return graph.then((g) => { if (g) { G = g; nextForYou(); } });
   }).catch(() => { /* the page works without it */ });
 })();

@@ -530,10 +530,13 @@
       profileBox.innerHTML = `<p>Sign in to see profiles.</p><button type="button" class="btn accent small">Sign in</button>`;
       profileBox.querySelector("button").onclick = askToSignIn; return;
     }
+    let first = true; // the first one came with the page's request (cohort.js); another person's (#<id>) is asked for
     const show = async () => {
       const who = location.hash.replace("#", "") || "me";
+      const ask = () => call("GET", "/profile?u=" + encodeURIComponent(who));
       try {
-        const d = await call("GET", "/profile?u=" + encodeURIComponent(who));
+        const d = first ? (await hello("profile", () => ask().then((profile) => ({ profile })))).profile : await ask();
+        first = false;
         const p = d.person, l = d.level, next = l.next;
         const pct = next ? Math.round(100 * (d.karma - (LEVEL_FLOOR[l.n - 1] || 0)) / (next - (LEVEL_FLOOR[l.n - 1] || 0))) : 100;
         document.title = nm(p.name) + " · Mathematics for Machine Learning";
@@ -567,7 +570,7 @@
           try { const r = await call("POST", "/me", { linkedin: lf.querySelector("input").value }); me = r.me; auth.setMe(me); toast(me.linkedin ? "LinkedIn link saved." : "LinkedIn link removed."); show(); }
           catch (err) { failed(err); }
         };
-      } catch (err) { profileBox.innerHTML = `<p class="soon">Couldn't find that profile.</p>`; }
+      } catch (err) { first = false; profileBox.innerHTML = `<p class="soon">Couldn't find that profile.</p>`; }
     };
     window.addEventListener("hashchange", show);
     show();
@@ -581,8 +584,8 @@
   }
   async function startBoard() {
     await signIn(); // anyone can see it; signing in only adds the links' context
-    try {
-      const d = await call("GET", "/leaderboard");
+    try { // it comes with the page's request (cohort.js); on its own only if that failed
+      const d = (await hello("board", () => call("GET", "/leaderboard").then((board) => ({ board })))).board;
       board.innerHTML = `<div class="lb-grid"><section><h2>This week</h2>${table(d.week)}</section><section><h2>All time</h2>${table(d.all)}</section></div>`;
     } catch (err) { board.innerHTML = `<p class="soon">Couldn't load the leaderboard. Please reload.</p>`; }
   }
@@ -590,19 +593,17 @@
   const plainLine = (t) => String(t).replace(/[#*_>`]+/g, "").replace(/\$+/g, "").replace(/\\(frac|dfrac)\{([^{}]*)\}\{([^{}]*)\}/g, "$2/$3")
     .replace(/\\(left|right|displaystyle|mathrm|text|quad|,)/g, "").replace(/\\([a-zA-Z]+)/g, "$1 ").replace(/[{}]/g, "").replace(/\s+/g, " ").trim();
   async function startRecent() { // everyone sees what's happening; opening a post asks to sign in
-    const yes = await signIn();
-    const foot = `<p class="foot"><a class="quiet" href="/leaderboard/">Leaderboard →</a>
-      <a class="quiet" href="https://srijitmukherjee.com/" target="_blank" rel="noopener">About Teacher →</a></p>`;
+    const yes = await signIn(); // (Leaderboard → and About Teacher → are in the page itself, above this: no waiting)
     try {
       const d = await hello("items", () => (yes ? call("GET", "/recent") : Promise.resolve({ items: [] })));
       if (!d.items.length) {
-        latest.innerHTML = `<h2>Latest in the discussion</h2><p class="soon">Nothing yet. Open a problem, solve it by hand and share your solution.</p>${foot}`;
+        latest.innerHTML = `<h2>Latest in the discussion</h2><p class="soon">Nothing yet. Open a problem, solve it by hand and share your solution.</p>`;
         latest.hidden = false; return;
       }
-      latest.innerHTML = `<h2>Latest in the discussion</h2><ul>${d.items.map((r) => `<li><a href="${PAGES}${encodeURIComponent(r.problem)}/#post-${r.post}">
+      latest.innerHTML = `<h2>Latest in the discussion</h2><ul>${d.items.slice(0, 6).map((r) => `<li><a href="${PAGES}${encodeURIComponent(r.problem)}/#post-${r.post}">
           <span class="what"><b>${esc(nm(r.name) || "Learner")}</b> ${r.type === "comment" ? "replied on" : r.kind === "question" ? "asked about" : "shared a solution to"} <b>${esc(r.title)}</b></span>
           ${r.body ? `<span class="snip">${esc(plainLine(r.body))}</span>` : ""}<time>${ago(r.created)}</time></a></li>`).join("")}</ul>
-        ${yes ? "" : `<p class="muted">Sign in to read them and join in.</p>`}${foot}`;
+        ${yes ? "" : `<p class="muted">Sign in to read them and join in.</p>`}`;
       latest.hidden = false; // previews are one plain line: no rendered maths (it would not fit a phone)
     } catch (err) { /* the home page is fine without it */ }
   }

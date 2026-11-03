@@ -534,44 +534,53 @@
     const show = async () => {
       const who = location.hash.replace("#", "") || "me";
       const ask = () => call("GET", "/profile?u=" + encodeURIComponent(who));
+      let drawn = false;
+      if (first && who === "me") { // your own dashboard: drawn at once from the last time, then brought up to date
+        const s = store.get("last_profile");
+        if (s && s.person && me && s.person.id === me.id) { paint(s); drawn = true; }
+      }
       try {
         const d = first ? (await hello("profile", () => ask().then((profile) => ({ profile })))).profile : await ask();
         first = false;
-        const p = d.person, l = d.level, next = l.next;
-        const pct = next ? Math.round(100 * (d.karma - (LEVEL_FLOOR[l.n - 1] || 0)) / (next - (LEVEL_FLOOR[l.n - 1] || 0))) : 100;
-        document.title = nm(p.name) + " · Mathematics for Machine Learning";
-        profileBox.innerHTML = `<header class="who-head"><h1>${esc(nm(p.name))}</h1>${linkedin(p).replace('class="li"', 'class="li big"')}
-            ${p.owner ? "" : `<span class="lvl big">Level ${l.n} · ${esc(l.name)}</span>`}
-            <p class="muted">Joined ${day(p.joined)}${p.mine ? ` · this is you · <button type="button" class="linkish" data-rename>change name</button>` : ""}</p>
-            ${p.mine ? `<form class="li-form"><label>Your LinkedIn <input type="url" inputmode="url" placeholder="https://www.linkedin.com/in/your-name/" value="${esc(p.linkedin || "")}"></label>
-              <button type="submit" class="btn small">Save</button><span class="muted">An icon by your name links to it. Leave it empty to remove it.</span></form>` : ""}</header>
-          <div class="stats-row">
-            <div><b>${d.karma}</b><span>Math Karma</span></div>
-            <div><b>${d.points}</b><span>points from claps</span></div>
-            <div><b>${d.solved.length}</b><span>problems solved</span></div>
-            <div><b>${d.replies}</b><span>replies</span></div></div>
-          ${p.owner ? "" : `<div class="karma-bar" title="${next ? `${next - d.karma} more Math Karma to the next level` : "Top level"}"><i style="width:${pct}%"></i></div>
-          <p class="muted small">${next ? `${next - d.karma} more Math Karma to the next level.` : "The top level."} Karma: +10 for each problem you solve, +3 for a question, +2 for each reply.</p>`}
-          <p class="foot links">${p.mine && !p.owner ? `<a class="btn accent small" href="/messages/">💬 Message Srijit</a>` : ""}
-            ${p.mine && p.owner ? `<a class="btn accent small" href="/messages/">💬 Messages</a>` : ""}
-            <a class="btn ghost small" href="/leaderboard/">Leaderboard</a>
-            <a class="btn ghost small" href="https://srijitmukherjee.com/" target="_blank" rel="noopener">About Teacher</a></p>
-          <h2>Solved</h2>
-          ${d.solved.length ? `<div class="solved">${d.solved.map((s) => `<a class="scard" href="${PAGES}${encodeURIComponent(s.problem)}/${s.id ? `#post-${s.id}` : ""}">
-              <span class="mod">${s.module ? `${esc(s.module)} · ${s.lesson}.${s.n}` : "Practice"}</span><b>${esc(s.title)}</b>
-              <span class="when">${s.created ? `Solved ${day(s.created)}` : "Srijit's solution"}</span>
-              ${s.id ? `<span class="nums">👏 ${s.claps}${s.grade != null ? ` · Srijit 👏 ${s.grade}/10` : ""} · ${s.replies} repl${s.replies === 1 ? "y" : "ies"}</span>` : ""}</a>`).join("")}</div>`
-            : `<p class="soon">${p.mine ? "No solutions yet. Open a problem, press Solve and share yours." : "No solutions yet."}</p>`}`;
-        const rn = profileBox.querySelector("[data-rename]");
-        if (rn) rn.onclick = async () => { await rename(); show(); };
-        const lf = profileBox.querySelector(".li-form");
-        if (lf) lf.onsubmit = async (e) => {
-          e.preventDefault();
-          try { const r = await call("POST", "/me", { linkedin: lf.querySelector("input").value }); me = r.me; auth.setMe(me); toast(me.linkedin ? "LinkedIn link saved." : "LinkedIn link removed."); show(); }
-          catch (err) { failed(err); }
-        };
-      } catch (err) { first = false; profileBox.innerHTML = `<p class="soon">Couldn't find that profile.</p>`; }
+        paint(d);
+        if (d.person.mine) store.set("last_profile", d);
+      } catch (err) { first = false; if (!drawn) profileBox.innerHTML = `<p class="soon">Couldn't find that profile.</p>`; } // keep the last one
     };
+    function paint(d) {
+      const p = d.person, l = d.level, next = l.next;
+      const pct = next ? Math.round(100 * (d.karma - (LEVEL_FLOOR[l.n - 1] || 0)) / (next - (LEVEL_FLOOR[l.n - 1] || 0))) : 100;
+      document.title = nm(p.name) + " · Mathematics for Machine Learning";
+      profileBox.innerHTML = `<header class="who-head"><h1>${esc(nm(p.name))}</h1>${linkedin(p).replace('class="li"', 'class="li big"')}
+          ${p.owner ? "" : `<span class="lvl big">Level ${l.n} · ${esc(l.name)}</span>`}
+          <p class="muted">Joined ${day(p.joined)}${p.mine ? ` · this is you · <button type="button" class="linkish" data-rename>change name</button>` : ""}</p>
+          ${p.mine ? `<form class="li-form"><label>Your LinkedIn <input type="url" inputmode="url" placeholder="https://www.linkedin.com/in/your-name/" value="${esc(p.linkedin || "")}"></label>
+            <button type="submit" class="btn small">Save</button><span class="muted">An icon by your name links to it. Leave it empty to remove it.</span></form>` : ""}</header>
+        <div class="stats-row">
+          <div><b>${d.karma}</b><span>Math Karma</span></div>
+          <div><b>${d.points}</b><span>points from claps</span></div>
+          <div><b>${d.solved.length}</b><span>problems solved</span></div>
+          <div><b>${d.replies}</b><span>replies</span></div></div>
+        ${p.owner ? "" : `<div class="karma-bar" title="${next ? `${next - d.karma} more Math Karma to the next level` : "Top level"}"><i style="width:${pct}%"></i></div>
+        <p class="muted small">${next ? `${next - d.karma} more Math Karma to the next level.` : "The top level."} Karma: +10 for each problem you solve, +3 for a question, +2 for each reply.</p>`}
+        <p class="foot links">${p.mine && !p.owner ? `<a class="btn accent small" href="/messages/">💬 Message Srijit</a>` : ""}
+          ${p.mine && p.owner ? `<a class="btn accent small" href="/messages/">💬 Messages</a>` : ""}
+          <a class="btn ghost small" href="/leaderboard/">Leaderboard</a>
+          <a class="btn ghost small" href="https://srijitmukherjee.com/" target="_blank" rel="noopener">About Teacher</a></p>
+        <h2>Solved</h2>
+        ${d.solved.length ? `<div class="solved">${d.solved.map((s) => `<a class="scard" href="${PAGES}${encodeURIComponent(s.problem)}/${s.id ? `#post-${s.id}` : ""}">
+            <span class="mod">${s.module ? `${esc(s.module)} · ${s.lesson}.${s.n}` : "Practice"}</span><b>${esc(s.title)}</b>
+            <span class="when">${s.created ? `Solved ${day(s.created)}` : "Srijit's solution"}</span>
+            ${s.id ? `<span class="nums">👏 ${s.claps}${s.grade != null ? ` · Srijit 👏 ${s.grade}/10` : ""} · ${s.replies} repl${s.replies === 1 ? "y" : "ies"}</span>` : ""}</a>`).join("")}</div>`
+          : `<p class="soon">${p.mine ? "No solutions yet. Open a problem, press Solve and share yours." : "No solutions yet."}</p>`}`;
+      const rn = profileBox.querySelector("[data-rename]");
+      if (rn) rn.onclick = async () => { await rename(); show(); };
+      const lf = profileBox.querySelector(".li-form");
+      if (lf) lf.onsubmit = async (e) => {
+        e.preventDefault();
+        try { const r = await call("POST", "/me", { linkedin: lf.querySelector("input").value }); me = r.me; auth.setMe(me); toast(me.linkedin ? "LinkedIn link saved." : "LinkedIn link removed."); show(); }
+        catch (err) { failed(err); }
+      };
+    }
     window.addEventListener("hashchange", show);
     show();
   }
@@ -582,29 +591,41 @@
     if (!rows.length) return `<p class="soon">No claps yet.</p>`;
     return `<ol class="lb">${rows.map((r, k) => `<li><span class="rank">${k + 1}</span><a class="who" href="/dashboard/#${r.id}">${esc(nm(r.name) || "Learner")}</a>${linkedin(r)}${lvl(r.level)}<span class="up">👏 ${r.points}</span></li>`).join("")}</ol>`;
   }
+  // The leaderboard and "Latest" show at once (2026-11-03): this browser keeps the last ones it showed and draws them
+  // straight away, then the page's own request (no extra one) brings the fresh ones a moment later.
+  const paintBoard = (d) => { board.innerHTML = `<div class="lb-grid"><section><h2>This week</h2>${table(d.week)}</section><section><h2>All time</h2>${table(d.all)}</section></div>`; };
   async function startBoard() {
+    const saved = store.get("last_board");
+    if (saved && saved.week && saved.all) paintBoard(saved);
     await signIn(); // anyone can see it; signing in only adds the links' context
     try { // it comes with the page's request (cohort.js); on its own only if that failed
       const d = (await hello("board", () => call("GET", "/leaderboard").then((board) => ({ board })))).board;
-      board.innerHTML = `<div class="lb-grid"><section><h2>This week</h2>${table(d.week)}</section><section><h2>All time</h2>${table(d.all)}</section></div>`;
-    } catch (err) { board.innerHTML = `<p class="soon">Couldn't load the leaderboard. Please reload.</p>`; }
+      paintBoard(d); store.set("last_board", { week: d.week, all: d.all });
+    } catch (err) { if (!saved) board.innerHTML = `<p class="soon">Couldn't load the leaderboard. Please reload.</p>`; }
   }
   // a post as one plain line: Markdown marks and LaTeX commands dropped, maths kept readable
   const plainLine = (t) => String(t).replace(/[#*_>`]+/g, "").replace(/\$+/g, "").replace(/\\(frac|dfrac)\{([^{}]*)\}\{([^{}]*)\}/g, "$2/$3")
     .replace(/\\(left|right|displaystyle|mathrm|text|quad|,)/g, "").replace(/\\([a-zA-Z]+)/g, "$1 ").replace(/[{}]/g, "").replace(/\s+/g, " ").trim();
+  function paintRecent(items, yes) {
+    if (!items.length) {
+      latest.innerHTML = `<h2>Latest in the discussion</h2><p class="soon">Nothing yet. Open a problem, solve it by hand and share your solution.</p>`;
+      latest.hidden = false; return;
+    }
+    latest.innerHTML = `<h2>Latest in the discussion</h2><ul>${items.slice(0, 6).map((r) => `<li><a href="${PAGES}${encodeURIComponent(r.problem)}/#post-${r.post}">
+        <span class="what"><b>${esc(nm(r.name) || "Learner")}</b> ${r.type === "comment" ? "replied on" : r.kind === "question" ? "asked about" : "shared a solution to"} <b>${esc(r.title)}</b></span>
+        ${r.body ? `<span class="snip">${esc(plainLine(r.body))}</span>` : ""}<time>${ago(r.created)}</time></a></li>`).join("")}</ul>
+      ${yes ? "" : `<p class="muted">Sign in to read them and join in.</p>`}`;
+    latest.hidden = false; // previews are one plain line: no rendered maths (it would not fit a phone)
+  }
   async function startRecent() { // everyone sees what's happening; opening a post asks to sign in
-    const yes = await signIn(); // (Leaderboard → and About Teacher → are in the page itself, above this: no waiting)
+    const yes = !!(auth && auth.token()); // (Leaderboard → and About Teacher → are in the page itself, above this)
+    const key = yes ? "last_latest_in" : "last_latest_out"; // the text of posts only ever for signed-in learners
+    const saved = store.get(key);
+    if (Array.isArray(saved) && saved.length) paintRecent(saved, yes);
+    await signIn();
     try {
       const d = await hello("items", () => (yes ? call("GET", "/recent") : Promise.resolve({ items: [] })));
-      if (!d.items.length) {
-        latest.innerHTML = `<h2>Latest in the discussion</h2><p class="soon">Nothing yet. Open a problem, solve it by hand and share your solution.</p>`;
-        latest.hidden = false; return;
-      }
-      latest.innerHTML = `<h2>Latest in the discussion</h2><ul>${d.items.slice(0, 6).map((r) => `<li><a href="${PAGES}${encodeURIComponent(r.problem)}/#post-${r.post}">
-          <span class="what"><b>${esc(nm(r.name) || "Learner")}</b> ${r.type === "comment" ? "replied on" : r.kind === "question" ? "asked about" : "shared a solution to"} <b>${esc(r.title)}</b></span>
-          ${r.body ? `<span class="snip">${esc(plainLine(r.body))}</span>` : ""}<time>${ago(r.created)}</time></a></li>`).join("")}</ul>
-        ${yes ? "" : `<p class="muted">Sign in to read them and join in.</p>`}`;
-      latest.hidden = false; // previews are one plain line: no rendered maths (it would not fit a phone)
+      paintRecent(d.items, yes); store.set(key, d.items.slice(0, 6));
     } catch (err) { /* the home page is fine without it */ }
   }
 

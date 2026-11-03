@@ -30,7 +30,7 @@
   function keep(d) { token = d.token; me = d.me; store.set("community_token", token); store.set("community_me", me); }
   function clear() {
     token = null; me = null;
-    ["community_token", "community_me"].forEach((k) => store.set(k, null));
+    ["community_token", "community_me", "last_profile", "last_latest_in"].forEach((k) => store.set(k, null)); // and what was signed-in only
     refresh();
     if (CF) loadGoogle(); // signed out now: they'll need the sign-in button
   }

@@ -61,6 +61,10 @@ button { font: inherit; cursor: pointer; }
 @media (max-width: 600px) { .pick { grid-template-columns: minmax(0, 1fr); } }
 .proof { color: var(--muted); font-size: 16px; margin: 26px 0 0; }
 .proof b { color: var(--ink); font-size: 18px; }
+@media (max-width: 600px) { /* a phone: "2.3k+ learners · Name joined", then "110+ discussions" on its own line */
+  .proof [data-talk]:not([hidden]) { display: block; margin-top: 2px; }
+  .proof [data-talk] .dot { display: none; }
+}
 [data-ticker] b { color: var(--accent); display: inline-block; transition: opacity .35s, transform .35s; }
 [data-ticker] b.fade { opacity: 0; transform: translateY(-4px); }
 .attended { color: var(--muted); font-size: 15px; margin-top: 4px; min-height: 1.6em; }

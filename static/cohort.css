@@ -41,6 +41,24 @@ button { font: inherit; cursor: pointer; }
 .cta .btn { font-size: 18px; padding: .75em 1.7em; }
 .quiet { color: var(--ink); font-weight: 600; text-decoration: none; border-bottom: 1.5px solid var(--line); }
 .quiet:hover { border-color: var(--accent); }
+button.quiet { background: none; border: 0; border-bottom: 1.5px solid var(--line); border-radius: 0; padding: 0; }
+.quiet[aria-expanded="true"] { border-color: var(--accent); }
+/* the two levels (2026-11-03): the choice under "Start solving", and the switch at the top of every problem */
+.pick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; max-width: 720px; margin: 28px 0 0; }
+.lvcard { display: flex; flex-direction: column; gap: 4px; padding: 18px 20px; border: 1.5px solid var(--line);
+  border-radius: 14px; text-decoration: none; min-width: 0; }
+.lvcard:hover { border-color: var(--accent); }
+.lvcard b { font-size: 19px; }
+.lvcard span { color: var(--muted); font-size: 15px; line-height: 1.45; }
+.lvcard small { color: var(--accent); font-size: 13px; font-weight: 700; margin-top: 6px; }
+.pick .hint { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: 14px; }
+.levels { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 18px; }
+.seg { display: inline-flex; padding: 3px; border: 1px solid var(--line); border-radius: 999px; background: var(--soft); }
+.seg a { padding: .28em 1em; border-radius: 999px; text-decoration: none; font-size: 14px; font-weight: 600; color: var(--muted); }
+.seg a:hover { color: var(--ink); }
+.seg a[aria-current] { background: var(--bg); color: var(--ink); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+.levels small { color: var(--muted); font-size: 13px; }
+@media (max-width: 600px) { .pick { grid-template-columns: minmax(0, 1fr); } }
 .proof { color: var(--muted); font-size: 16px; margin: 26px 0 0; }
 .proof b { color: var(--ink); font-size: 18px; }
 [data-ticker] b { color: var(--accent); display: inline-block; transition: opacity .35s, transform .35s; }

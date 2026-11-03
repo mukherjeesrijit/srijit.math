@@ -74,6 +74,17 @@
     menuList.querySelector("a").addEventListener("click", (e) => { if (!signedIn()) { e.preventDefault(); close(); askToEnrol(); } }); // Dashboard
   }
 
+  // -- the two levels (2026-11-03): "Start solving" asks which one; a level's link (on the home page, and the switch at
+  // the top of a problem) leads back to the problem you were last on there. Kept in this browser only, no request.
+  const here = document.querySelector("[data-here]");
+  if (here) { store.set("level", here.dataset.here); store.set("level_" + here.dataset.here, location.pathname); }
+  document.querySelectorAll("a[data-level]:not([aria-current])").forEach((a) => {
+    const last = store.get("level_" + a.dataset.level);
+    if (typeof last === "string" && last.startsWith(CFG.problems || "/problems/")) a.href = last;
+  });
+  const startBtn = document.querySelector("[data-start]"), pick = document.querySelector("[data-pick]");
+  if (startBtn && pick) startBtn.onclick = () => { pick.hidden = !pick.hidden; startBtn.setAttribute("aria-expanded", String(!pick.hidden)); };
+
   const ready = Promise.resolve().then(() => refresh());
   window.cohortReady = ready;
 

@@ -76,7 +76,9 @@
     const done = (id) => id in solved && (solved[id] == null || solved[id] >= 5);
     const open = (id) => G[id] && !done(id) && !isStuck(id);
     const byEase = (a, b) => G[a].d - G[b].d || (G[a].o ?? 1e9) - (G[b].o ?? 1e9);
-    const course = Object.keys(G).filter((x) => G[x].o != null).sort((a, b) => G[a].o - G[b].o);
+    let lvl = null; // the level you were last on (cohort.js); "next in the course" stays in it
+    try { lvl = JSON.parse(localStorage.getItem("level")); } catch (e) { /* private mode */ }
+    const course = Object.keys(G).filter((x) => G[x].o != null && (!lvl || G[x].l === lvl)).sort((a, b) => G[a].o - G[b].o);
     const items = [], seen = new Set();
     const add = (x, why) => { if (x && !seen.has(x)) { seen.add(x); items.push([x, why]); } };
     const tried = Object.keys(G).filter((id) => id in solved || stuck.has(id));

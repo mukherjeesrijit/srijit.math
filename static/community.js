@@ -196,7 +196,7 @@
       : `<p class="soon">No solutions yet. Be the first: press Solve and share yours.</p>`;
     math(list); fits(list);
     box.querySelector(".count").textContent = posts.length ? `${posts.length} solution${posts.length > 1 ? "s" : ""}` : "";
-    const n = posts.reduce((t, p) => t + 1 + p.comments.length, 0);
+    const n = posts.reduce((t, p) => t + 1 + p.comments.length + (p.feedback ? 1 : 0), 0); // Srijit's grade reply counts too
     if (talkBtn) talkBtn.textContent = n ? `Discuss · ${n}` : "Discuss";
     refreshSolve();
   }

@@ -13,7 +13,23 @@
   store.set("cohort_user", null); // the old Apps Script sign-in: no longer used
   store.set("cohort_vid", null); // the old visitor number: visits are no longer logged (2026-10-30)
 
-  const math = (el) => el && window.renderMathInElement && renderMathInElement(el, {
+  // One broken formula in a post (a KaTeX crash, not a parse error) must not stop the page: it becomes an ordinary
+  // maths error, shown as text. Sai's alg-2 post (\begin\ …) broke the whole discussion this way (2026-11-06).
+  const guardKatex = () => {
+    const k = window.katex;
+    if (k && !k.render.guarded) {
+      const render = k.render;
+      k.render = function (tex, el, opts) {
+        try { return render.call(this, tex, el, opts); } catch (e) {
+          if (e instanceof k.ParseError) throw e;
+          throw new k.ParseError(String((e && e.message) || e));
+        }
+      };
+      k.render.guarded = true;
+    }
+    return true;
+  };
+  const math = (el) => el && window.renderMathInElement && guardKatex() && renderMathInElement(el, {
     delimiters: [{ left: "$$", right: "$$", display: true }, { left: "\\[", right: "\\]", display: true },
                  { left: "$", right: "$", display: false }, { left: "\\(", right: "\\)", display: false }],
     throwOnError: false });

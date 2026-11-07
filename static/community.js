@@ -276,7 +276,7 @@
           await call("POST", `/posts/${itemOf(f).id}/comments`, { body: ta.value });
         } else if (f.classList.contains("editing")) {
           const it = itemOf(f);
-          await call("PATCH", `/${it.kind === "post" ? "posts" : "comments"}/${it.id}`, { body: ta.value });
+          await call("PATCH", `/${it.kind === "post" ? "posts" : "comments"}/${it.id}`, { body: it.kind === "post" ? unfence(ta.value) : ta.value });
         } else if (f.classList.contains("grading")) {
           await call("POST", "/grade", { post: itemOf(f).id, claps: Number(f.querySelector("select").value), feedback: ta.value });
           toast("Grade saved. They'll see it in their notifications.");
@@ -415,17 +415,25 @@
     solveBox.innerHTML = `<h2>Your solution</h2><div class="join"><p>Solve it by hand first. Then share it with the cohort.</p>
       <button type="button" class="btn accent small" data-act="join">Sign in to solve</button></div>`;
   }
-  // the prompt learners give their own AI with the photo: a copy of the page, exactly as written, in our Markdown
+  // the prompt learners give their own AI with the photo: a copy of the page, exactly as written, in our Markdown.
+  // The reply comes as ONE code block: chat apps (Gemini, ChatGPT) show rendered Markdown, and copying that loses the
+  // $...$ maths; a code block has a copy button that copies the raw Markdown. The Solve box removes the ``` lines.
   const PROMPT = [
     "Copy my handwritten solution in the attached photo into Markdown, exactly as I wrote it.",
     "",
+    "Output format (strict):",
+    "- Your whole reply is ONE code block: the first line is ```markdown and the last line is ```. Nothing before it and nothing after it: no title, no explanation, no comments.",
+    "- Inside the code block: plain Markdown text with LaTeX maths only. No HTML, no tables, no images.",
+    "",
+    "Content:",
     "- Keep every word, symbol, step and line, in my order. Do not fix mistakes, add missing steps, reword, shorten or solve anything, even if it is wrong.",
-    "- Write all maths in LaTeX between dollar signs: $...$ inside a sentence, and $$...$$ on its own line for a displayed equation. Never use \\( \\) or \\[ \\].",
+    "- Write all maths in LaTeX between dollar signs: $...$ inside a sentence, and $$...$$ on its own line for a displayed equation. Never use \\( \\) or \\[ \\], and never \\begin{document}, \\documentclass or \\usepackage.",
     "- Start a new line wherever I did. Use a list only where I wrote one.",
     "- If you can't read a word or symbol, write [unclear] instead of guessing.",
     "- Leave out anything I crossed out. For a drawing or a graph, write [figure].",
-    "- Reply with the Markdown only: no code block, no title, no comments before or after.",
   ].join("\n");
+  // what the AI gave back, without the code block around it (```markdown ... ```), if the learner copied that too
+  const unfence = (s) => { const m = /^\s*```[\w-]*[ \t]*\r?\n([\s\S]*?)\r?\n[ \t]*```\s*$/.exec(s); return m ? m[1] : s; };
   function copyPrompt(btn) { // the clipboard, or a hidden textarea where the browser refuses it (the prompt itself is never shown)
     const done = () => { btn.textContent = "Prompt copied ✓"; setTimeout(() => (btn.textContent = "Copy prompt"), 2000); };
     const old = () => {
@@ -440,7 +448,8 @@
     const key = "solve_draft_" + solveBox.dataset.solve;
     solveBox.innerHTML = `<h2>Your solution</h2>
       <p class="hint">Solve it by hand, photograph it and give the photo to your AI (Claude, Gemini, ChatGPT) with this prompt
-        <button type="button" class="copy" data-act="copy-prompt">Copy prompt</button>, then paste its reply below.</p>
+        <button type="button" class="copy" data-act="copy-prompt">Copy prompt</button>. It replies with one code block: press
+        the code block's copy button and paste it below.</p>
       <p class="mine-note" hidden></p>
       <form class="write">
         <textarea maxlength="8000" rows="8" placeholder="Paste what your AI gave back here. You can also type: Markdown works, and maths between $ signs, e.g. $\\frac{1}{n}$."></textarea>
@@ -452,7 +461,10 @@
     ta.value = store.get(key) || "";
     let t = null;
     const paint = () => { pv.innerHTML = ta.value.trim() ? md(ta.value) : ""; math(pv); };
-    ta.addEventListener("input", () => { store.set(key, ta.value || null); clearTimeout(t); t = setTimeout(paint, 300); });
+    ta.addEventListener("input", () => {
+      const clean = unfence(ta.value); if (clean !== ta.value) ta.value = clean; // pasted with its ``` lines
+      store.set(key, ta.value || null); clearTimeout(t); t = setTimeout(paint, 300);
+    });
     paint();
     solveBox.querySelector("form").addEventListener("submit", async (e) => {
       e.preventDefault();

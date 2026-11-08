@@ -167,7 +167,7 @@
   function graded(p) {
     if (p.grade == null && !p.feedback) return "";
     return `${p.grade != null ? `<p class="grade">Srijit's grade: <b>👏 ${p.grade}/10</b></p>` : ""}
-      ${p.feedback ? `<div class="feedback"><p class="muted">Srijit's feedback</p>${md(p.feedback)}</div>` : ""}`;
+      ${p.feedback ? `<div class="feedback"><p class="muted">Srijit's feedback · only ${me && me.owner ? "the student" : "you"} can see this</p>${md(p.feedback)}</div>` : ""}`;
   }
   function commentHTML(c) {
     return `<div class="comment${c.hidden ? " is-hidden" : ""}" data-kind="comment" data-id="${c.id}">
@@ -196,7 +196,7 @@
       : `<p class="soon">No solutions yet. Be the first: press Solve and share yours.</p>`;
     math(list); fits(list);
     box.querySelector(".count").textContent = posts.length ? `${posts.length} solution${posts.length > 1 ? "s" : ""}` : "";
-    const n = posts.reduce((t, p) => t + 1 + p.comments.length + (p.feedback ? 1 : 0), 0); // Srijit's grade reply counts too
+    const n = posts.reduce((t, p) => t + 1 + p.comments.length, 0); // his grade replies are private (2026-11-08): not counted
     if (talkBtn) talkBtn.textContent = n ? `Discuss · ${n}` : "Discuss";
     refreshSolve();
   }
@@ -334,7 +334,7 @@
           const g = it.item.grade == null ? 8 : it.item.grade;
           const f = document.createElement("form"); f.className = "grading";
           f.innerHTML = `<label>Your grade <select>${Array.from({ length: 11 }, (_, k) => `<option value="${k}"${k === g ? " selected" : ""}>👏 ${k}/10</option>`).join("")}</select></label>
-            <textarea maxlength="3000" rows="3" placeholder="Feedback for improvement. Everyone can read it."></textarea>
+            <textarea maxlength="3000" rows="3" placeholder="Feedback for improvement. Only the student sees it."></textarea>
             <div class="row"><button type="button" class="linkish" data-act="cancel">Cancel</button><button type="submit" class="btn small">Save grade</button></div>`;
           f.querySelector("textarea").value = it.item.feedback || "";
           it.node.querySelector(":scope > .tools").before(f); b.disabled = true;
@@ -692,7 +692,8 @@
       chatBox.querySelector("button").onclick = askToSignIn; return;
     }
     const when = (ms) => new Date(ms).toLocaleString(undefined, { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
-    const bubble = (m, mineIsOwner) => `<div class="bub ${!!m.owner === mineIsOwner ? "me" : "them"}"><div class="txt">${md(m.body)}</div><time>${when(m.created)}</time></div>`;
+    const bubble = (m, mineIsOwner) => { const mine = !!m.owner === mineIsOwner; // your own: editable any time (2026-11-08)
+      return `<div class="bub ${mine ? "me" : "them"}" data-mid="${m.id}"><div class="txt">${md(m.body)}</div><time>${when(m.created)}${m.edited ? " · edited" : ""}</time>${mine ? `<button type="button" class="linkish" data-medit>Edit</button>` : ""}</div>`; };
     // 💬 (2026-11-03): this browser keeps each conversation it has shown (chat_<you>_<them>) and the inbox (inbox_<you>),
     // and draws them at once. The page's own request (cohort.js: hello, want "chat") then brings only the messages newer
     // than the last one kept (usually none); ↻ asks the same way. Nothing is loaded twice.
@@ -703,6 +704,8 @@
       firstAsk = false; // the first one came with the page's request
       return hello("chat", () => get().then((chat) => ({ chat }))).then((h) => h.chat);
     };
+    const askSince = (uid, after, since) => { firstAsk = false; // with a kept copy: new messages + ones edited since
+      return call("GET", "/messages?" + new URLSearchParams({ ...(uid ? { u: uid } : {}), after, since })); };
     async function inbox() {
       const key = `inbox_${me.id}`, saved = store.get(key);
       const draw = (list) => {
@@ -732,18 +735,37 @@
         math(msgs); msgs.scrollTop = msgs.scrollHeight;
       };
       const keep = () => store.set(key, { with: who, messages: list.slice(-50) });
-      const fresh = async () => { // only what's newer than the last message kept
+      const fresh = async () => { // only what's newer than the last message kept, and any edited since
         const after = list && list.length ? list[list.length - 1].id : 0;
-        const d = await ask(uid, after);
+        const since = list ? list.reduce((t, m) => Math.max(t, m.edited || 0, m.created || 0), 0) : 0;
+        const d = await (after ? askSince(uid, after, since) : ask(uid, after));
         who = d.with; if (owner) head.textContent = nm(who.name);
         if (d.after && list) {
+          const byId = new Map(d.messages.map((m) => [m.id, m]));
           const add = d.messages.filter((m) => !list.some((x) => x.id === m.id));
-          if (!add.length) return keep();
-          list = list.concat(add);
+          const swapped = list.some((x) => byId.has(x.id) && byId.get(x.id).body !== x.body);
+          if (!add.length && !swapped) return keep();
+          list = list.map((x) => byId.get(x.id) || x).concat(add);
         } else list = d.messages;
         draw(); keep();
       };
       if (list) draw();
+      msgs.addEventListener("click", async (e) => { // edit your own message
+        const eb = e.target.closest("[data-medit]"), sv = e.target.closest("[data-msave]"), cx = e.target.closest("[data-mcancel]");
+        const bub = e.target.closest(".bub"); if (!bub) return;
+        const m = list.find((x) => x.id === Number(bub.dataset.mid)); if (!m) return;
+        if (eb) {
+          bub.innerHTML = `<textarea rows="3" maxlength="1000"></textarea><div class="row"><button type="button" class="linkish" data-mcancel>Cancel</button>
+            <button type="button" class="btn small" data-msave>Save</button></div>`;
+          const t = bub.querySelector("textarea"); t.value = m.body; t.focus();
+        } else if (cx) draw();
+        else if (sv) {
+          const body = bub.querySelector("textarea").value.trim(); if (!body) return;
+          sv.disabled = true;
+          try { const r = await call("PATCH", `/messages/${m.id}`, { body }); m.body = r.message.body; m.edited = r.message.edited; keep(); draw(); }
+          catch (err) { failed(err); sv.disabled = false; }
+        }
+      });
       chatBox.querySelector("[data-reload]").onclick = () => fresh().catch(failed);
       ta.addEventListener("input", () => { ta.style.height = "auto"; ta.style.height = Math.min(ta.scrollHeight, 160) + "px"; });
       ta.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey && !matchMedia("(max-width: 600px)").matches) { e.preventDefault(); form.requestSubmit(); } });

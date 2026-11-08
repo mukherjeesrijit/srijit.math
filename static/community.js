@@ -116,6 +116,7 @@
   const LI_SVG = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="#0A66C2" d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>';
   const linkedin = (a) => (a.linkedin && /^https:\/\/([a-z]{2,3}\.)?linkedin\.com\/in\//.test(a.linkedin)
     ? `<a class="li" href="${esc(a.linkedin)}" target="_blank" rel="noopener nofollow" title="${esc(nm(a.name))} on LinkedIn" aria-label="${esc(nm(a.name))} on LinkedIn">${LI_SVG}</a>` : "");
+  const short = (s, n = 16) => (s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s); // leaderboard: one line per person (2026-11-08)
   const person = (a) => `<a class="who" href="/dashboard/#${a.id}">${esc(nm(a.name))}</a>${linkedin(a)}${a.owner ? "" : lvl(a.level)}`;
 
   // -- the discussion on a problem page ------------------------------------------------------------------
@@ -644,7 +645,7 @@
   // -- leaderboard page and "latest discussion" on the home page ------------------------------------------
   function table(rows) {
     if (!rows.length) return `<p class="soon">No claps yet.</p>`;
-    return `<ol class="lb">${rows.map((r, k) => `<li><span class="rank">${k + 1}</span><a class="who" href="/dashboard/#${r.id}">${esc(nm(r.name) || "Learner")}</a>${linkedin(r)}${lvl(r.level)}<span class="up">👏 ${r.points}</span></li>`).join("")}</ol>`;
+    return `<ol class="lb">${rows.map((r, k) => `<li><span class="rank">${k + 1}</span><a class="who" href="/dashboard/#${r.id}" title="${esc(nm(r.name) || "Learner")}">${esc(short(nm(r.name) || "Learner"))}</a>${linkedin(r)}${lvl(r.level)}<span class="up">👏 ${r.points}</span></li>`).join("")}</ol>`;
   }
   // The leaderboard and "Latest" show at once (2026-11-03): this browser keeps the last ones it showed and draws them
   // straight away, then the page's own request (no extra one) brings the fresh ones a moment later.

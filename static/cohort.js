@@ -29,10 +29,16 @@
     }
     return true;
   };
-  const math = (el) => el && window.renderMathInElement && guardKatex() && renderMathInElement(el, {
-    delimiters: [{ left: "$$", right: "$$", display: true }, { left: "\\[", right: "\\]", display: true },
-                 { left: "$", right: "$", display: false }, { left: "\\(", right: "\\)", display: false }],
-    throwOnError: false });
+  // cohort.js now loads before KaTeX (2026-11-09), so the page's one request ("/hello") starts at once instead of after
+  // ~350 KB of libraries; maths asked for before KaTeX is there waits for the page's load event.
+  const math = (el) => {
+    if (!el) return;
+    if (!window.renderMathInElement) { if (document.readyState !== "complete") window.addEventListener("load", () => math(el), { once: true }); return; }
+    if (guardKatex()) renderMathInElement(el, {
+      delimiters: [{ left: "$$", right: "$$", display: true }, { left: "\\[", right: "\\]", display: true },
+                   { left: "$", right: "$", display: false }, { left: "\\(", right: "\\)", display: false }],
+      throwOnError: false });
+  };
   const cf = (path, body, auth) => fetch(CF + path, { method: body ? "POST" : "GET",
     headers: Object.assign({ "content-type": "application/json" }, auth && token ? { authorization: "Bearer " + token } : {}),
     body: body ? JSON.stringify(body) : undefined }).then((r) => r.json().then((d) => Object.assign({ status: r.status }, d)));
@@ -172,30 +178,40 @@
   // rounded down, so the line never overstates: 2,370 -> "2.3k+" (2.4k+ from 2,400), 116 -> "110+"
   const short = (n) => (n >= 1000 ? Math.floor(n / 100) / 10 + "k+" : String(n));
   const shown = () => Number(enrolled.dataset.n) || 0;
-  const live = (d) => {
-    if (enrolled && d && d.ok && d.learners >= shown()) { enrolled.dataset.n = d.learners; enrolled.textContent = short(d.learners); }
-    return d;
+  // The last numbers this browser saw, shown at once, so a refresh doesn't wait for the request (2026-11-09: the line
+  // filled in a moment after every refresh). The request then brings them up to date, quietly.
+  const proof = store.get("home_proof") || {};
+  const setCount = (n) => { if (enrolled && n >= shown()) { enrolled.dataset.n = n; enrolled.textContent = short(n); } };
+  const setTalk = (n) => {
+    if (!talk || !n) return;
+    talk.querySelector("b").textContent = n >= 10 ? Math.floor(n / 10) * 10 + "+" : String(n);
+    talk.hidden = false;
   };
-  if (CF && talk) {
-    hello.then((d) => {
-      const n = d && d.counts ? Object.values(d.counts).reduce((a, b) => a + b, 0) : 0;
-      if (!n) return;
-      talk.querySelector("b").textContent = n >= 10 ? Math.floor(n / 10) * 10 + "+" : String(n);
-      talk.hidden = false;
+  let names = [], k = 0, rolling = false;
+  const setNames = (list) => {
+    list = (list || []).filter((n) => n.length >= 3).map(nm); // no initials ("Kd")
+    if (!ticker || list.length < 2) return;
+    names = list; k = 0;
+    const slot = ticker.querySelector("b");
+    slot.textContent = names[0];
+    ticker.hidden = false;
+    if (rolling) return;
+    rolling = true;
+    onTick.push(() => { // on the shared clock, with the headline
+      slot.classList.add("fade");
+      setTimeout(() => { k = (k + 1) % names.length; slot.textContent = names[k]; slot.classList.remove("fade"); }, 350);
     });
-  }
-  if (CF && (enrolled || ticker)) {
-    hello.then(live).then((d) => {
-      const names = ((d && d.names) || []).filter((n) => n.length >= 3).map(nm); // no initials ("Kd")
-      if (!ticker || names.length < 2) return;
-      const slot = ticker.querySelector("b");
-      let k = 0;
-      slot.textContent = names[0];
-      ticker.hidden = false;
-      onTick.push(() => { // on the shared clock, with the headline
-        slot.classList.add("fade");
-        setTimeout(() => { k = (k + 1) % names.length; slot.textContent = names[k]; slot.classList.remove("fade"); }, 350);
-      });
+  };
+  if (CF && (enrolled || ticker || talk)) {
+    setCount(proof.learners || 0); setTalk(proof.talk || 0); setNames(proof.names);
+    hello.then((d) => {
+      if (!d) return;
+      const keep = Object.assign({}, proof);
+      if (d.learners) { setCount(d.learners); keep.learners = d.learners; }
+      if (d.names && d.names.length >= 2 && !proof.names) setNames(d.names); // already rolling kept names: no jump mid-line
+      if (d.names) keep.names = d.names;
+      if (talk && d.counts) { keep.talk = Object.values(d.counts).reduce((a, b) => a + b, 0); setTalk(keep.talk); }
+      store.set("home_proof", keep);
     });
   }
 

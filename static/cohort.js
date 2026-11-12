@@ -124,6 +124,10 @@
   window.cohortReady = ready;
 
   function refresh() {
+    // the Blog menu item: everyone sees it once a post is published (the page says so); Srijit always, to write
+    document.querySelectorAll("[data-blog]").forEach((a) => {
+      if (me && me.owner) { a.hidden = false; a.href = "/blog/write/"; }
+    });
     document.querySelectorAll("[data-enrol]").forEach((b) => {
       const header = b.classList.contains("enrol");
       b.classList.toggle("done", signedIn());
@@ -150,6 +154,8 @@
   const profileBox = document.querySelector("[data-profile]");
   if (profileBox && token) want.push("profile"); // the dashboard comes with the page's request (2026-11-03), not a second one
   if (document.querySelector("[data-leaderboard]")) want.push("board"); // and so does the leaderboard
+  const blogPost = document.querySelector("[data-love]"); // a blog post: its ❤️ come with the page's request too
+  if (blogPost) want.push("blog");
   // 💬: the conversation on the messages page, only what's newer than the last message this browser kept (community.js)
   let chatU, chatAfter;
   if (document.querySelector("[data-messages]") && token && me) {
@@ -163,7 +169,7 @@
   // a signed-out visitor on a page that shows nothing live (Start, Books, Roadmap, Privacy): no request at all
   const hello = !CF || (!token && !want.length && !discuss) ? Promise.resolve(null) : cf("/hello", { want,
       problem: discuss ? discuss.dataset.discuss : undefined, u: profileBox ? location.hash.slice(1) || "me" : undefined,
-      chat_u: chatU, chat_after: chatAfter }, true)
+      chat_u: chatU, chat_after: chatAfter, blog_post: blogPost ? blogPost.dataset.love : undefined }, true)
     .then((d) => { if (d.ok && token && !d.signedIn) clear(); return d.ok ? d : null; }) // a sign-in that has run out
     .catch(() => null);
   window.cohortHello = hello;

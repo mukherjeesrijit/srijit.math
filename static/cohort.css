@@ -422,6 +422,7 @@ a.who:hover { color: var(--accent); }
 .menulist { position: absolute; right: 0; top: calc(100% + 8px); min-width: 170px; background: var(--bg); border: 1px solid var(--line);
   border-radius: 12px; box-shadow: 0 10px 30px rgba(11, 11, 12, .12); padding: 6px; display: flex; flex-direction: column; z-index: 5; }
 .menulist[hidden] { display: none; } /* closed on phones (a PC shows the links below) */
+.menulist a[hidden] { display: none !important; } /* Blog, until a post is published (Srijit always sees it) */
 .menulist a { padding: 9px 12px; border-radius: 8px; text-decoration: none; font-weight: 600; }
 .menulist a:hover { background: var(--soft); color: var(--accent); }
 @media (min-width: 901px) { /* a PC: the links sit in the header; below 900 px (phones, tablets) it's ☰ · 💬 · 🔔 */

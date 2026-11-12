@@ -473,12 +473,11 @@ a.who:hover { color: var(--accent); }
 .msgbtn { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 34px; margin-right: 6px;
   border: 1.5px solid var(--line); border-radius: 10px; text-decoration: none; font-size: 16px; }
 .msgbtn:hover { border-color: var(--ink); }
-/* the YouTube channel, beside 💬 and the bell (2026-11-12): in the page itself, for everyone, no script */
+/* the YouTube channel (2026-11-12), in the page itself, no script: ☰ · YouTube · 💬 · 🔔 signed in, ☰ · YouTube · Enroll for a new visitor */
 .ytbtn { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 34px; margin-right: 6px; flex-shrink: 0;
   border: 1.5px solid var(--line); border-radius: 10px; text-decoration: none; }
 .ytbtn:hover { border-color: var(--ink); }
-.menulist .yt-item { display: none; } /* phones: the header has no room for the icon, so YouTube is in ☰ instead */
-@media (max-width: 600px) { .ytbtn { display: none; } .menulist .yt-item { display: block; } }
+
 .msgbtn { position: relative; }
 .msgbtn .dot { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px;
   background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; line-height: 18px; text-align: center; }

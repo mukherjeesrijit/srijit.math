@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Write · Srijit Mukherjee</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="dist/editor.css?v=7dbfef6f26">
+<style>
+/* srijitmath.com's look: white, black, one orange accent, Inter (site_assets/cohort.css) */
+:root { --bg: #ffffff; --ink: #0b0b0c; --muted: #5d6067; --line: #e6e6e8; --soft: #f6f6f7; --accent: #e8590c; --accent-soft: #fff1e8; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 17px/1.6 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+button { font: inherit; cursor: pointer; }
+
+.bar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 12px; padding: 10px 20px;
+  background: rgba(255,255,255,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); font-size: 14px; }
+.bar .back { color: var(--muted); text-decoration: none; white-space: nowrap; }
+.bar .info { color: var(--muted); display: flex; gap: 10px; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.bar .spacer { flex: 1; }
+.seg { display: flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; background: var(--soft); }
+.seg button { border: 0; background: none; padding: 4px 12px; border-radius: 999px; color: var(--muted); }
+.seg button.on { background: var(--bg); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.btn { border: 1.5px solid var(--ink); background: var(--ink); color: #fff; border-radius: 999px; padding: 6px 16px; font-weight: 600; }
+.ghost { border: 0; background: none; color: var(--muted); padding: 6px 4px; }
+
+main { max-width: 760px; margin: 0 auto; padding: 48px 20px 160px; }
+.field { display: block; width: 100%; border: 0; outline: 0; resize: none; overflow: hidden; background: none; color: var(--ink);
+  font-family: inherit; padding: 0; }
+#title { font-size: 44px; line-height: 1.15; font-weight: 800; letter-spacing: -0.02em; }
+#subtitle { font-size: 21px; line-height: 1.45; color: var(--muted); margin-top: 12px; }
+.field::placeholder { color: #c4c5c9; }
+
+/* the editor, in the same type as the published post */
+#editor { margin-top: 28px; }
+.milkdown {
+  --crepe-color-background: #ffffff; --crepe-color-on-background: #0b0b0c;
+  --crepe-color-surface: #f6f6f7; --crepe-color-surface-low: #fafafa; --crepe-color-on-surface: #0b0b0c;
+  --crepe-color-on-surface-variant: #5d6067; --crepe-color-outline: #b9bbc0; --crepe-color-primary: #e8590c;
+  --crepe-color-secondary: #fff1e8; --crepe-color-on-secondary: #0b0b0c; --crepe-color-hover: #f6f6f7;
+  --crepe-color-selected: #ffe3d1; --crepe-color-inline-area: #f1f1f3; --crepe-color-inline-code: #b4400a;
+  --crepe-font-title: "Inter", sans-serif; --crepe-font-default: "Inter", sans-serif; --crepe-base-font-size: 19px;
+}
+.milkdown .ProseMirror { padding: 0 !important; line-height: 1.7; }
+.milkdown .ProseMirror h2 { font-size: 28px; font-weight: 750; letter-spacing: -0.01em; }
+.milkdown .ProseMirror h3 { font-size: 22px; font-weight: 700; }
+.milkdown .ProseMirror blockquote { border-left: 3px solid var(--accent); color: #2b2c30; }
+.milkdown .ProseMirror > p { margin: 0 0 1.1em; }
+.milkdown .ProseMirror > h2 { margin: 1.6em 0 .4em; } .milkdown .ProseMirror > h3 { margin: 1.4em 0 .3em; }
+.milkdown span[data-type='math_inline'] { color: inherit; padding: 0 2px; } /* maths in the text's colour, as readers see it */
+.milkdown .milkdown-code-block { margin: 1.2em 0; background: transparent; transition: background .15s; }
+.milkdown .milkdown-code-block:hover, .milkdown .milkdown-code-block:focus-within { background: var(--soft); }
+
+/* the reader's view (what srijitmath.com/blog/<post> will look like) */
+#preview h1 { font-size: 44px; line-height: 1.15; font-weight: 800; letter-spacing: -0.02em; margin: 0; }
+#preview .sub { font-size: 21px; color: var(--muted); margin: 12px 0 0; }
+#preview .meta { color: var(--muted); font-size: 14px; margin: 18px 0 36px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.post { font-size: 19px; line-height: 1.75; }
+.post h2 { font-size: 28px; line-height: 1.25; margin: 1.8em 0 .5em; letter-spacing: -0.01em; }
+.post h3 { font-size: 22px; margin: 1.6em 0 .4em; }
+.post img { max-width: 100%; height: auto; border-radius: 6px; display: block; margin: 1.5em auto; }
+.post blockquote { margin: 1.5em 0; padding: 0 0 0 20px; border-left: 3px solid var(--accent); color: #2b2c30; }
+.post pre { background: var(--soft); padding: 14px 16px; border-radius: 8px; overflow-x: auto; font-size: 15px; }
+.post .katex-display { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+.post table { border-collapse: collapse; } .post td, .post th { border: 1px solid var(--line); padding: 6px 10px; }
+.love { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 15px; }
+.love button { border: 1.5px solid var(--line); background: none; border-radius: 999px; padding: 4px 14px; font-size: 18px; color: var(--accent); }
+/* views: the list of posts, a post, or the sign-in gate (editor.js sets body[data-view]) */
+body:not([data-view="edit"]) .edit-only, body:not([data-view="edit"]) #write, body:not([data-view="list"]) #list { display: none !important; }
+body[data-view="gate"] .bar > :not(.back) { display: none; }
+#gate { max-width: 560px; margin: 80px auto; padding: 0 20px; } #gate h1 { font-size: 32px; margin: 0 0 12px; } #gate a { color: var(--ink); }
+#list .list-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+#list h1 { font-size: 32px; margin: 0; }
+.mine { list-style: none; margin: 0; padding: 0; } .mine li { padding: 18px 0; border-bottom: 1px solid var(--line); display: grid; gap: 6px; }
+.mine li > a { color: var(--ink); text-decoration: none; font-size: 20px; } .mine li > a:hover { color: var(--accent); }
+.mine .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 14px; } .mine .row a { text-decoration: none; }
+.muted { color: var(--muted); }
+.tag { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--soft); color: var(--muted); }
+.tag.live { background: #e7f6ec; color: #17733a; } .tag.warn { background: var(--accent-soft); color: #b4400a; }
+.btn:disabled { opacity: .45; cursor: default; }
+.more { position: relative; } .more > button { border: 0; background: none; font-size: 20px; line-height: 1; padding: 4px 8px; color: var(--muted); }
+#menu { position: absolute; right: 0; top: 34px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.08);
+  min-width: 170px; padding: 6px; display: grid; } #menu[hidden] { display: none; }
+#menu a, #menu button { border: 0; background: none; text-align: left; padding: 8px 10px; border-radius: 6px; color: var(--ink); text-decoration: none; font-size: 14px; }
+#menu a:hover, #menu button:hover { background: var(--soft); } #menu #delete { color: #b42318; }
+#status a { color: var(--ink); }
+#source { white-space: pre-wrap; font: 14px/1.6 Menlo, Monaco, monospace; background: var(--soft); padding: 20px; border-radius: 8px; }
+
+@media (max-width: 640px) {
+  .bar { padding: 8px 16px; gap: 8px; } .bar .info { display: none; }
+  main { padding: 28px 16px 120px; }
+  #title, #preview h1 { font-size: 32px; } #subtitle, #preview .sub { font-size: 18px; }
+  .milkdown { --crepe-base-font-size: 17px; } .post { font-size: 17px; }
+}
+</style>
+</head><body>
+<div class="bar">
+  <a class="back" href="/blog/">← Blog</a>
+  <span class="info"><a class="muted" href="#" style="text-decoration:none">All posts</a><span class="edit-only">·</span><span id="status" class="edit-only"></span><span class="edit-only">·</span><span id="words" class="edit-only"></span></span>
+  <span class="spacer"></span>
+  <div class="seg edit-only"><button type="button" data-view="write" class="on">Write</button><button type="button" data-view="preview">Preview</button><button type="button" data-view="markdown">Markdown</button></div>
+  <div class="more edit-only"><button type="button" id="more" aria-label="More">⋯</button>
+    <div id="menu" hidden><a id="view" href="#" target="_blank" rel="noopener" hidden>View the post ↗</a><button type="button" id="unpublish" hidden>Unpublish</button><button type="button" id="delete" hidden>Delete draft</button></div></div>
+  <button type="button" class="btn edit-only" id="publish">Publish</button>
+</div>
+<main>
+  <section id="gate" hidden></section>
+  <section id="list"></section>
+  <section id="write">
+    <textarea id="title" class="field" rows="1" placeholder="Post title"></textarea>
+    <textarea id="subtitle" class="field" rows="1" placeholder="A subtitle (optional)"></textarea>
+    <div id="editor"></div>
+  </section>
+  <article id="preview" class="edit-only" hidden></article>
+  <pre id="source" class="edit-only" hidden></pre>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+<script src="/static/config.js?v=7dbfef6f26"></script>
+<script type="module" src="dist/editor.js?v=7dbfef6f26"></script>
+</body></html>

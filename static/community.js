@@ -539,9 +539,8 @@
       dot.hidden = !n || !!chatBox; dot.textContent = n > 9 ? "9+" : n; // on the messages page itself, it's being read
     }).catch(() => {});
     const btn = wrap.querySelector(".bellbtn"), dot = wrap.querySelector(".dot"), list = wrap.querySelector(".notes");
-    // The bell (2026-11-03): this browser keeps the list it last showed (bell_<you>). Opening the bell shows it at once;
-    // only if the dot says there's something new does it ask, and then only for the items newer than the ones it has
-    // (?since=), which the Worker marks seen as it sends them. Nothing new: no request at all.
+    // The bell (2026-11-03): this browser keeps the list it last showed (bell_<you>). Opening the bell shows it at once,
+    // then asks only for the items newer than the ones it has (?since=), which the Worker marks seen as it sends them.
     const key = "bell_" + (me && me.id);
     let items = store.get(key) || null;
     const paint = (list_) => {
@@ -569,7 +568,9 @@
       list.hidden = !list.hidden; btn.setAttribute("aria-expanded", String(!list.hidden));
       if (list.hidden) return;
       if (items) paint(items); else list.innerHTML = `<p class="muted">Loading…</p>`;
-      if (items && dot.hidden) return; // nothing new since this browser last looked: no request
+      // always ask for what is newer than this browser's list (2026-11-12): read on another device (his phone), they
+      // were no longer "new", the dot stayed off, and this browser kept showing its old list. ?since= reads only the
+      // newer rows (index notifications_recent), so an open with nothing new costs one tiny query.
       await load().catch(() => { if (!items) list.innerHTML = `<p class="muted">Couldn't load. Please try again.</p>`; });
     });
     document.addEventListener("click", (e) => { if (!wrap.contains(e.target)) { list.hidden = true; btn.setAttribute("aria-expanded", "false"); } });

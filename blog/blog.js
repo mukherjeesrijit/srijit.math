@@ -11,7 +11,7 @@
   }
 })();
 (function () {
-  const box = document.querySelector("[data-love]");
+  const box = document.querySelector("main.blog-post [data-love]");
   const API = (window.COHORT || {}).community;
   if (!box || !API) return;
   const auth = window.srijitAuth;

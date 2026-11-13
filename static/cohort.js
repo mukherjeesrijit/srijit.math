@@ -96,7 +96,11 @@
   modal.querySelectorAll("[data-close]").forEach((b) => (b.onclick = () => { modal.hidden = true; }));
   modal.addEventListener("click", (e) => { if (e.target === modal) modal.hidden = true; });
   document.querySelectorAll("[data-enrol]").forEach((b) => (b.onclick = () => !signedIn() && askToEnrol()));
-  if (!token && CF) loadGoogle(); // signed out: have the button ready for when they press Enroll
+  if (!token && CF) { // signed out: have the button ready for when they press Enroll, but only once the page itself has
+    // loaded (2026-11-13: Google's 100 KB script competed with the page on first visits from phones; Enroll still loads it at once)
+    const soon = () => ("requestIdleCallback" in window ? requestIdleCallback(loadGoogle, { timeout: 3000 }) : setTimeout(loadGoogle, 1500));
+    if (document.readyState === "complete") soon(); else window.addEventListener("load", soon, { once: true });
+  }
 
   // -- the ☰ menu: Dashboard, Roadmap, Books -------------------------------------------------------------------
   const menuBtn = document.querySelector("[data-menu]"), menuList = document.querySelector(".menulist");

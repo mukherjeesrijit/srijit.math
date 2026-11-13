@@ -8,6 +8,7 @@
   const API = C.community, BASE = C.base || "/cohort/fall-2026/", PAGES = C.problems || "/problems/"; // a problem's page: PAGES + its id
   const box = document.querySelector("[data-discuss]");
   const solveBox = document.querySelector("[data-solve]");
+  const demo = new Map(), grading = new Set(); // DEMO: live grades so far ("solve" or a post id → text; null while it starts)
   const talkBtn = document.querySelector('.actions [data-gate="discuss"]');
   const solveBtn = document.querySelector('.actions [data-gate="solve"]');
   const loveBtn = document.querySelector(".actions [data-love]");
@@ -155,7 +156,8 @@
     if (!x.mine && !x.flagged) out.push(`<button data-act="flag">Flag</button>`);
     if (x.flagged) out.push(`<span class="muted">Flagged</span>`);
     if (me && me.owner) {
-      if (kind === "post" && x.kind === "solution" && !x.mine) out.push(`<button class="gradebtn" data-act="grade">${x.grade == null ? "Grade" : "Change grade"}</button>`);
+      if (kind === "post" && x.kind === "solution" && !x.mine) out.push(`<button class="gradebtn" data-act="grade">${x.grade == null ? "Grade" : "Change grade"}</button>`,
+        `<button data-act="demo-grade"${grading.has(x.id) ? " disabled" : ""}>${grading.has(x.id) ? "Grading…" : "Grade (demo)"}</button>`); // DEMO: a live grade by Claude, nothing saved
       out.push(x.hidden ? `<button data-act="restore">Restore</button>` : `<button data-act="hide">Hide</button>`);
     }
     return out.join("");
@@ -185,7 +187,7 @@
         ${p.edited ? `<button class="muted linkish" data-act="history">edited</button>` : ""}</header>
       ${hiddenNote(p)}<div class="body md">${md(p.body)}</div>
       ${open ? `${graded(p)}
-        <div class="tools">${tools("post", p)}</div>
+        <div class="tools">${tools("post", p)}</div>${demoBox(p.id)}
         <div class="comments">${p.comments.map(commentHTML).join("")}</div>
         <form class="reply"><textarea maxlength="1000" rows="2" placeholder="Reply to ${esc(nm(p.author.name))}…"></textarea>
           <div class="row"><button type="submit" class="btn small">Reply</button></div></form>`
@@ -297,7 +299,7 @@
       const b = e.target.closest("button");
       if (!b) {
         const card = e.target.closest("[data-card]");
-        if (!card || e.target.closest("a, textarea, input, select, form, .comments") || getSelection().toString()) return;
+        if (!card || e.target.closest("a, textarea, input, select, form, .comments, .grade-live") || getSelection().toString()) return;
         const k = Number(card.dataset.card);
         opened.has(k) ? opened.delete(k) : opened.add(k);
         renderThread();
@@ -321,6 +323,8 @@
           v.querySelector(".score").textContent = d.score;
           v.querySelector(".up").classList.toggle("on", value === 1); v.querySelector(".up").setAttribute("aria-pressed", value === 1);
           v.querySelector(".down").classList.toggle("on", value === -1); v.querySelector(".down").setAttribute("aria-pressed", value === -1);
+        } else if (act === "demo-grade") { // DEMO
+          liveGrade(box.dataset.discuss, it.item.body, it.id);
         } else if (act === "clap") {
           const d = await call("POST", "/clap", { post: it.id, n: 1 });
           it.item.claps = d.claps; it.item.myClaps = d.mine;
@@ -625,37 +629,57 @@
     });
     paint();
     // DEMO (2026-11-13, for the judges; to be removed when Srijit asks): grade what is in the box, live
-    const gbtn = solveBox.querySelector('[data-act="grade"]'), gbox = solveBox.querySelector(".grade-live");
-    if (!gbtn || !gbox) return;
-    const statement = () => {
-      const st = document.querySelector("article.statement"); if (!st) return "";
-      const c = st.cloneNode(true), tex = (k) => { const a = k.querySelector('annotation[encoding="application/x-tex"]'); return a ? a.textContent : k.textContent; };
-      c.querySelectorAll(".katex-display").forEach((k) => k.replaceWith(" $$" + tex(k) + "$$ "));
-      c.querySelectorAll(".katex").forEach((k) => k.replaceWith("$" + tex(k) + "$"));
-      return c.textContent.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
-    };
-    gbtn.addEventListener("click", async () => {
+    const gbtn = solveBox.querySelector('[data-act="grade"]');
+    if (!gbtn) return;
+    gbtn.addEventListener("click", () => {
       if (!ta.value.trim()) return toast("Write or convert a solution first.");
-      gbtn.disabled = true; gbtn.textContent = "Grading…";
-      gbox.hidden = false; gbox.innerHTML = `<div class="kicker">Live grade · Claude, in Srijit's persona</div><div class="md body"><p class="typing">Reading the solution…</p></div>`;
-      const body = gbox.querySelector(".body");
-      let text = "", t = null;
-      const show = () => { body.innerHTML = md(text) || '<p class="typing">Reading the solution…</p>'; math(body); };
-      try {
-        const r = await fetch(API + "/ai/grade", { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + token },
-          body: JSON.stringify({ problem: solveBox.dataset.solve, statement: statement(), solution: ta.value }) });
-        if (!r.body) { text = await r.text(); show(); return; }
+      liveGrade(solveBox.dataset.solve, ta.value, "solve", gbtn);
+    });
+  }
+  // DEMO (2026-11-13; remove with the buttons): Claude grades a solution live in Srijit's persona, against his "My ideas",
+  // for the Solve box ("solve") or a learner's posted solution (its id). Streams; nothing is saved.
+  function demoBox(id) { // a repaint of the thread keeps what has been written so far
+    if (!demo.has(id)) return "";
+    return `<div class="grade-live" data-demo="${id}"><div class="kicker">Live grade · Claude, in Srijit's persona</div>
+      <div class="md body">${md(demo.get(id) || "") || '<p class="typing">Reading the solution…</p>'}</div></div>`;
+  }
+  function statementText() {
+    const st = document.querySelector("article.statement"); if (!st) return "";
+    const c = st.cloneNode(true), tex = (k) => { const a = k.querySelector('annotation[encoding="application/x-tex"]'); return a ? a.textContent : k.textContent; };
+    c.querySelectorAll(".katex-display").forEach((k) => k.replaceWith(" $$" + tex(k) + "$$ "));
+    c.querySelectorAll(".katex").forEach((k) => k.replaceWith("$" + tex(k) + "$"));
+    return c.textContent.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+  }
+  async function liveGrade(problem, solution, where, btn) {
+    if (grading.has(where)) return; // already grading this one
+    grading.add(where); demo.set(where, null);
+    const target = () => where === "solve" ? solveBox.querySelector(".grade-live") : document.querySelector(`.grade-live[data-demo="${where}"]`);
+    if (where !== "solve") renderThread(); // opens the box under the post
+    const button = () => btn || document.querySelector(`#post-${where} [data-act="demo-grade"]`);
+    const busy = (on) => { const b = button(); if (b) { b.disabled = on; b.textContent = on ? "Grading…" : "Grade (demo)"; } };
+    let text = "", t = null;
+    const show = () => {
+      const g = target(); if (!g) return;
+      g.hidden = false;
+      if (where === "solve" && !g.querySelector(".body")) g.innerHTML = `<div class="kicker">Live grade · Claude, in Srijit's persona</div><div class="md body"></div>`;
+      const body = g.querySelector(".body"); body.innerHTML = md(text) || '<p class="typing">Reading the solution…</p>'; math(body);
+    };
+    busy(true); if (where === "solve") { const g = target(); if (g) g.innerHTML = ""; } show();
+    try {
+      const r = await fetch(API + "/ai/grade", { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + token },
+        body: JSON.stringify({ problem, statement: statementText(), solution }) });
+      if (!r.body) text = await r.text();
+      else {
         const reader = r.body.getReader(), dec = new TextDecoder();
         for (;;) {
           const { done, value } = await reader.read();
           if (done) break;
-          text += dec.decode(value, { stream: true });
+          text += dec.decode(value, { stream: true }); if (where !== "solve") demo.set(where, text || null);
           if (!t) t = setTimeout(() => { t = null; show(); }, 120); // repaint a few times a second as it is written
         }
-        clearTimeout(t); show();
-      } catch (err) { body.innerHTML = '<p class="muted">Grading didn\'t work. Please try again.</p>'; }
-      finally { gbtn.disabled = false; gbtn.textContent = "Grade (demo)"; }
-    });
+      }
+    } catch (err) { text = "_Grading didn't work. Please try again._"; }
+    clearTimeout(t); demo.set(where, text); grading.delete(where); show(); busy(false);
   }
   const AI_ROOM = 12;
   function refreshSolve() { // once the thread is loaded: if I've posted my solution, the box edits it

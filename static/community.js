@@ -179,7 +179,7 @@
     const open = opened.has(p.id);
     const r = p.comments.length;
     const summary = [p.kind === "solution" ? `👏 ${p.claps}` : `▲ ${p.score}`, `${r} repl${r === 1 ? "y" : "ies"}`]
-      .concat(p.grade != null ? [`Srijit 👏 ${p.grade}/10`] : []).join(" · ");
+      .concat(p.grade != null ? [`Srijit 👏 ${p.grade}/10${p.feedback ? " + reply" : ""}`] : []).join(" · "); // his reply shows inside (2026-11-13)
     return `<article class="post solcard${p.hidden ? " is-hidden" : ""}${open ? " open" : ""}" id="post-${p.id}" data-kind="post" data-id="${p.id}" data-card="${p.id}">
       <header>${person(p.author)}<span class="kind ${p.kind}">${KIND[p.kind] || "Post"}</span><time>${ago(p.created)}</time>
         ${p.edited ? `<button class="muted linkish" data-act="history">edited</button>` : ""}</header>
@@ -248,12 +248,20 @@
     const m = location.hash.match(/^#post-(\d+)$/); // a link from the bell or a profile: open that post
     if (!m) return loadPage().catch(threadFailed);
     await loadThread().catch(threadFailed);
-    if (m) {
-      opened.add(Number(m[1])); renderThread(); openTalk(true);
-      const el = document.getElementById("post-" + m[1]);
-      if (el) { el.classList.add("lit"); el.scrollIntoView({ behavior: "smooth", block: "center" }); }
-    }
+    openPost(Number(m[1]));
   }
+  function openPost(id) {
+    opened.add(id); renderThread(); openTalk(true);
+    const el = document.getElementById("post-" + id);
+    if (el) { el.classList.add("lit"); el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  }
+  // the same link followed while already on this page (2026-11-13: the card stayed shut, its grade reply out of sight)
+  window.addEventListener("hashchange", async () => {
+    const m = location.hash.match(/^#post-(\d+)$/);
+    if (!m || !box || !box.querySelector(".posts")) return;
+    if (!loaded) await loadThread().catch(threadFailed);
+    openPost(Number(m[1]));
+  });
 
   function itemOf(el) {
     const node = el.closest("[data-kind]");

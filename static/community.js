@@ -451,6 +451,9 @@
       <p class="hint">Solve it by hand, photograph it and give the photo to your AI (Claude, Gemini, ChatGPT) with this prompt
         <button type="button" class="copy" data-act="copy-prompt">Copy prompt</button>. It replies with one code block: press
         the code block's copy button and paste it below.</p>
+      ${me && me.owner ? `<p class="photo-row"><button type="button" class="btn small" data-act="photo">📷 Photo → text</button>
+        <span class="muted">Claude Haiku copies your handwriting into the box below; then edit and post. Only you see this.</span>
+        <input type="file" accept="image/*" hidden></p>` : ""}
       <p class="mine-note" hidden></p>
       <form class="write">
         <textarea maxlength="8000" rows="8" placeholder="Paste what your AI gave back here. You can also type: Markdown works, and maths between $ signs, e.g. $\\frac{1}{n}$."></textarea>
@@ -467,6 +470,7 @@
       store.set(key, ta.value || null); clearTimeout(t); t = setTimeout(paint, 300);
     });
     paint();
+    photoToText(ta);
     solveBox.querySelector("form").addEventListener("submit", async (e) => {
       e.preventDefault();
       if (!ta.value.trim()) return toast(ERR.empty);
@@ -479,6 +483,40 @@
         toast(mySolution ? "Your solution is updated." : "Posted. Thanks for sharing it.");
         sort = "new"; syncSort(); await loadThread(); openTalk(true);
       } catch (err) { failed(err); } finally { btn.disabled = false; }
+    });
+  }
+  // Srijit only (2026-11-13): a photo of his handwritten page -> Claude Haiku (POST /ai/transcribe) -> Markdown with
+  // $...$ maths in the Solve box, to edit and post. The photo is shrunk here first (at most 1568 px on the long side,
+  // what the model reads at full detail; a JPEG of a few hundred KB) and isn't kept anywhere.
+  const PHOTO_ERR = { owner: "Only Srijit can use this.", "ai-key": "Photo → text isn't set up yet (the Anthropic key).",
+    "ai-busy": "Claude is busy. Try again in a moment.", "ai-offline": "Couldn't reach Claude. Try again.",
+    "ai-refused": "Claude declined this photo.", "ai-empty": "Nothing readable came back. Try a clearer photo.",
+    "too big": "That photo is too big.", image: "That file isn't a photo Claude can read." };
+  async function shrinkPhoto(file) {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, 1568 / Math.max(bitmap.width, bitmap.height));
+    const c = Object.assign(document.createElement("canvas"), { width: Math.round(bitmap.width * scale), height: Math.round(bitmap.height * scale) });
+    const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(bitmap, 0, 0, c.width, c.height);
+    const url = c.toDataURL("image/jpeg", 0.85);
+    return { data: url.slice(url.indexOf(",") + 1), type: "image/jpeg" };
+  }
+  function photoToText(ta) {
+    const btn = solveBox.querySelector('[data-act="photo"]');
+    if (!btn) return;
+    const file = btn.parentElement.querySelector('input[type="file"]');
+    btn.addEventListener("click", () => file.click());
+    file.addEventListener("change", async () => {
+      const f = file.files && file.files[0]; file.value = "";
+      if (!f) return;
+      const label = btn.textContent; btn.disabled = true; btn.textContent = "Reading your handwriting…";
+      try {
+        const photo = await shrinkPhoto(f);
+        const d = await call("POST", "/ai/transcribe", { image: photo.data, media_type: photo.type });
+        ta.value = ta.value.trim() ? ta.value.trimEnd() + "\n\n" + d.text : d.text;
+        ta.dispatchEvent(new Event("input")); ta.focus();
+        toast(d.truncated ? "Done, but the page was long: check the end." : "Done. Check it, edit, then post.");
+      } catch (err) { toast(PHOTO_ERR[err.message] || ERR[err.message] || "Photo → text didn't work. Please try again."); }
+      finally { btn.disabled = false; btn.textContent = label; }
     });
   }
   function refreshSolve() { // once the thread is loaded: if I've posted my solution, the box edits it

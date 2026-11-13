@@ -448,12 +448,16 @@
   function solveShell() {
     const key = "solve_draft_" + solveBox.dataset.solve;
     solveBox.innerHTML = `<h2>Your solution</h2>
-      ${me && me.owner ? "" : `<p class="hint">Solve it by hand first. Then choose <b>Image</b> to turn photos of your pages into text here, or
+      ${"" /* hidden 2026-11-13 (Srijit: "only image upload -> text, which one can edit"); kept here to bring back:
+      <p class="hint">Solve it by hand first. Then choose <b>Image</b> to turn photos of your pages into text here, or
         give the photo to your own AI with this prompt <button type="button" class="copy" data-act="copy-prompt">Copy prompt</button>
-        and paste its answer under <b>Text</b>.</p>`}
-      <div class="owner-ai"><div class="seg" data-modes><button type="button" data-mode="image">Image</button><button type="button" data-mode="text" class="on">Text</button></div>
-        <span class="muted">${me && me.owner ? "Image: photos or a PDF of your pages, read by Claude." : "New: photos or a PDF of your pages, turned into text by Claude (up to 20 pages a day)."}</span></div>
-        <div class="pages-panel" hidden><div class="pages"></div>
+        and paste its answer under <b>Text</b>.</p> */}
+      <div class="owner-ai">${"" /* the Image | Text switch, hidden 2026-11-13 (only image -> text; the text box appears below
+        once there is text to edit); kept here to bring back:
+        <div class="seg" data-modes><button type="button" data-mode="image">Image</button><button type="button" data-mode="text" class="on">Text</button></div> */}
+        <span class="muted">${me && me.owner ? "Add photos or a PDF of your handwritten pages; Claude turns them into text you can edit."
+          : "Add photos or a PDF of your handwritten pages; Claude turns them into text you can edit (up to 20 pages a day)."}</span></div>
+        <div class="pages-panel"><div class="pages"></div>
           <div class="row"><button type="button" class="btn small ghost" data-act="add-pages">+ Add pages (photos or a PDF)</button>
             <button type="button" class="btn small accent" data-act="convert" disabled>Convert to text</button>
             <input type="file" accept="image/*,application/pdf" multiple hidden data-pick="add"><input type="file" accept="image/*" hidden data-pick="replace"></div>
@@ -546,12 +550,13 @@
     const form = solveBox.querySelector("form.write"), list = panel.querySelector(".pages"), status = panel.querySelector(".ai-status");
     const add = panel.querySelector('[data-pick="add"]'), rep = panel.querySelector('[data-pick="replace"]'), convert = panel.querySelector('[data-act="convert"]');
     let pages = [], replacing = null, busy = false;
-    const setMode = (m) => {
-      solveBox.querySelectorAll("[data-mode]").forEach((b) => b.classList.toggle("on", b.dataset.mode === m));
-      panel.hidden = m !== "image"; form.hidden = m !== "text";
-      if (m === "text") ta.focus();
-    };
-    solveBox.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
+    // only image -> text (2026-11-13): the pages are always shown, and the text box below them appears once there is
+    // text to edit (a conversion, a saved draft, or the solution already posted). The old Image | Text switch is the
+    // commented-out markup above; setMode("text") now just reveals the text box.
+    const showText = () => { if (ta.value.trim()) form.hidden = false; };
+    const setMode = (m) => { if (m === "text") { form.hidden = false; form.scrollIntoView({ behavior: "smooth", block: "start" }); ta.focus(); } };
+    form.hidden = !ta.value.trim();
+    ta.addEventListener("input", showText);
     const paint = () => {
       list.innerHTML = pages.map((p, k) => {
         const bad = p.ai || p.sharp < BLURRY;

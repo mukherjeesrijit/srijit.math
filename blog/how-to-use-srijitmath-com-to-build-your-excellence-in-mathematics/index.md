@@ -1,7 +1,7 @@
 <!-- title: How to use srijitmath.com to build your excellence in mathematics?
 subtitle: Every feature, picture by picture, for beginners and advanced learners. Read it slowly. Then pick up a pen.
 published: 2026-11-13T13:08:45.108Z
-updated: 2026-11-13T13:08:45.108Z -->
+updated: 2026-11-13T13:18:08.183Z -->
 
 # How to use srijitmath.com to build your excellence in mathematics?
 
@@ -107,7 +107,16 @@ Please discuss. A solution nobody talks about gives you only half of what it can
 
 ## Keep practising: you never have to wonder what to do next
 
-Under every problem you have solved, the site picks your next problem, based on my grade.
+The simplest next step is always in front of you. Go down the left bar, in order, one problem after another.
+
+![1.00](1defb6d9ef9c28364daaca5f.webp)
+
+1. **You are here.** The problem you are on is lit up in the left bar.
+2. **The next lesson.** Every lesson has four problems. When you finish them, open the next lesson.
+3. **The next topic.** Every topic has two lessons. After them, a new topic begins, and it stands on the ones before it.
+4. **The next problem.** The arrow → at the bottom of every problem takes you to the next one in the left bar, even across lessons and topics. The arrow ← takes you back.
+
+On top of that, under every problem you have solved, the site picks problems for you, based on my grade.
 
 ![1.00](15ee16a48aabf4b1c949e67b.webp)
 
@@ -158,11 +167,26 @@ Some of you will come for the leaderboard. That's okay. Stay for the mathematics
 2. **All time** counts everything since you joined.
 3. **Levels** sit next to every name. Click a name to see their solutions. It is a good way to find people to study with.
 
-## Roadmap and books
+## The order of topics: the left bar walks down the Roadmap
 
-![1.00](3d929d2f8a9859c1f5ed6650.webp)
+The left bar is not a random list. It follows the Roadmap, from the top to the bottom.
 
-The **Roadmap** shows every topic, from high school algebra to statistical inference, and how each one leads to the ones that build on it. Use it to see where a problem fits and what comes after it.
+The **High School level** has eight topics: Algebra & Functions, Progressions & Means, Complex Numbers, Trigonometry, Coordinate Geometry, Counting & Number Theory, Matrices & Determinants, and Elementary Calculus.
+
+The **University level** has eight more: Sequences & Series, Calculus, Linear Algebra, Multivariate Calculus, Probability I, Probability II, Statistical Estimation, and Hypothesis Testing.
+
+Each topic has two lessons, and each lesson has four problems. Now look at the Roadmap. I have marked every box with the topic of the left bar it belongs to.
+
+![1.00](60ad6f436f1680289ab59936.webp)
+
+- **H** (orange) marks the ground floor: algebra and complex numbers, trigonometry, pre-calculus and coordinate geometry. The High School level is built here, and it also gives you a first taste of the boxes just below: progressions, counting, matrices and calculus.
+- **1 to 8** (blue) are the University topics, in the same order as the left bar. 1 is Sequences & Series. 2 is Calculus: continuity, differentiation and integration. 3 is Linear Algebra. 4 is Multivariate Calculus. 5 is Probability I. 6 is Probability II, up to the Law of Large Numbers and the Central Limit Theorem. 7 is Statistical Estimation. 8 is Hypothesis Testing.
+- **Each line** goes from a topic to the topics that build on it. Multivariable differentiation needs differentiation and linear algebra. Statistics needs probability. So when you go down the left bar, every new topic stands on ground you have already built.
+- **The grey boxes** at the bottom, Markov Chains, Non-Parametric Statistics, and Surveys & Linear Models, are where the road continues after these sixteen topics.
+
+Look at the picture for a moment. Find the box where you are today. Then look at the bottom of the picture. That is where you are going, one box at a time.
+
+## Books
 
 ![1.00](c8b30e2bacdf5866a0024887.webp)
 

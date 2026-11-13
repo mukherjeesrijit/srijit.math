@@ -448,16 +448,16 @@
   function solveShell() {
     const key = "solve_draft_" + solveBox.dataset.solve;
     solveBox.innerHTML = `<h2>Your solution</h2>
-      ${me && me.owner ? "" : `<p class="hint">Solve it by hand, photograph it and give the photo to your AI (Claude, Gemini, ChatGPT) with this prompt
-        <button type="button" class="copy" data-act="copy-prompt">Copy prompt</button>. It replies with one code block: press
-        the code block's copy button and paste it below.</p>`}
-      ${me && me.owner ? `<div class="owner-ai"><div class="seg" data-modes><button type="button" data-mode="image">Image</button><button type="button" data-mode="text" class="on">Text</button></div>
-        <span class="muted">Only you see this.</span></div>
+      ${me && me.owner ? "" : `<p class="hint">Solve it by hand first. Then choose <b>Image</b> to turn photos of your pages into text here, or
+        give the photo to your own AI with this prompt <button type="button" class="copy" data-act="copy-prompt">Copy prompt</button>
+        and paste its answer under <b>Text</b>.</p>`}
+      <div class="owner-ai"><div class="seg" data-modes><button type="button" data-mode="image">Image</button><button type="button" data-mode="text" class="on">Text</button></div>
+        <span class="muted">${me && me.owner ? "Image: photos or a PDF of your pages, read by Claude." : "New: photos or a PDF of your pages, turned into text by Claude (up to 20 pages a day)."}</span></div>
         <div class="pages-panel" hidden><div class="pages"></div>
           <div class="row"><button type="button" class="btn small ghost" data-act="add-pages">+ Add pages (photos or a PDF)</button>
             <button type="button" class="btn small accent" data-act="convert" disabled>Convert to text</button>
             <input type="file" accept="image/*,application/pdf" multiple hidden data-pick="add"><input type="file" accept="image/*" hidden data-pick="replace"></div>
-          <p class="muted ai-status">Add the pages in order: page 1 first. A blurred page is flagged so you can take it again.</p></div>` : ""}
+          <p class="muted ai-status">Add the pages in order: page 1 first. A blurred page is flagged so you can take it again.</p></div>
       <p class="mine-note" hidden></p>
       <form class="write">
         <textarea maxlength="8000" rows="8" placeholder="Paste what your AI gave back here. You can also type: Markdown works, and maths between $ signs, e.g. $\\frac{1}{n}$."></textarea>
@@ -476,7 +476,7 @@
       store.set(key, ta.value || null); clearTimeout(t); t = setTimeout(paint, 300);
     });
     paint();
-    ownerTools(ta);
+    aiTools(ta);
     solveBox.querySelector("form").addEventListener("submit", async (e) => {
       e.preventDefault();
       if (!ta.value.trim()) return toast(ERR.empty);
@@ -491,12 +491,13 @@
       } catch (err) { failed(err); } finally { btn.disabled = false; }
     });
   }
-  // Srijit only (2026-11-13): his handwritten solution as pages (photos or a PDF) -> Claude Haiku (POST /ai/transcribe)
+  // Everyone signed in (2026-11-13; at first Srijit only): a handwritten solution as pages (photos or a PDF) -> Claude Haiku (POST /ai/transcribe)
   // -> organised Markdown with $...$ maths in the Solve box, to edit and post. Image mode holds the pages in order
   // (move, replace, delete); each page gets a sharpness check here at once, and Haiku checks them again: a blurred page
   // must be taken again before any text is written. Photos are shrunk here (at most 1568 px, what the model reads at
   // full detail) and kept only in this page's memory. PDFs become one image per page (PDF.js, loaded only when needed).
-  const PHOTO_ERR = { owner: "Only Srijit can use this.", "ai-key": "Photo → text isn't set up yet (the Anthropic key).",
+  const PHOTO_ERR = { "ai-limit": "You've used today's 20 pages. Try again tomorrow, or type it under Text.",
+    "ai-limit-all": "Photo → text is resting for today. Please use Text, or try again tomorrow.", "ai-key": "Photo → text isn't set up yet.",
     "ai-busy": "Claude is busy. Try again in a moment.", "ai-offline": "Couldn't reach Claude. Try again.",
     "ai-refused": "Claude declined these pages.", "ai-long": "Too much writing for one go: convert fewer pages at a time.",
     "too big": "Those pages are too big together.", "too many": "At most 12 pages at a time.", image: "One of the files isn't an image Claude can read." };
@@ -539,7 +540,7 @@
     return out;
   }
   const byName = (a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }); // IMG_9 before IMG_10
-  function ownerTools(ta) {
+  function aiTools(ta) { // everyone signed in (2026-11-13); the Grade button inside is Srijit's only
     const panel = solveBox.querySelector(".pages-panel");
     if (!panel) return;
     const form = solveBox.querySelector("form.write"), list = panel.querySelector(".pages"), status = panel.querySelector(".ai-status");

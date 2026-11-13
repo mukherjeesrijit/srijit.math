@@ -154,7 +154,7 @@
   const profileBox = document.querySelector("[data-profile]");
   if (profileBox && token) want.push("profile"); // the dashboard comes with the page's request (2026-11-03), not a second one
   if (document.querySelector("[data-leaderboard]")) want.push("board"); // and so does the leaderboard
-  const blogPost = document.querySelector("[data-love]"); // a blog post: its ❤️ come with the page's request too
+  const blogPost = document.querySelector("main.blog-post [data-love]"); // a blog post: its ❤️ come with the page's request too (not a problem's ♥)
   if (blogPost) want.push("blog");
   // 💬: the conversation on the messages page, only what's newer than the last message this browser kept (community.js)
   let chatU, chatAfter;

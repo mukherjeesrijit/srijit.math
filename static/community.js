@@ -448,19 +448,25 @@
   function solveShell() {
     const key = "solve_draft_" + solveBox.dataset.solve;
     solveBox.innerHTML = `<h2>Your solution</h2>
-      <p class="hint">Solve it by hand, photograph it and give the photo to your AI (Claude, Gemini, ChatGPT) with this prompt
+      ${me && me.owner ? "" : `<p class="hint">Solve it by hand, photograph it and give the photo to your AI (Claude, Gemini, ChatGPT) with this prompt
         <button type="button" class="copy" data-act="copy-prompt">Copy prompt</button>. It replies with one code block: press
-        the code block's copy button and paste it below.</p>
-      ${me && me.owner ? `<p class="photo-row"><button type="button" class="btn small" data-act="photo">📷 Photo → text</button>
-        <span class="muted">Claude Haiku copies your handwriting into the box below; then edit and post. Only you see this.</span>
-        <input type="file" accept="image/*" hidden></p>` : ""}
+        the code block's copy button and paste it below.</p>`}
+      ${me && me.owner ? `<div class="owner-ai"><div class="seg" data-modes><button type="button" data-mode="image">Image</button><button type="button" data-mode="text" class="on">Text</button></div>
+        <span class="muted">Only you see this.</span></div>
+        <div class="pages-panel" hidden><div class="pages"></div>
+          <div class="row"><button type="button" class="btn small ghost" data-act="add-pages">+ Add pages (photos or a PDF)</button>
+            <button type="button" class="btn small accent" data-act="convert" disabled>Convert to text</button>
+            <input type="file" accept="image/*,application/pdf" multiple hidden data-pick="add"><input type="file" accept="image/*" hidden data-pick="replace"></div>
+          <p class="muted ai-status">Add the pages in order: page 1 first. A blurred page is flagged so you can take it again.</p></div>` : ""}
       <p class="mine-note" hidden></p>
       <form class="write">
         <textarea maxlength="8000" rows="8" placeholder="Paste what your AI gave back here. You can also type: Markdown works, and maths between $ signs, e.g. $\\frac{1}{n}$."></textarea>
         <div class="preview md"></div>
         <div class="row"><span class="muted">One solution per problem. You can edit it any time.</span>
-          <button type="submit" class="btn accent small">Post to the discussion</button></div></form>`;
-    solveBox.querySelector('[data-act="copy-prompt"]').addEventListener("click", (e) => copyPrompt(e.currentTarget));
+          ${me && me.owner ? `<button type="button" class="btn small" data-act="grade">Grade (demo)</button>` : ""}
+          <button type="submit" class="btn accent small">Post to the discussion</button></div></form>
+      ${me && me.owner ? `<div class="grade-live" hidden></div>` : ""}`;
+    const cp = solveBox.querySelector('[data-act="copy-prompt"]'); if (cp) cp.addEventListener("click", (e) => copyPrompt(e.currentTarget));
     const ta = solveBox.querySelector("form.write textarea"), pv = solveBox.querySelector(".preview");
     ta.value = store.get(key) || "";
     let t = null;
@@ -470,7 +476,7 @@
       store.set(key, ta.value || null); clearTimeout(t); t = setTimeout(paint, 300);
     });
     paint();
-    photoToText(ta);
+    ownerTools(ta);
     solveBox.querySelector("form").addEventListener("submit", async (e) => {
       e.preventDefault();
       if (!ta.value.trim()) return toast(ERR.empty);
@@ -485,40 +491,159 @@
       } catch (err) { failed(err); } finally { btn.disabled = false; }
     });
   }
-  // Srijit only (2026-11-13): a photo of his handwritten page -> Claude Haiku (POST /ai/transcribe) -> Markdown with
-  // $...$ maths in the Solve box, to edit and post. The photo is shrunk here first (at most 1568 px on the long side,
-  // what the model reads at full detail; a JPEG of a few hundred KB) and isn't kept anywhere.
+  // Srijit only (2026-11-13): his handwritten solution as pages (photos or a PDF) -> Claude Haiku (POST /ai/transcribe)
+  // -> organised Markdown with $...$ maths in the Solve box, to edit and post. Image mode holds the pages in order
+  // (move, replace, delete); each page gets a sharpness check here at once, and Haiku checks them again: a blurred page
+  // must be taken again before any text is written. Photos are shrunk here (at most 1568 px, what the model reads at
+  // full detail) and kept only in this page's memory. PDFs become one image per page (PDF.js, loaded only when needed).
   const PHOTO_ERR = { owner: "Only Srijit can use this.", "ai-key": "Photo → text isn't set up yet (the Anthropic key).",
     "ai-busy": "Claude is busy. Try again in a moment.", "ai-offline": "Couldn't reach Claude. Try again.",
-    "ai-refused": "Claude declined this photo.", "ai-empty": "Nothing readable came back. Try a clearer photo.",
-    "too big": "That photo is too big.", image: "That file isn't a photo Claude can read." };
-  async function shrinkPhoto(file) {
-    const bitmap = await createImageBitmap(file);
-    const scale = Math.min(1, 1568 / Math.max(bitmap.width, bitmap.height));
-    const c = Object.assign(document.createElement("canvas"), { width: Math.round(bitmap.width * scale), height: Math.round(bitmap.height * scale) });
-    const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(bitmap, 0, 0, c.width, c.height);
-    const url = c.toDataURL("image/jpeg", 0.85);
-    return { data: url.slice(url.indexOf(",") + 1), type: "image/jpeg" };
+    "ai-refused": "Claude declined these pages.", "ai-long": "Too much writing for one go: convert fewer pages at a time.",
+    "too big": "Those pages are too big together.", "too many": "At most 12 pages at a time.", image: "One of the files isn't an image Claude can read." };
+  const PDFJS = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+  const BLURRY = 40; // sharpness below this (variance of the Laplacian, on a 600 px greyscale copy) looks blurred
+  function sharpness(canvas) {
+    const s = Math.min(1, 600 / Math.max(canvas.width, canvas.height));
+    const w = Math.max(3, Math.round(canvas.width * s)), h = Math.max(3, Math.round(canvas.height * s));
+    const c = Object.assign(document.createElement("canvas"), { width: w, height: h });
+    const g = c.getContext("2d"); g.drawImage(canvas, 0, 0, w, h);
+    const px = g.getImageData(0, 0, w, h).data, grey = new Float32Array(w * h);
+    for (let i = 0; i < w * h; i++) grey[i] = 0.299 * px[4 * i] + 0.587 * px[4 * i + 1] + 0.114 * px[4 * i + 2];
+    let n = 0, sum = 0, sq = 0;
+    for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
+      const i = y * w + x, l = 4 * grey[i] - grey[i - 1] - grey[i + 1] - grey[i - w] - grey[i + w];
+      n++; sum += l; sq += l * l;
+    }
+    return n ? sq / n - (sum / n) ** 2 : 0;
   }
-  function photoToText(ta) {
-    const btn = solveBox.querySelector('[data-act="photo"]');
-    if (!btn) return;
-    const file = btn.parentElement.querySelector('input[type="file"]');
-    btn.addEventListener("click", () => file.click());
-    file.addEventListener("change", async () => {
-      const f = file.files && file.files[0]; file.value = "";
-      if (!f) return;
-      const label = btn.textContent; btn.disabled = true; btn.textContent = "Reading your handwriting…";
+  function toPage(source, sw, sh) { // any drawable -> a page: a JPEG of at most 1568 px, and how sharp it is
+    const scale = Math.min(1, 1568 / Math.max(sw, sh));
+    const c = Object.assign(document.createElement("canvas"), { width: Math.round(sw * scale), height: Math.round(sh * scale) });
+    const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(source, 0, 0, c.width, c.height);
+    const url = c.toDataURL("image/jpeg", 0.85);
+    return { id: Math.random().toString(36).slice(2), url, data: url.slice(url.indexOf(",") + 1), type: "image/jpeg", sharp: sharpness(c), ai: "" };
+  }
+  async function imagePage(file) { const b = await createImageBitmap(file); return toPage(b, b.width, b.height); }
+  async function pdfPages(file, room) {
+    if (!window.pdfjsLib) await new Promise((ok, no) => document.head.appendChild(Object.assign(document.createElement("script"), { src: PDFJS + "pdf.min.js", onload: ok, onerror: no })));
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + "pdf.worker.min.js";
+    const pdf = await window.pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise, out = [];
+    for (let i = 1; i <= Math.min(pdf.numPages, room); i++) {
+      const page = await pdf.getPage(i), v1 = page.getViewport({ scale: 1 });
+      const vp = page.getViewport({ scale: Math.min(3, 1568 / Math.max(v1.width, v1.height)) });
+      const c = Object.assign(document.createElement("canvas"), { width: Math.round(vp.width), height: Math.round(vp.height) });
+      const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height);
+      await page.render({ canvasContext: g, viewport: vp }).promise;
+      out.push(toPage(c, c.width, c.height));
+    }
+    return out;
+  }
+  const byName = (a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }); // IMG_9 before IMG_10
+  function ownerTools(ta) {
+    const panel = solveBox.querySelector(".pages-panel");
+    if (!panel) return;
+    const form = solveBox.querySelector("form.write"), list = panel.querySelector(".pages"), status = panel.querySelector(".ai-status");
+    const add = panel.querySelector('[data-pick="add"]'), rep = panel.querySelector('[data-pick="replace"]'), convert = panel.querySelector('[data-act="convert"]');
+    let pages = [], replacing = null, busy = false;
+    const setMode = (m) => {
+      solveBox.querySelectorAll("[data-mode]").forEach((b) => b.classList.toggle("on", b.dataset.mode === m));
+      panel.hidden = m !== "image"; form.hidden = m !== "text";
+      if (m === "text") ta.focus();
+    };
+    solveBox.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
+    const paint = () => {
+      list.innerHTML = pages.map((p, k) => {
+        const bad = p.ai || p.sharp < BLURRY;
+        return `<div class="page${bad ? " bad" : ""}" data-id="${p.id}"><img src="${p.url}" alt="Page ${k + 1}">
+          <div class="cap"><b>Page ${k + 1}</b> <span class="chip">${p.ai ? "Blurred: " + esc(p.ai) : p.sharp < BLURRY ? "Looks blurred: take it again" : "Clear ✓"}</span></div>
+          <div class="tools"><button type="button" data-do="left" title="Move earlier" ${k ? "" : "disabled"}>◀</button><button type="button" data-do="right" title="Move later" ${k < pages.length - 1 ? "" : "disabled"}>▶</button>
+            <button type="button" data-do="replace" title="Replace this page">↻</button><button type="button" data-do="delete" title="Delete this page">✕</button></div></div>`;
+      }).join("");
+      convert.disabled = busy || !pages.length;
+      const bad = pages.map((p, k) => (p.ai || p.sharp < BLURRY ? k + 1 : 0)).filter(Boolean);
+      if (!busy) status.textContent = !pages.length ? "Add the pages in order: page 1 first. A blurred page is flagged so you can take it again."
+        : bad.length ? `Page${bad.length > 1 ? "s" : ""} ${bad.join(", ")} look${bad.length > 1 ? "" : "s"} blurred. Replace ${bad.length > 1 ? "them" : "it"} (↻) for the best text.`
+        : `${pages.length} page${pages.length > 1 ? "s" : ""} in order. Convert when ready.`;
+    };
+    list.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-do]"); if (!b || busy) return;
+      const k = pages.findIndex((p) => p.id === b.closest(".page").dataset.id);
+      if (b.dataset.do === "left" && k > 0) [pages[k - 1], pages[k]] = [pages[k], pages[k - 1]];
+      if (b.dataset.do === "right" && k < pages.length - 1) [pages[k + 1], pages[k]] = [pages[k], pages[k + 1]];
+      if (b.dataset.do === "delete") pages.splice(k, 1);
+      if (b.dataset.do === "replace") { replacing = pages[k].id; rep.click(); return; }
+      paint();
+    });
+    panel.querySelector('[data-act="add-pages"]').addEventListener("click", () => add.click());
+    add.addEventListener("change", async () => {
+      const files = [...(add.files || [])].sort(byName); add.value = "";
+      status.textContent = "Reading the pages…";
       try {
-        const photo = await shrinkPhoto(f);
-        const d = await call("POST", "/ai/transcribe", { image: photo.data, media_type: photo.type });
-        ta.value = ta.value.trim() ? ta.value.trimEnd() + "\n\n" + d.text : d.text;
-        ta.dispatchEvent(new Event("input")); ta.focus();
-        toast(d.truncated ? "Done, but the page was long: check the end." : "Done. Check it, edit, then post.");
-      } catch (err) { toast(PHOTO_ERR[err.message] || ERR[err.message] || "Photo → text didn't work. Please try again."); }
-      finally { btn.disabled = false; btn.textContent = label; }
+        for (const f of files) {
+          const room = AI_ROOM - pages.length; if (room <= 0) { toast("At most 12 pages."); break; }
+          if (f.type === "application/pdf" || /\.pdf$/i.test(f.name)) pages.push(...(await pdfPages(f, room)));
+          else if (f.type.startsWith("image/")) pages.push(await imagePage(f));
+        }
+      } catch (err) { toast("Couldn't read that file."); }
+      paint();
+    });
+    rep.addEventListener("change", async () => {
+      const f = rep.files && rep.files[0]; rep.value = "";
+      const k = pages.findIndex((p) => p.id === replacing); replacing = null;
+      if (!f || k < 0) return;
+      try { pages[k] = await imagePage(f); } catch (err) { toast("Couldn't read that photo."); }
+      paint();
+    });
+    convert.addEventListener("click", async () => {
+      if (!pages.length || busy) return;
+      busy = true; convert.disabled = true; convert.textContent = "Reading your handwriting…";
+      status.textContent = `Claude is checking ${pages.length} page${pages.length > 1 ? "s" : ""} and writing them out…`;
+      try {
+        const d = await call("POST", "/ai/transcribe", { images: pages.map((p) => ({ data: p.data, media_type: p.type })) });
+        d.pages.forEach((r) => { if (pages[r.page - 1]) pages[r.page - 1].ai = r.readable ? "" : (r.problem || "can't read it"); });
+        if (!d.readable) { busy = false; paint(); toast("Some pages are blurred: replace them and convert again."); return; }
+        if (ta.value.trim() && ta.value.trim() !== d.text && !confirm("Replace the text in the box with this conversion?")) { busy = false; paint(); return; }
+        ta.value = d.text; ta.dispatchEvent(new Event("input"));
+        pages.forEach((p) => { p.sharp = Math.max(p.sharp, BLURRY); }); // Claude read them all
+        busy = false; paint(); setMode("text"); toast("Done. Check it, edit, then post.");
+      } catch (err) { busy = false; paint(); toast(PHOTO_ERR[err.message] || ERR[err.message] || "Converting didn't work. Please try again."); }
+      finally { convert.textContent = "Convert to text"; convert.disabled = !pages.length; }
+    });
+    paint();
+    // DEMO (2026-11-13, for the judges; to be removed when Srijit asks): grade what is in the box, live
+    const gbtn = solveBox.querySelector('[data-act="grade"]'), gbox = solveBox.querySelector(".grade-live");
+    if (!gbtn || !gbox) return;
+    const statement = () => {
+      const st = document.querySelector("article.statement"); if (!st) return "";
+      const c = st.cloneNode(true), tex = (k) => { const a = k.querySelector('annotation[encoding="application/x-tex"]'); return a ? a.textContent : k.textContent; };
+      c.querySelectorAll(".katex-display").forEach((k) => k.replaceWith(" $$" + tex(k) + "$$ "));
+      c.querySelectorAll(".katex").forEach((k) => k.replaceWith("$" + tex(k) + "$"));
+      return c.textContent.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+    };
+    gbtn.addEventListener("click", async () => {
+      if (!ta.value.trim()) return toast("Write or convert a solution first.");
+      gbtn.disabled = true; gbtn.textContent = "Grading…";
+      gbox.hidden = false; gbox.innerHTML = `<div class="kicker">Live grade · Claude, in Srijit's persona</div><div class="md body"><p class="typing">Reading the solution…</p></div>`;
+      const body = gbox.querySelector(".body");
+      let text = "", t = null;
+      const show = () => { body.innerHTML = md(text) || '<p class="typing">Reading the solution…</p>'; math(body); };
+      try {
+        const r = await fetch(API + "/ai/grade", { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + token },
+          body: JSON.stringify({ problem: solveBox.dataset.solve, statement: statement(), solution: ta.value }) });
+        if (!r.body) { text = await r.text(); show(); return; }
+        const reader = r.body.getReader(), dec = new TextDecoder();
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          text += dec.decode(value, { stream: true });
+          if (!t) t = setTimeout(() => { t = null; show(); }, 120); // repaint a few times a second as it is written
+        }
+        clearTimeout(t); show();
+      } catch (err) { body.innerHTML = '<p class="muted">Grading didn\'t work. Please try again.</p>'; }
+      finally { gbtn.disabled = false; gbtn.textContent = "Grade (demo)"; }
     });
   }
+  const AI_ROOM = 12;
   function refreshSolve() { // once the thread is loaded: if I've posted my solution, the box edits it
     if (!solveBox || !solveBox.querySelector("form.write") || solveBox.querySelector("form.owner")) return;
     mySolution = (loaded ? posts.find((p) => p.mine && p.kind === "solution") : mineFromPage) || null;

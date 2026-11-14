@@ -459,24 +459,23 @@
   }
   function solveShell() {
     const key = "solve_draft_" + solveBox.dataset.solve;
+    // Text | Image switch (back 2026-11-14, Srijit: "keep the text option on first so that people use less image
+    // option"). Text is always the starting mode: type the solution, or paste what your own AI read from your photo.
     solveBox.innerHTML = `<h2>Your solution</h2>
-      ${"" /* hidden 2026-11-13 (Srijit: "only image upload -> text, which one can edit"); kept here to bring back:
-      <p class="hint">Solve it by hand first. Then choose <b>Image</b> to turn photos of your pages into text here, or
-        give the photo to your own AI with this prompt <button type="button" class="copy" data-act="copy-prompt">Copy prompt</button>
-        and paste its answer under <b>Text</b>.</p> */}
-      <div class="owner-ai">${"" /* the Image | Text switch, hidden 2026-11-13 (only image -> text; the text box appears below
-        once there is text to edit); kept here to bring back:
-        <div class="seg" data-modes><button type="button" data-mode="image">Image</button><button type="button" data-mode="text" class="on">Text</button></div> */}
-        <span class="muted">${me && me.owner ? "Add photos or a PDF of your handwritten pages; Claude turns them into text you can edit."
+      <div class="owner-ai"><div class="seg" data-modes><button type="button" data-mode="text" class="on">Text</button><button type="button" data-mode="image">Image</button></div>
+        <span class="muted" data-tip="text">Solve it by hand first, then type it here.</span>
+        <span class="muted" data-tip="image" hidden>${me && me.owner ? "Add photos or a PDF of your handwritten pages; Claude turns them into text you can edit."
           : "Add photos or a PDF of your handwritten pages; Claude turns them into text you can edit (up to 20 pages a day)."}</span></div>
-        <div class="pages-panel"><div class="pages"></div>
+      <p class="hint" data-tip="text">Have a photo of your page? Give it to your own AI app with this prompt
+        <button type="button" class="copy" data-act="copy-prompt">Copy prompt</button> and paste its answer below.</p>
+        <div class="pages-panel" hidden><div class="pages"></div>
           <div class="row"><button type="button" class="btn small ghost" data-act="add-pages">+ Add pages (photos or a PDF)</button>
             <button type="button" class="btn small accent" data-act="convert" disabled>Convert to text</button>
             <input type="file" accept="image/*,application/pdf" multiple hidden data-pick="add"><input type="file" accept="image/*" hidden data-pick="replace"></div>
           <p class="muted ai-status">Add the pages in order: page 1 first. A blurred page is flagged so you can take it again.</p></div>
       <p class="mine-note" hidden></p>
       <form class="write">
-        <textarea maxlength="8000" rows="8" placeholder="Paste what your AI gave back here. You can also type: Markdown works, and maths between $ signs, e.g. $\\frac{1}{n}$."></textarea>
+        <textarea maxlength="8000" rows="8" placeholder="Type your solution: Markdown works, and maths goes between $ signs, e.g. $\\frac{1}{n}$. Or paste what your AI gave back."></textarea>
         <div class="preview md"></div>
         <div class="row"><span class="muted">One solution per problem. You can edit it any time.</span>
           ${me && me.owner ? `<button type="button" class="btn small" data-act="grade">Grade (demo)</button>` : ""}
@@ -562,13 +561,19 @@
     const form = solveBox.querySelector("form.write"), list = panel.querySelector(".pages"), status = panel.querySelector(".ai-status");
     const add = panel.querySelector('[data-pick="add"]'), rep = panel.querySelector('[data-pick="replace"]'), convert = panel.querySelector('[data-act="convert"]');
     let pages = [], replacing = null, busy = false;
-    // only image -> text (2026-11-13): the pages are always shown, and the text box below them appears once there is
-    // text to edit (a conversion, a saved draft, or the solution already posted). The old Image | Text switch is the
-    // commented-out markup above; setMode("text") now just reveals the text box.
-    const showText = () => { if (ta.value.trim()) form.hidden = false; };
-    const setMode = (m) => { if (m === "text") { form.hidden = false; form.scrollIntoView({ behavior: "smooth", block: "start" }); ta.focus(); } };
-    form.hidden = !ta.value.trim();
-    ta.addEventListener("input", showText);
+    // Text | Image (2026-11-14). Text (the start): the text box, plus the "your own AI" prompt. Image: the pages, and the
+    // text box below them once there is text to edit (a conversion, a saved draft, or the solution already posted).
+    // Pages added in Image stay in memory when switching back and forth.
+    const setMode = (m) => {
+      solveBox.querySelectorAll("[data-mode]").forEach((b) => b.classList.toggle("on", b.dataset.mode === m));
+      solveBox.querySelectorAll("[data-tip]").forEach((el) => { el.hidden = el.dataset.tip !== m; });
+      panel.hidden = m !== "image";
+      form.hidden = m === "image" && !ta.value.trim();
+    };
+    const reveal = () => { form.hidden = false; form.scrollIntoView({ behavior: "smooth", block: "start" }); ta.focus(); }; // after a conversion
+    solveBox.querySelector("[data-modes]").addEventListener("click", (e) => { const b = e.target.closest("[data-mode]"); if (b && !busy) setMode(b.dataset.mode); });
+    ta.addEventListener("input", () => { if (ta.value.trim()) form.hidden = false; });
+    setMode("text");
     const paint = () => {
       list.innerHTML = pages.map((p, k) => {
         const bad = p.ai || p.sharp < BLURRY;
@@ -623,7 +628,7 @@
         if (ta.value.trim() && ta.value.trim() !== d.text && !confirm("Replace the text in the box with this conversion?")) { busy = false; paint(); return; }
         ta.value = d.text; ta.dispatchEvent(new Event("input"));
         pages.forEach((p) => { p.sharp = Math.max(p.sharp, BLURRY); }); // Claude read them all
-        busy = false; paint(); setMode("text"); toast("Done. Check it, edit, then post.");
+        busy = false; paint(); reveal(); toast("Done. Check it, edit, then post.");
       } catch (err) { busy = false; paint(); toast(PHOTO_ERR[err.message] || ERR[err.message] || "Converting didn't work. Please try again."); }
       finally { convert.textContent = "Convert to text"; convert.disabled = !pages.length; }
     });

@@ -118,7 +118,11 @@
   const linkedin = (a) => (a.linkedin && /^https:\/\/([a-z]{2,3}\.)?linkedin\.com\/in\//.test(a.linkedin)
     ? `<a class="li" href="${esc(a.linkedin)}" target="_blank" rel="noopener nofollow" title="${esc(nm(a.name))} on LinkedIn" aria-label="${esc(nm(a.name))} on LinkedIn">${LI_SVG}</a>` : "");
   const short = (s, n = 16) => (s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s); // leaderboard: one line per person (2026-11-08)
-  const person = (a) => `<a class="who" href="/dashboard/#${a.id}">${esc(nm(a.name))}</a>${linkedin(a)}${a.owner ? "" : lvl(a.level)}`;
+  // Profile pictures: only the MahaKali profile (user 3) has one (Srijit, 2026-11-14), on that profile and beside the
+  // name on that account's solutions and replies. A 13 KB file in the site repo, fetched only where it shows.
+  const AVATAR = { 3: "/assets/img/kali/mahakali-avatar.webp" };
+  const pic = (a) => (AVATAR[a.id] ? `<img class="who-pic" src="${AVATAR[a.id]}" alt="" width="24" height="24" loading="lazy" decoding="async">` : "");
+  const person = (a) => `${pic(a)}<a class="who" href="/dashboard/#${a.id}">${esc(nm(a.name))}</a>${linkedin(a)}${a.owner ? "" : lvl(a.level)}`;
 
   // -- the discussion on a problem page ------------------------------------------------------------------
   let sort = "top", posts = [];
@@ -809,15 +813,12 @@
         keptProfiles.set(String(d.person.id), d);
       } catch (err) { first = false; if (!drawn) profileBox.innerHTML = `<p class="soon">Couldn't find that profile.</p>`; } // keep the last one
     };
-    // Profile pictures: only the MahaKali profile (user 3) has one (Srijit, 2026-11-14). A 13 KB file in the site repo,
-    // fetched only when that profile is opened; nobody else's profile changes.
-    const AVATAR = { 3: "/assets/img/kali/mahakali-avatar.webp" };
     function paint(d) {
       const p = d.person, l = d.level, next = l.next;
       const pct = next ? Math.round(100 * (d.karma - (LEVEL_FLOOR[l.n - 1] || 0)) / (next - (LEVEL_FLOOR[l.n - 1] || 0))) : 100;
       document.title = nm(p.name) + " · Mathematics for Machine Learning";
-      const pic = AVATAR[p.id];
-      profileBox.innerHTML = `<header class="who-head">${pic ? `<img class="avatar" src="${pic}" alt="" width="72" height="72" decoding="async">` : ""}<h1>${esc(nm(p.name))}</h1>${linkedin(p).replace('class="li"', 'class="li big"')}
+      const face = AVATAR[p.id];
+      profileBox.innerHTML = `<header class="who-head">${face ? `<img class="avatar" src="${face}" alt="" width="72" height="72" decoding="async">` : ""}<h1>${esc(nm(p.name))}</h1>${linkedin(p).replace('class="li"', 'class="li big"')}
           ${p.owner ? "" : `<span class="lvl big">Level ${l.n} · ${esc(l.name)}</span>`}
           <p class="muted">Joined ${day(p.joined)}${p.mine ? ` · this is you · <button type="button" class="linkish" data-rename>change name</button>` : ""}</p>
           ${p.mine ? `<form class="li-form"><label>Your LinkedIn <input type="url" inputmode="url" placeholder="https://www.linkedin.com/in/your-name/" value="${esc(p.linkedin || "")}"></label>

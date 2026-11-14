@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>srijitmath — Shark Tank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   Keys: → / Space / PageDown = next · ← / PageUp = back · N = speaker notes
+         R = replay this slide · F = fullscreen · V = play/close a demo video
+         Home / End = first / last.  Click right half = next, left half = back.
+   Fill in the [ ] numbers in CONFIG (in the <script> at the bottom).
+   Photos and videos go in media/ (see README.md).
+   The previous version of the deck is index-v1.html.
+   ===================================================================== */
+:root{
+  --ink:#111; --ink2:#444; --muted:#8a8a8a; --faint:#e6e6e6; --faint2:#f4f4f4;
+  --accent:#e8590c; --bg:#fff; --good:#2b8a3e; --bad:#c92a2a;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  --hand:"Caveat","Bradley Hand","Segoe Print","Comic Sans MS",cursive;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);overflow:hidden;font-family:var(--sans);-webkit-font-smoothing:antialiased}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:center center;background:var(--bg)}
+.slide{position:absolute;inset:0;opacity:0;visibility:hidden}
+.slide.active{opacity:1;visibility:visible;transition:opacity .45s ease}
+svg{overflow:visible}
+text{font-family:var(--sans)}
+
+/* ---------- shared type ---------- */
+.caption{position:absolute;left:80px;right:80px;bottom:96px;text-align:center;font-size:50px;font-weight:600;letter-spacing:-.025em;line-height:1.15}
+.sub{position:absolute;left:80px;right:80px;bottom:52px;text-align:center;font-size:24px;color:var(--muted);letter-spacing:-.005em}
+.accent{color:var(--accent)}
+.hand{font-family:var(--hand);font-weight:700}
+.ph{color:var(--accent);border-bottom:3px dashed var(--accent);padding:0 .15em}
+.tag{display:inline-block;font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:999px}
+.tag.built{background:#111;color:#fff}
+.tag.next{border:1.5px solid var(--accent);color:var(--accent)}
+.corner{position:absolute;top:44px;right:56px}
+
+/* ---------- animation primitives (run only while the slide is active) ---------- */
+.fade{opacity:0}
+.active .fade{animation:fadeUp .8s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:var(--d,0s)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.pop{opacity:0;transform-box:fill-box;transform-origin:center}
+.active .pop{animation:pop .55s cubic-bezier(.2,1.4,.4,1) forwards;animation-delay:var(--d,0s)}
+@keyframes pop{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+.draw{stroke-dasharray:1;stroke-dashoffset:1}
+.active .draw{animation:draw var(--t,1.6s) ease-in-out forwards;animation-delay:var(--d,0s)}
+@keyframes draw{to{stroke-dashoffset:0}}
+.write{clip-path:inset(-20% 100% -20% 0)}
+.active .write{animation:write var(--t,1.3s) steps(28) forwards;animation-delay:var(--d,0s)}
+@keyframes write{to{clip-path:inset(-20% -2% -20% 0)}}
+.litB{fill:var(--accent);opacity:0}
+.active .litB{animation:litB .35s ease forwards;animation-delay:var(--d)}
+@keyframes litB{to{opacity:1}}
+
+/* ---------- 1 intro ---------- */
+.s-intro .hello{position:absolute;left:0;right:0;top:150px;text-align:center;font-family:var(--hand);font-weight:700;font-size:70px}
+.s-intro .name{position:absolute;left:0;right:0;top:240px;text-align:center;font-size:110px;font-weight:800;letter-spacing:-.045em}
+.s-intro .role{position:absolute;left:0;right:0;top:390px;text-align:center;font-size:36px;color:var(--ink2);letter-spacing:-.01em}
+.s-intro .teacher{position:absolute;left:0;right:0;top:480px;text-align:center}
+.s-intro .teacher span{display:inline-block;font-family:var(--hand);font-weight:700;font-size:96px;color:var(--accent)}
+
+/* ---------- 2 teaching photos ---------- */
+.photo{position:absolute;top:110px;width:320px;height:250px;border-radius:14px;overflow:hidden;background:var(--faint2);border:1.5px solid var(--faint)}
+.photo .fb{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#9a9a9a;font-size:15px}
+.photo .fb b{font-family:var(--hand);font-size:34px;color:#777}
+.photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.plabel{position:absolute;top:376px;width:320px;text-align:center;font-size:24px;font-weight:600}
+.big11{position:absolute;left:0;right:0;top:470px;text-align:center;font-size:150px;font-weight:800;letter-spacing:-.05em;line-height:1}
+.big11 small{font-size:44px;font-weight:600;letter-spacing:-.02em;margin-left:14px}
+
+/* ---------- 4 ML engineers ---------- */
+.mlnum{position:absolute;left:110px;top:330px;width:620px}
+.mlhead{position:absolute;left:0;right:0;top:110px;text-align:center;font-size:80px;font-weight:800;letter-spacing:-.04em;transition:opacity .4s}
+.s-ml.st2 .mlhead{opacity:0!important}
+.cm{position:absolute;left:150px;top:290px;width:1300px;border-radius:14px;border:1px solid #eee;box-shadow:0 10px 40px rgba(0,0,0,.08);transition:left .8s cubic-bezier(.5,0,.3,1),top .8s cubic-bezier(.5,0,.3,1),width .8s cubic-bezier(.5,0,.3,1)}
+.s-ml.st2 .cm{left:420px;top:34px;width:760px}
+.stage2{opacity:0;transition:opacity .5s .35s}
+.s-ml.st2 .stage2{opacity:1}
+.pop2{opacity:0;transform-box:fill-box;transform-origin:center}
+.st2 .pop2{animation:pop .55s cubic-bezier(.2,1.4,.4,1) forwards;animation-delay:var(--d,0s)}
+.fade2{opacity:0}
+.st2 .fade2{animation:fadeUp .8s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:var(--d,0s)}
+.mlnum .n{font-size:170px;font-weight:800;letter-spacing:-.06em;line-height:1}
+.mlnum .l{font-size:32px;color:var(--ink2);margin-top:10px}
+.mlnum .y{font-size:26px;color:var(--muted);margin-top:6px}
+
+/* ---------- 7 phone ---------- */
+.phone{position:absolute;left:250px;top:46px;width:390px;height:760px;border:3px solid var(--ink);border-radius:52px;padding:58px 26px 26px;background:#fff}
+.phone::before{content:"";position:absolute;left:50%;top:18px;width:110px;height:24px;margin-left:-55px;border-radius:14px;background:var(--ink)}
+.phone .pt{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.phone .pq{font-size:22px;font-weight:600;margin:6px 0 16px;line-height:1.3}
+.shot{position:relative;height:250px;border:2px dashed #cfcfcf;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#b0b0b0;font-size:18px}
+.shot .paper{position:absolute;inset:0;background:repeating-linear-gradient(#fff 0 47px,#eef1f6 47px 49px);padding:14px 18px;opacity:0;transition:filter .6s ease,opacity .2s}
+.shot .paper div{font-family:var(--hand);font-weight:700;font-size:31px;line-height:49px;white-space:nowrap}
+.shot .flash{position:absolute;inset:0;background:#fff;opacity:0}
+.s7-blur .shot .paper,.s7-clear .shot .paper{opacity:1}
+.s7-blur .shot .paper{filter:blur(6px)}
+.s7-flash .shot .flash{animation:flash .5s ease}
+@keyframes flash{0%{opacity:1}100%{opacity:0}}
+.flag{height:40px;margin-top:10px;font-size:20px;font-weight:600;display:flex;align-items:center;gap:8px;opacity:0;transition:opacity .3s}
+.s7-blur .flag.bad{opacity:1;color:var(--bad)}
+.s7-clear .flag.good{opacity:1;color:var(--good)}
+.flags{position:relative;height:40px}.flags .flag{position:absolute;left:0;right:0;top:0;margin:0}
+.typed{margin-top:12px;min-height:150px;font-size:24px;line-height:1.55}
+.typed div{opacity:0;transform:translateY(6px);transition:opacity .4s,transform .4s}
+.s7-text .typed div{opacity:1;transform:none}
+.typed div:nth-child(2){transition-delay:.5s}.typed div:nth-child(3){transition-delay:1s}
+.typed .edit{border-bottom:2px solid var(--accent)}
+.pbtn{margin-top:8px;height:58px;border-radius:16px;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;transition:background .3s,color .3s,border-color .3s}
+.s7-done .pbtn{background:var(--accent);border-color:var(--accent);color:#fff}
+.steps{position:absolute;left:780px;top:210px;width:720px}
+.steps .stp{display:flex;align-items:center;gap:24px;margin-bottom:44px;color:#bdbdbd;transition:color .35s}
+.steps .stp b{font-size:26px;width:44px;height:44px;border-radius:50%;border:2.5px solid currentColor;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.steps .stp span{font-size:44px;font-weight:600;letter-spacing:-.02em}
+.steps .stp em{display:block;font-style:normal;font-size:22px;font-weight:400;margin-top:4px}
+.steps .stp.on{color:var(--ink)}
+.steps .stp.on b{color:var(--accent)}
+
+/* ---------- 8 persona ---------- */
+.src{position:absolute;left:70px;width:380px;border:2px solid var(--ink);border-radius:14px;padding:18px 22px;font-size:24px;font-weight:600;line-height:1.25;background:#fff}
+.src small{display:block;font-size:16px;font-weight:400;color:var(--muted);margin-top:4px}
+.chat{position:absolute;left:880px;top:120px;width:650px}
+.msg{border:2px solid var(--ink);border-radius:22px 22px 22px 4px;padding:16px 22px;font-size:25px;line-height:1.35;margin-bottom:18px;max-width:560px;background:#fff}
+.msg small{display:block;font-size:14px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.msg.me{border-color:var(--accent)}
+.msg.stu{margin-left:auto;border-radius:22px 22px 4px 22px;background:var(--faint2);border-color:var(--faint2)}
+.msg .gr{font-size:40px;font-weight:800;color:var(--accent);letter-spacing:-.03em}
+
+/* ---------- 9 student graph ---------- */
+.kg-t{fill:none;stroke:#cfcfcf;stroke-width:2}
+.kg-f{fill:var(--accent);fill-opacity:0;transition:fill-opacity .45s}
+.kg-e{stroke:#ececec;stroke-width:2;fill:none;transition:stroke .45s}
+.kg-e.lit{stroke:#f2b48f}
+.chips{position:absolute;left:110px;top:110px;display:flex;gap:12px}
+.chips span{border:1.5px solid var(--ink);border-radius:999px;padding:6px 16px;font-size:20px;font-weight:500}
+.wk{position:absolute;right:110px;top:100px;text-align:right}
+.wk .w{font-size:24px;color:var(--muted)}
+.wk .p{font-size:56px;font-weight:800;color:var(--accent);letter-spacing:-.03em;line-height:1.1}
+
+/* ---------- 10 adaptive ---------- */
+.ad-n{fill:#fff;stroke:var(--ink);stroke-width:3}
+.ad-e{stroke:#cfcfcf;stroke-width:3;fill:none}
+.ad-l{font-size:24px;font-weight:600;text-anchor:middle}
+.ad-s{font-size:19px;fill:var(--muted);text-anchor:middle}
+#adMarker{transition:transform .9s cubic-bezier(.5,0,.3,1)}
+.adcard{position:absolute;left:0;right:0;top:118px;text-align:center;font-size:40px;font-weight:600;letter-spacing:-.02em;transition:opacity .25s}
+.adcard .k{color:var(--accent)}
+.adarrow{opacity:0;transition:opacity .3s}
+.adarrow.on{opacity:1}
+
+/* ---------- traction ---------- */
+.nums{position:absolute;left:0;right:0;top:250px;display:flex;justify-content:center;gap:110px;text-align:center}
+.nums .n{font-size:132px;font-weight:800;letter-spacing:-.05em;line-height:1}
+.nums .l{font-size:28px;color:var(--muted);margin-top:16px}
+
+/* ---------- receipt ---------- */
+.receipt{position:absolute;left:50%;top:90px;transform:translateX(-50%);width:1040px;padding:40px 60px 44px;border:2px dashed var(--ink);border-radius:6px;font-family:var(--mono);font-size:30px;line-height:1.9}
+.receipt .h{font-family:var(--sans);font-size:18px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;text-align:center}
+.receipt .row{display:flex;justify-content:space-between}
+.receipt .rule{border-top:2px solid var(--ink);margin:14px 0}
+.receipt .tot{font-weight:700;color:var(--accent);font-size:38px}
+
+/* ---------- engine ---------- */
+.card{position:absolute;top:470px;width:360px;border:2px solid var(--ink);border-radius:16px;padding:24px 26px;background:#fff}
+.card h3{margin:0 0 8px;font-size:34px;letter-spacing:-.02em}
+.card p{margin:0;font-size:20px;line-height:1.4;color:var(--ink2)}
+.card .price{margin-top:12px;font-size:24px;font-weight:700;color:var(--accent)}
+.chip{position:absolute;right:-18px;top:-20px;background:var(--ink);color:#fff;font-size:17px;font-weight:600;padding:8px 14px;border-radius:999px;transform:rotate(4deg)}
+.active .chip{animation:click .5s cubic-bezier(.2,1.6,.4,1) both;animation-delay:2.9s}
+@keyframes click{from{opacity:0;transform:translateY(-40px) rotate(4deg) scale(1.3)}to{opacity:1;transform:rotate(4deg)}}
+
+/* ---------- ask ---------- */
+.ask{position:absolute;left:0;right:0;top:90px;text-align:center;font-size:170px;font-weight:800;letter-spacing:-.05em;line-height:1}
+.askbar{position:absolute;left:200px;top:360px;width:1200px;height:92px;display:flex;gap:6px}
+.askbar .seg{height:100%;border-radius:8px;transform-origin:left;transform:scaleX(0)}
+.active .askbar .seg{animation:grow .7s cubic-bezier(.3,.8,.3,1) forwards;animation-delay:var(--d)}
+@keyframes grow{to{transform:scaleX(1)}}
+.barlab{position:absolute;left:200px;top:470px;width:1200px;display:flex;gap:6px}
+.barlab div{font-size:21px;line-height:1.35;color:var(--ink2);padding-right:14px}
+.barlab b{display:block;font-size:30px;color:var(--ink);letter-spacing:-.02em}
+
+/* ---------- close ---------- */
+.close-l{position:absolute;left:0;right:0;top:170px;text-align:center;font-size:76px;font-weight:700;letter-spacing:-.035em;line-height:1.15}
+.qr{position:absolute;left:50%;top:470px;width:220px;height:220px;margin-left:-110px}
+.qr svg{width:100%;height:100%}
+.close-url{position:absolute;left:0;right:0;top:712px;text-align:center;font-size:32px;font-weight:600}
+
+/* ---------- chrome: progress, counter, notes, video ---------- */
+#fs{position:fixed;left:14px;bottom:14px;z-index:6;width:40px;height:40px;border-radius:10px;border:1px solid #e2e2e2;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.55;transition:opacity .2s}
+#fs:hover{opacity:1}
+body.isfs #fs{display:none}
+#progress{position:fixed;left:0;bottom:0;height:4px;background:var(--accent);transition:width .4s ease;z-index:5}
+#counter{position:fixed;right:18px;bottom:12px;font-size:13px;color:#b5b5b5;font-variant-numeric:tabular-nums;z-index:5}
+#notes{position:fixed;left:0;right:0;bottom:0;max-height:42vh;overflow:auto;background:rgba(17,17,17,.94);color:#fff;padding:18px 28px 26px;font-size:22px;line-height:1.45;z-index:10;display:none}
+#notes.on{display:block}
+#notes .meta{font-size:14px;color:#aaa;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:flex;gap:24px}
+#notes .meta b{color:var(--accent)}
+#video{position:absolute;inset:0;background:#fff;display:none;align-items:center;justify-content:center;z-index:4}
+#video.on{display:flex}
+#video video{max-width:1500px;max-height:840px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.12)}
+.vhint{position:absolute;right:56px;bottom:30px;font-size:15px;color:var(--muted);display:none}
+.has-video .vhint{display:block}
+</style>
+</head>
+<body>
+<div id="stage">
+
+<!-- ============ 1 · HELLO ============ -->
+<section class="slide s-intro" data-id="intro" data-time="0:10"
+  data-say="→ Hello, sharks.  I'm Srijit, an AI PhD student in Electrical Engineering, right here at Penn State. (pause)">
+  <div class="name fade" style="--d:.1s">Srijit Mukherjee</div>
+  <div class="role fade" style="--d:.6s">AI PhD student · Electrical Engineering · Penn State</div>
+  <div class="teacher"><span class="write" style="--d:1.4s;--t:1s">and a teacher.</span></div>
+</section>
+
+<!-- ============ 2 · A TEACHER ============ -->
+<section class="slide" data-id="teach" data-time="0:25"
+  data-say="→ But more importantly, I'm a teacher.  For eleven years, I've taught mathematics to students of every age and every background. And I've learned one thing: understanding happens at the tip of a pen.">
+  <div class="photo fade" style="left:215px;top:70px;width:330px;height:440px;--d:.1s"><img src="media/teach-1.jpg" alt=""></div>
+  <div class="photo fade" style="left:575px;top:70px;width:450px;height:440px;--d:.4s"><img src="media/teach-2.jpg" alt=""></div>
+  <div class="photo fade" style="left:1055px;top:70px;width:330px;height:440px;--d:.7s"><img src="media/teach-3.jpg" alt=""></div>
+  <div class="caption fade" style="--d:1.3s;bottom:170px;font-size:58px"><span class="accent">11 years</span> of teaching mathematics</div>
+</section>
+
+<!-- ============ 3 · PRODUCTIVITY UP, THINKING DOWN ============ -->
+<section class="slide" data-id="thinking" data-time="0:30"
+  data-say="→ I've spent eleven years teaching students how to think. Then AI made me forget how to. (pause)  From 2023 to 2025, my productivity skyrocketed, and my thinking quietly collapsed. I didn't notice it happening. That's the dangerous part. An MIT study saw the same thing: people who wrote with ChatGPT showed the weakest brain connectivity, and struggled to quote what they had just written.">
+  <svg viewBox="0 0 1600 900" width="1600" height="900" style="position:absolute;inset:0">
+    <line x1="260" y1="640" x2="1300" y2="640" stroke="#111" stroke-width="2"/>
+    <text x="260" y="684" font-size="24" fill="#8a8a8a" text-anchor="middle">2023</text>
+    <text x="780" y="684" font-size="24" fill="#8a8a8a" text-anchor="middle">2024</text>
+    <text x="1300" y="684" font-size="24" fill="#8a8a8a" text-anchor="middle">2025</text>
+    <path class="draw" pathLength="1" style="--d:.5s;--t:2.4s" d="M260,420 C560,410 900,300 1300,130" stroke="#111" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <path class="draw" pathLength="1" style="--d:.5s;--t:2.4s" d="M260,420 C560,430 900,520 1300,600" stroke="#e8590c" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <g class="fade" style="--d:2.7s"><text x="1330" y="140" font-size="40" font-weight="700" fill="#111">productivity</text></g>
+    <g class="fade" style="--d:2.9s"><text x="1330" y="610" font-size="40" font-weight="700" fill="#e8590c">thinking</text></g>
+    <g class="fade" style="--d:.1s"><text x="260" y="110" font-size="26" fill="#8a8a8a">me, using AI every day</text></g>
+  </svg>
+  <div class="sub fade" style="--d:3.6s;bottom:120px;font-size:26px">MIT, 2025: ChatGPT users → <b style="color:#111">weakest brain connectivity</b></div>
+</section>
+
+<!-- ============ 4 · I AM NOT ALONE (2 steps: comment, then numbers) ============ -->
+<section class="slide s-ml" data-id="ml" data-steps="2" data-time="0:25"
+  data-say="→ And I'm not alone.  Read this. An AI engineer wrote it under my video: &quot;I have stopped using my brain and I am not becoming better. I want to solve maths.&quot; (pause)  [press →]  And there are millions like this engineer. 1.6 million machine learning engineers today. A projected 5 million by 2030. Every one of them uses AI every day. Every one of them needs maths every day.">
+  <div class="mlhead fade" style="--d:.1s">I am not alone.</div>
+  <img class="cm fade" style="--d:.6s" src="media/iamnotalone.png" alt="A YouTube comment from an AI engineer">
+  <div class="stage2">
+    <div class="mlnum">
+      <div class="n" id="mlN">1.6M</div>
+      <div class="l">machine learning engineers</div>
+      <div class="y" id="mlY">today</div>
+    </div>
+    <svg id="mlSvg" viewBox="0 0 1600 900" width="1600" height="900" style="position:absolute;inset:0"></svg>
+    <div class="fade2" style="--d:.4s;position:absolute;left:853px;width:542px;top:256px;text-align:center;font-size:20px;color:#8a8a8a">1 dot = 10,000 engineers</div>
+    <div class="caption fade2" style="--d:4.8s;bottom:56px;font-size:42px">They use AI every day. They need maths every day.</div>
+  </div>
+</section>
+
+<!-- ============ 5 · WHY I BUILT SRIJITMATH.COM ============ -->
+<section class="slide" data-id="built" data-time="0:30"
+  data-say="→ So I built something, first for myself.  srijitmath.com. One problem a day. By hand. Now, you're already asking the right question: how can one teacher reach thousands of students? (pause) Because AI does the busywork, and the teacher stays in the loop.">
+  <div class="fade" style="--d:.1s;position:absolute;left:110px;top:96px;font-size:30px;line-height:1.6">
+    <div><b>2025</b> <span style="color:#8a8a8a">· built for me</span></div>
+    <div class="fade" style="--d:.6s"><b class="accent">2026</b> <span style="color:#8a8a8a">· open to the world</span></div>
+  </div>
+  <svg id="builtSvg" viewBox="0 0 1600 900" width="1600" height="900" style="position:absolute;inset:0"></svg>
+  <div class="caption fade" style="--d:5s;bottom:100px"><span class="accent">AI</span> removes the bottleneck.</div>
+</section>
+
+<!-- ============ 6 · DUMP → REAL KNOWLEDGE GRAPH ============ -->
+<section class="slide" data-id="kg" data-time="0:35"
+  data-say="→ It starts with a map.  I poured in everything I've taught: problems, solutions, notes. AI turned it into a knowledge graph. 35 topics. 1,883 problems. Every idea connected to the next. This is the north star, and every student walks it.">
+  <canvas id="kgCanvas" width="3200" height="1440" style="position:absolute;left:0;top:0;width:1600px;height:720px"></canvas>
+  <div class="fade" style="--d:.2s;position:absolute;left:0;top:628px;width:360px;text-align:center;font-size:19px;color:#8a8a8a;white-space:nowrap">problems · solutions · notes</div>
+  <div class="caption fade" style="--d:5s;bottom:100px">One knowledge graph.</div>
+  <div class="sub fade" style="--d:5.4s;bottom:58px">35 topics · 1,883 problems</div>
+</section>
+
+<!-- ============ 7 · SOLVE, SNAP, SUBMIT ============ -->
+<section class="slide" data-id="snap" data-time="0:30" data-video="media/demo-photo.mp4"
+  data-say="→ One problem at a time. By hand.  Watch. The student solves on paper and snaps a photo. Blurry? It says retake. Clear? AI reads the handwriting in seconds, the student checks it, and submits. The pen does the thinking. AI does the typing.">
+  <div class="phone fade" style="--d:.1s">
+    <div class="pt">problem 14 · random variables</div>
+    <div class="pq">X ~ Exp(λ). Find P(X &gt; 2).</div>
+    <div class="shot">tap to take a photo<div class="paper"><div>P(X &gt; 2) = ∫<sub>2</sub><sup>∞</sup> λe<sup>−λx</sup> dx</div><div>= [−e<sup>−λx</sup>]<sub>2</sub><sup>∞</sup></div><div>= e<sup>−2λ</sup></div></div><div class="flash"></div></div>
+    <div class="flags"><div class="flag bad">✕ Too blurry. Please retake.</div><div class="flag good">✓ Clear. Reading it…</div></div>
+    <div class="typed"><div>P(X &gt; 2) = ∫<sub>2</sub><sup>∞</sup> λe<sup>−λx</sup> dx</div><div>= [−e<sup>−λx</sup>]<sub>2</sub><sup>∞</sup></div><div>= <span class="edit">e<sup>−2λ</sup></span></div></div>
+    <div class="pbtn">Submit</div>
+  </div>
+  <div class="steps">
+    <div class="stp" data-s="0"><b>1</b><span>Solve by hand</span></div>
+    <div class="stp" data-s="1"><b>2</b><span>Snap</span></div>
+    <div class="stp" data-s="2"><b>3</b><span>Blurry? Retake.</span></div>
+    <div class="stp" data-s="3"><b>4</b><span>AI → text</span></div>
+    <div class="stp" data-s="4"><b>5</b><span>Submit</span></div>
+  </div>
+  <div class="vhint">V ▶ demo</div>
+</section>
+
+<!-- ============ 8 · THE TEACHER'S PERSONA ============ -->
+<section class="slide" data-id="persona" data-time="0:35" data-video="media/demo-grade.mp4"
+  data-say="→ Then the solution comes to me, or rather, to my persona.  I built it from my conversations with students, the way I solve problems, and my YouTube videos. It grades in my voice. And it never just hands over the answer. It asks one question back, because that's the moment you start thinking.">
+  <div class="src fade" style="top:170px;--d:.1s">Conversations with students</div>
+  <div class="src fade" style="top:345px;--d:.4s">My problem-solving</div>
+  <div class="src fade" style="top:520px;--d:.7s">My YouTube videos</div>
+  <svg viewBox="0 0 1600 900" width="1600" height="900" style="position:absolute;inset:0;pointer-events:none">
+    <path class="draw" pathLength="1" style="--d:1s;--t:.7s" d="M450,215 C540,215 560,380 600,410" stroke="#e8590c" stroke-width="3" fill="none"/>
+    <path class="draw" pathLength="1" style="--d:1.2s;--t:.7s" d="M450,390 L590,420" stroke="#e8590c" stroke-width="3" fill="none"/>
+    <path class="draw" pathLength="1" style="--d:1.4s;--t:.7s" d="M450,565 C540,565 560,450 600,430" stroke="#e8590c" stroke-width="3" fill="none"/>
+    <g class="pop" style="--d:1.9s">
+      <circle cx="700" cy="420" r="112" fill="#fff" stroke="#e8590c" stroke-width="5"/>
+      <text x="700" y="400" text-anchor="middle" font-size="30" font-weight="800">my persona</text>
+      <text x="700" y="436" text-anchor="middle" font-size="21" fill="#8a8a8a">teaching + grading</text>
+    </g>
+    <path class="draw" pathLength="1" style="--d:2.4s;--t:.5s" d="M812,420 L870,420" stroke="#111" stroke-width="3" fill="none"/>
+  </svg>
+  <div class="chat">
+    <div class="msg me fade" style="--d:2.7s"><small>my grade</small><span class="gr">👏 8/10</span><br>Right answer. Why does step 2 hold?</div>
+    <div class="msg stu fade" style="--d:4s"><small>student</small>X and Y are independent?</div>
+    <div class="msg me fade" style="--d:5.2s"><small>me</small>Good. And if they weren't?</div>
+  </div>
+  <div class="caption fade" style="--d:6s;bottom:60px;font-size:40px"><span class="accent">Deep thinking</span>, back and forth.</div>
+  <div class="vhint">V ▶ demo</div>
+</section>
+
+<!-- ============ 9 · ONE REAL LEARNER'S KNOWLEDGE GRAPH (from the LLM wiki) ============ -->
+<section class="slide" data-id="student" data-time="0:30"
+  data-say="→ Every solution, every discussion, grows the student's own knowledge graph.  This is a real learner. Watch it grow, every five problems. Two weeks. 29 problems, by hand. Algebra, calculus, probability, estimation, testing. From 8% of the course to 44%. The goal? 100%. Their graph becomes the course's graph.">
+  <div class="fade" style="--d:.1s;position:absolute;left:110px;top:80px"><div style="font-size:40px;font-weight:800;letter-spacing:-.03em">One real learner</div><div style="font-size:22px;color:#8a8a8a;margin-top:4px">every 5 problems</div></div>
+  <div class="wk" style="top:64px"><div class="p" id="stP">0%</div><div class="w">of the course graph</div><div class="w" style="color:#111;margin-top:6px" id="stK">&nbsp;</div><div class="w" id="stD">&nbsp;</div></div>
+  <svg id="stSvg" viewBox="0 0 1600 900" width="1600" height="900" style="position:absolute;inset:0"></svg>
+  <div class="fade" style="--d:.4s;position:absolute;left:110px;bottom:40px;font-size:18px;color:#8a8a8a"><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#e8590c;vertical-align:-2px"></span> strength = grades + discussions &nbsp; <span style="display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid #111;vertical-align:-3px"></span> discussed with me</div>
+</section>
+
+<!-- ============ 10 · ADAPTIVE ============ -->
+<section class="slide" data-id="adapt" data-time="0:30"
+  data-say="→ And the graph decides what comes next.  Stuck? It walks you back one step, to a simpler problem. Solved it? A similar one. Solved it well? A step up. You never wonder what to do next. You just keep climbing.">
+  <div class="adcard" id="adCard">&nbsp;</div>
+  <svg id="adSvg" viewBox="0 0 1600 900" width="1600" height="900" style="position:absolute;inset:0"></svg>
+  </section>
+
+<!-- ============ 11 · TRACTION ============ -->
+<section class="slide" data-id="traction" data-time="0:10"
+  data-say="→ And people are using it.  Since October: 3,084 learners. 451 this week alone. 223 handwritten solutions graded. Zero dollars on ads. They find me on Instagram, where 49,300 people follow along.">
+  <div class="nums" style="top:160px">
+    <div class="fade" style="--d:.1s"><div class="n" data-cfg="learners" data-countup></div><div class="l">learners</div></div>
+    <div class="fade" style="--d:.5s"><div class="n" data-cfg="active7" data-countup></div><div class="l">active this week</div></div>
+    <div class="fade" style="--d:.9s"><div class="n" data-cfg="graded" data-countup></div><div class="l">solutions graded</div></div>
+  </div>
+  <img class="fade" src="media/instagram.png" alt="" style="--d:1.2s;position:absolute;left:350px;top:400px;width:900px;border:1px solid #eee;border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,.07)">
+  <div class="sub fade" style="--d:1.6s;bottom:150px;font-size:28px">since <span data-cfg="launch"></span> · <b class="accent">$0</b> spent on ads</div>
+</section>
+
+<!-- ============ 12 · RECEIPT ============ -->
+<section class="slide" data-id="receipt" data-time="0:25"
+  data-say="→ Why does this work now, and not five years ago? Cost.  Reading a page of handwriting: three hundredths of a cent. A grade in my voice: about two cents. Fifty-five problems a month, two a day, for one dollar ten. A teacher's twin for less than a cup of coffee, per month.">
+  <div class="receipt">
+    <div class="h fade">one student · one month · 55 problems</div>
+    <div class="row fade" style="--d:.6s"><span>read 110 handwritten pages</span><span>$0.03</span></div>
+    <div class="row fade" style="--d:1.3s"><span>grade 55 solutions in my voice</span><span>$1.07</span></div>
+    <div class="rule fade" style="--d:2s"></div>
+    <div class="row tot fade" style="--d:2.4s"><span>one student, one month</span><span>≈ $1.10</span></div>
+  </div>
+  <div class="caption fade" style="--d:3.2s;bottom:120px">A teacher's twin for $1.10 a month.</div>
+  </section>
+
+<!-- ============ 13 · ENGINE + 3 CUSTOMERS ============ -->
+<section class="slide" data-id="engine" data-time="0:30"
+  data-say="→ And it's a business.  One engine, three customers. Creators turn their videos into courses that grade themselves. Teachers give every student feedback. Universities plug it into Canvas. Each student costs a dollar ten and pays two ninety. That's a 62% margin, from day one.">
+  <svg viewBox="0 0 1600 900" width="1600" height="900" style="position:absolute;inset:0">
+    <path class="draw" pathLength="1" style="--d:.9s;--t:.6s" d="M720,330 L420,470" stroke="#111" stroke-width="2.5" fill="none"/>
+    <path class="draw" pathLength="1" style="--d:1.5s;--t:.6s" d="M800,360 L800,470" stroke="#111" stroke-width="2.5" fill="none"/>
+    <path class="draw" pathLength="1" style="--d:2.1s;--t:.6s" d="M880,330 L1180,470" stroke="#111" stroke-width="2.5" fill="none"/>
+    <g class="pop" style="--d:.1s">
+      <circle cx="800" cy="215" r="145" fill="#fff" stroke="#e8590c" stroke-width="5"/>
+      <text x="800" y="170" text-anchor="middle" font-size="22" fill="#8a8a8a" letter-spacing="2">THE ENGINE</text>
+      <text x="800" y="212" text-anchor="middle" font-size="25" font-weight="600">course → graph</text>
+      <text x="800" y="246" text-anchor="middle" font-size="25" font-weight="600">photo → grade</text>
+      <text x="800" y="280" text-anchor="middle" font-size="25" font-weight="600" fill="#e8590c">in your voice</text>
+    </g>
+  </svg>
+  <div class="card fade" style="left:200px;--d:1.1s"><h3>Creators</h3><div class="price">$2.90 / student / month</div></div>
+  <div class="card fade" style="left:620px;--d:1.7s"><h3>Teachers</h3><div class="price">$2.90 / student / month</div></div>
+  <div class="card fade" style="left:1040px;--d:2.3s"><h3>Universities</h3><div class="price">$12 / student / term</div><div class="chip">plugs into Canvas</div></div>
+  <div class="sub fade" style="--d:3.4s;bottom:60px;font-size:28px;color:#111">per student, per month: costs <b>$1.10</b> · sells for <b class="accent">$2.90</b> · 62% margin</div>
+</section>
+
+<!-- ============ 14 · THE ASK ============ -->
+<section class="slide" data-id="ask" data-time="0:25"
+  data-say="→ So here's my ask: fifty thousand dollars.  Not to survive; every student already pays for themselves. To grow. Fifteen thousand to build, thirteen for a year of AI, ten for a human grader, ten for pilots starting right here at Penn State, and two for servers. (pause) Now imagine twelve months from now: a thousand paying students, fifty-five thousand graded solutions, three universities.">
+  <div class="ask fade" data-cfg="ask"></div>
+  <div class="askbar">
+    <div class="seg" style="flex:15;background:#e8590c;--d:.7s"></div>
+    <div class="seg" style="flex:13;background:#111;--d:1s"></div>
+    <div class="seg" style="flex:10;background:#555;--d:1.3s"></div>
+    <div class="seg" style="flex:10;background:#999;--d:1.6s"></div>
+    <div class="seg" style="flex:2;background:#ccc;--d:1.9s"></div>
+  </div>
+  <div class="barlab">
+    <div class="fade" style="flex:15;--d:.9s"><b>$15k</b>build</div>
+    <div class="fade" style="flex:13;--d:1.2s"><b>$13k</b>AI · 1,000 paying students</div>
+    <div class="fade" style="flex:10;--d:1.5s"><b>$10k</b>grader</div>
+    <div class="fade" style="flex:10;--d:1.8s"><b>$10k</b>pilots</div>
+    <div class="fade" style="flex:2;--d:2.1s;padding-right:0"><b>$2k</b></div>
+  </div>
+  <div class="caption fade" style="--d:2.7s;bottom:110px;font-size:35px;white-space:nowrap;left:0;right:0">12 months → 1,000 paying students · 55,000 graded solutions · 3 university pilots</div>
+</section>
+
+<!-- ============ 15 · CLOSE ============ -->
+<section class="slide" data-id="close" data-time="0:10"
+  data-say="→ AI made us faster. Let's not let it make us forget how to think.  Solve by hand. Get graded. Discuss with peers. Start solving today, at srijitmath.com. (pause) Thank you.">
+  <div class="close-l" style="top:120px"><span class="fade" style="display:inline-block;--d:.1s">Solve by hand.</span><br><span class="fade" style="display:inline-block;--d:.7s">Get graded.</span><br><span class="fade accent" style="display:inline-block;--d:1.3s">Discuss with peers.</span></div>
+  <div class="qr fade" style="--d:2s;top:520px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 250" class="segno"><path transform="scale(10)" class="qrline" stroke="#111" d="M0 0.5h7m3 0h1m2 0h3m2 0h7m-25 1h1m5 0h1m2 0h2m1 0h1m2 0h2m1 0h1m5 0h1m-25 1h1m1 0h3m1 0h1m2 0h4m5 0h1m1 0h3m1 0h1m-25 1h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m-25 1h1m1 0h3m1 0h1m4 0h2m1 0h3m1 0h1m1 0h3m1 0h1m-25 1h1m5 0h1m1 0h1m2 0h1m3 0h2m1 0h1m5 0h1m-25 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-16 1h4m2 0h2m-17 1h1m2 0h1m1 0h2m1 0h2m1 0h1m1 0h2m1 0h2m1 0h1m-18 1h2m1 0h1m1 0h2m1 0h1m1 0h2m2 0h1m1 0h1m5 0h1m-25 1h3m1 0h4m1 0h3m2 0h1m1 0h1m1 0h1m4 0h2m-24 1h2m1 0h1m3 0h1m2 0h1m1 0h1m1 0h2m1 0h3m-20 1h1m2 0h5m2 0h3m1 0h5m1 0h1m1 0h2m-23 1h3m6 0h3m3 0h3m1 0h2m1 0h1m-25 1h1m1 0h1m2 0h2m2 0h2m1 0h3m1 0h2m1 0h2m1 0h1m1 0h1m-24 1h4m3 0h3m1 0h5m3 0h1m2 0h1m-24 1h2m1 0h1m1 0h5m1 0h1m4 0h7m-15 1h2m4 0h1m1 0h1m3 0h2m2 0h1m-25 1h7m2 0h2m4 0h2m1 0h1m1 0h2m1 0h2m-25 1h1m5 0h1m1 0h1m1 0h2m2 0h1m1 0h1m3 0h5m-25 1h1m1 0h3m1 0h1m2 0h4m3 0h6m2 0h1m-25 1h1m1 0h3m1 0h1m1 0h1m2 0h3m5 0h4m-23 1h1m1 0h3m1 0h1m2 0h6m1 0h1m2 0h2m1 0h1m1 0h1m-25 1h1m5 0h1m3 0h7m1 0h1m2 0h1m-22 1h7m1 0h1m2 0h2m1 0h3m2 0h1m3 0h2"/></svg></div>
+  <div class="close-url fade" style="--d:2.3s;top:756px">srijitmath.com</div>
+</section>
+
+<div id="video"><video playsinline controls></video></div>
+</div>
+
+<button id="fs" type="button" title="Full screen (F)" aria-label="Full screen"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 6V1h5M12 1h5v5M17 12v5h-5M6 17H1v-5"/></svg></button>
+<div id="progress"></div>
+<div id="counter"></div>
+<div id="notes"><div class="meta"><span id="nSlide"></span><span>target <b id="nTarget"></b></span><span>elapsed <b id="nElapsed">0:00</b></span><span style="margin-left:auto">N to hide</span></div><div id="nSay"></div></div>
+
+<script>
+/* ===================== FILL THESE IN ===================== */
+const CONFIG = {
+  learners:       3084,
+  active7:        451,
+  graded:         223,
+  launch:         "October 2026",
+  ask:            50000,  // the ask, in dollars
+};
+/* ========================================================= */
+
+const stage = document.getElementById('stage');
+const slides = [...document.querySelectorAll('.slide')];
+let cur = 0, timers = [], rafs = [], startTime = null;
+
+function fit(){ const s = Math.min(innerWidth/1600, innerHeight/900); stage.style.transform = `translate(-50%,-50%) scale(${s})`; }
+addEventListener('resize', fit); fit();
+
+const fmtNum = v => typeof v === 'number' ? v.toLocaleString('en-US') : v;
+const ph = '<span class="ph">[&nbsp;]</span>';
+document.querySelectorAll('[data-cfg]').forEach(el=>{
+  const k = el.dataset.cfg, v = CONFIG[k];
+  if (v == null || v === '') { el.innerHTML = ph; return; }
+  el.textContent = k === 'ask' ? '$' + fmtNum(v) : fmtNum(v);
+});
+
+function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
+function loop(fn){ const step = t => { if (fn(t) !== false) rafs.push(requestAnimationFrame(step)); }; rafs.push(requestAnimationFrame(step)); }
+function stopAll(){ timers.forEach(clearTimeout); timers = []; rafs.forEach(cancelAnimationFrame); rafs = []; }
+const ease = t => t<.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
+const clamp = (x,a=0,b=1) => Math.max(a, Math.min(b, x));
+function rng(seed){ return ()=>{ seed = (seed*1664525 + 1013904223) % 4294967296; return seed/4294967296; }; }
+const NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs, parent){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent && parent.appendChild(e); return e; }
+
+function countUps(s){
+  s.querySelectorAll('[data-countup]').forEach(n=>{
+    const v = CONFIG[n.dataset.cfg]; if (typeof v !== 'number') return;
+    const t0 = performance.now() + 300;
+    loop(t=>{ const p = clamp((t-t0)/1400); n.textContent = fmtNum(Math.round(v*ease(p))); return p<1; });
+  });
+}
+
+/* ===================== the real knowledge graph (data/topic_graph.csv) ===================== */
+const TOPICS = [
+ ['alg','Algebra','',83],['trig','Trigonometry','',8],['precalc','Pre-calculus','alg;trig',21],['coord','Coordinate geometry','alg;trig',36],
+ ['seq','Sequences & series','precalc',150],['cont','Continuity','seq',52],['diff','Differentiation','cont;coord',110],['integ','Integration','diff',71],
+ ['mat','Matrices','alg',100],['vs','Vector spaces','mat',9],['eig','Eigenvalues','vs',78],['mvdiff','Multivariable calculus','diff;eig',46],
+ ['mvint','Multiple integrals','integ;mvdiff',58],['prob','Probability','alg;seq',173],['rv','Random variables','prob;integ',116],
+ ['disc','Discrete distributions','rv',33],['cts','Continuous distributions','rv',43],['utrans','Transformations','disc;cts',39],
+ ['joint','Joint distributions','utrans;mvint',130],['mvfun','Functions of RVs','joint',35],['mvn','Multivariate normal','joint;eig',18],
+ ['order','Order statistics','mvfun;mvn',48],['wlln','Law of large numbers','joint',22],['clt','Central limit theorem','wlln;mvfun',36],
+ ['unb','Unbiased estimators','order',13],['mle','Maximum likelihood','unb',90],['suff','Sufficiency','unb',38],['umvue','UMVUE & CRLB','mle;suff;clt',35],
+ ['ci','Confidence intervals','mle;clt',19],['test','Hypothesis testing','ci',43],['np','Neyman–Pearson','test;suff',62],['lrt','Likelihood ratio test','np',3],
+ ['markov','Markov chains','joint;eig',3],['nonpar','Non-parametric','test;order',5],['survey','Linear models','mle;test;eig',57]
+].map(([id,label,pre,n])=>({id,label,pre:pre?pre.split(';'):[],n}));
+const T = Object.fromEntries(TOPICS.map(t=>[t.id,t]));
+const KEY = ['alg','eig','integ','prob','joint','clt','mle','test'];
+(function depth(){ const d = id => T[id].d ?? (T[id].d = T[id].pre.length ? 1 + Math.max(...T[id].pre.map(d)) : 0); TOPICS.forEach(t=>d(t.id)); })();
+const MAXD = Math.max(...TOPICS.map(t=>t.d));
+function layout(x0,x1,y0,y1){
+  const layers = [...Array(MAXD+1)].map(()=>[]);
+  TOPICS.forEach(t=>layers[t.d].push(t.id));
+  const P = {};
+  const place = (ids, d) => ids.forEach((id,i)=>{ P[id] = {x: x0 + d/MAXD*(x1-x0), y: y0 + (i+.5)/ids.length*(y1-y0)}; });
+  layers.forEach(place);
+  for (let pass=0; pass<3; pass++) layers.forEach((ids,d)=>{
+    if (!d) return;
+    ids.sort((a,b)=>{ const m = id => T[id].pre.reduce((s,p)=>s+P[p].y,0)/T[id].pre.length; return m(a)-m(b); });
+    place(ids, d);
+  });
+  return P;
+}
+const radius = n => 3 + Math.sqrt(n)*1.25;
+
+/* ===================== 4 · ML engineers: 1.6M → 5M ===================== */
+(function(){
+  const svg = document.getElementById('mlSvg');
+  const cols = 25, x0 = 860, y0 = 300, sp = 22;
+  for (let i=0;i<500;i++){
+    const x = x0 + (i%cols)*sp, y = y0 + Math.floor(i/cols)*sp;
+    if (i < 160) el('circle', {cx:x, cy:y, r:7, fill:'#111', class:'pop2', style:`--d:${(.6 + i*.006).toFixed(3)}s`}, svg);
+    else el('circle', {cx:x, cy:y, r:7, fill:'#e8590c', class:'pop2', style:`--d:${(2.6 + (i-160)*.0055).toFixed(3)}s`}, svg);
+  }
+})();
+function runML(){
+  const n = document.getElementById('mlN'), y = document.getElementById('mlY');
+  n.textContent = '1.6M'; y.textContent = 'today'; n.style.color = '';
+  const t0 = performance.now() + 2600;
+  loop(t=>{
+    const p = clamp((t-t0)/1900);
+    if (p > 0) { n.textContent = (1.6 + 3.4*ease(p)).toFixed(1).replace('.0','') + 'M'; y.textContent = 'by 2030'; n.style.color = '#e8590c'; }
+    return p < 1;
+  });
+}
+
+/* ===================== 5 · one teacher → thousands (AI) ===================== */
+(function(){
+  const svg = document.getElementById('builtSvg');
+  const tx = 300, ty = 430;
+  const tg = el('g', {class:'pop', style:'--d:.9s'}, svg);
+  el('circle', {cx:tx, cy:ty, r:40, fill:'#111'}, tg);
+  const tl = el('text', {x:tx, y:ty+82, 'text-anchor':'middle', 'font-size':24, 'font-weight':600}, tg); tl.textContent = '1 teacher';
+  const cols = 30, rows = 16, x0 = 640, y0 = 190, sp = 29;
+  const lines = el('g', {}, svg), dots = el('g', {}, svg);
+  const r = rng(11), few = new Set(); while (few.size < 6) few.add(Math.floor(r()*cols*rows));
+  let h = 0;
+  for (let j=0;j<rows;j++) for (let i=0;i<cols;i++){
+    const k = j*cols+i, x = x0 + i*sp, y = y0 + j*sp;
+    el('circle', {cx:x, cy:y, r:7.5, class:'pop', fill:'#d4d4d4', style:`--d:${(1 + k*.0016).toFixed(3)}s`}, dots);
+    let dl;
+    if (few.has(k)) { const hd = 2.2 + (h++)*.15; dl = hd + .3;
+      el('path', {d:`M${tx+40},${ty} L${x-9},${y}`, stroke:'#e8590c', 'stroke-width':1.4, fill:'none', opacity:.5, class:'draw', pathLength:1, style:`--d:${hd}s;--t:.35s`}, lines); }
+    else dl = 4 + i*.035 + j*.008;
+    el('circle', {cx:x, cy:y, r:7.5, class:'litB', style:`--d:${dl.toFixed(3)}s`}, dots);
+  }
+  // the AI badge
+  const ag = el('g', {class:'pop', style:'--d:3.5s'}, svg);
+  el('circle', {cx:tx+58, cy:ty-50, r:30, fill:'#e8590c'}, ag);
+  const at = el('text', {x:tx+58, y:ty-50, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size':24, 'font-weight':800, fill:'#fff'}, ag); at.textContent = 'AI';
+  const st = el('text', {x:x0 + (cols-1)*sp/2, y:y0 + rows*sp + 26, 'text-anchor':'middle', 'font-size':24, 'font-weight':600, class:'fade', style:'--d:1.4s'}, svg); st.textContent = 'thousands of students';
+})();
+
+
+/* ===================== 6 · dump → the real knowledge graph ===================== */
+const KG = (function(){
+  const P = layout(400, 1500, 90, 610);
+  const r = rng(5), parts = [];
+  TOPICS.forEach(t=>{
+    const p = P[t.id], R = radius(t.n);
+    for (let k=0;k<t.n;k++){
+      const a = r()*6.2832, d = Math.sqrt(r())*R*.9;
+      parts.push({sx: 95 + r()*170, sy: 500 + r()*90, tx: p.x + Math.cos(a)*d, ty: p.y + Math.sin(a)*d, st: 1500 + r()*1400});
+    }
+  });
+  return {P, parts};
+})();
+function runKG(){
+  const cv = document.getElementById('kgCanvas'), c = cv.getContext('2d');
+  const {P, parts} = KG, t0 = performance.now();
+  const files = ['problems','solutions','notes','videos'];
+  loop(now=>{
+    const t = now - t0;
+    c.setTransform(2,0,0,2,0,0); c.clearRect(0,0,1600,720);
+    // the box
+    c.strokeStyle = '#111'; c.lineWidth = 3; c.lineJoin = 'round';
+    c.beginPath(); c.moveTo(80,470); c.lineTo(80,610); c.lineTo(280,610); c.lineTo(280,470); c.stroke();
+    // files dropping in
+    files.forEach((f,i)=>{
+      const st = 150 + i*260, p = clamp((t-st)/650); if (p<=0 || t > st + 900) return;
+      const y = 120 + (480-120)*ease(p), x = 100 + i*44, a = t > st + 650 ? 1 - (t-st-650)/250 : 1;
+      c.globalAlpha = clamp(a); c.fillStyle = '#fff'; c.strokeStyle = '#111'; c.lineWidth = 2.5;
+      c.beginPath(); c.roundRect(x, y, 48, 62, 5); c.fill(); c.stroke();
+      c.strokeStyle = '#bbb'; c.lineWidth = 3; for (let j=0;j<3;j++){ c.beginPath(); c.moveTo(x+9, y+16+j*12); c.lineTo(x+39, y+16+j*12); c.stroke(); }
+      c.globalAlpha = 1;
+    });
+    // edges
+    const ea = clamp((t-3300)/900);
+    if (ea > 0){
+      c.strokeStyle = `rgba(17,17,17,${.22*ea})`; c.lineWidth = 1.6;
+      TOPICS.forEach(tp=> tp.pre.forEach(pr=>{
+        const A = P[pr], B = P[tp.id], mx = (A.x+B.x)/2;
+        c.beginPath(); c.moveTo(A.x, A.y); c.bezierCurveTo(mx, A.y, mx, B.y, B.x, B.y); c.stroke();
+      }));
+    }
+    // problems flying from the box to their topic
+    const fadeP = 1 - clamp((t-4300)/700);
+    if (fadeP > 0 && t > 1400){
+      parts.forEach(p=>{
+        const q = ease(clamp((t - p.st)/1100));
+        c.fillStyle = q > 0 ? `rgba(232,89,12,${.85*fadeP})` : `rgba(150,150,150,${.6*fadeP})`;
+        c.fillRect(p.sx + (p.tx-p.sx)*q - 1.3, p.sy + (p.ty-p.sy)*q - 1.3, 2.6, 2.6);
+      });
+    }
+    // topic nodes
+    const g = ease(clamp((t-3900)/700));
+    if (g > 0){
+      TOPICS.forEach(tp=>{
+        const p = P[tp.id];
+        c.fillStyle = KEY.includes(tp.id) ? '#e8590c' : '#111';
+        c.beginPath(); c.arc(p.x, p.y, radius(tp.n)*g, 0, 6.2832); c.fill();
+      });
+    }
+    // labels on a few key topics
+    const la = clamp((t-4600)/600);
+    if (la > 0){
+      c.globalAlpha = la; c.font = '600 19px Inter, -apple-system, Helvetica, Arial, sans-serif'; c.textAlign = 'center';
+      c.lineWidth = 6; c.strokeStyle = '#fff'; c.fillStyle = '#111'; c.lineJoin = 'round';
+      KEY.forEach(id=>{ const p = P[id], y = p.y + radius(T[id].n) + 22; c.strokeText(T[id].label, p.x, y); c.fillText(T[id].label, p.x, y); });
+      c.globalAlpha = 1;
+    }
+    return t < 5400;
+  });
+}
+
+/* ===================== 9 · one real learner's graph, every 5 problems (wiki/ideas.json + the database) ===================== */
+const KG9 = {"mods":[{"name":"Algebra & Functions","short":"Algebra","ideas":["swap-substitution","symmetric-substitution","vieta","discriminant","bijection","absolute-value"]},{"name":"Progressions & Means","short":"Progressions","ideas":["am-gm","progressions","series-differentiation"]},{"name":"Complex Numbers","short":"Complex numbers","ideas":["roots-of-unity","polar-form","conjugate-real-part","modulus-distance"]},{"name":"Trigonometry","short":"Trigonometry","ideas":["trig-identities","auxiliary-angle","tan-quadratic","circle-geometry"]},{"name":"Coordinate Geometry","short":"Coordinates","ideas":["reflection","complete-square-conics","polar-coordinates"]},{"name":"Counting & Number Theory","short":"Counting","ideas":["modular-counting","stars-bars","binomial-identities"]},{"name":"Elementary Calculus","short":"Elem. calculus","ideas":["root-counting","rationalise","lhopital","derivative-definition","calculus-optimisation","chain-rule","integral-area"]},{"name":"Sequences & Series","short":"Sequences","ideas":["log-limits","riemann-sums","series-tests","monotone-convergence","taylor-coefficients"]},{"name":"Calculus","short":"Calculus","ideas":["density-sequences","mvt","lipschitz","linear-ode","solids-of-revolution","gamma-beta"]},{"name":"Linear Algebra","short":"Linear algebra","ideas":["linear-systems","determinant-operations","eigen-cayley","dimension"]},{"name":"Multivariate Calculus","short":"Multivariate","ideas":["hessian","partial-derivative-limit","boundary-extrema","multiple-integrals","gaussian-integral"]},{"name":"Probability I","short":"Probability I","ideas":["complement-counting","probability-inequalities","symmetry-counting","cdf-density","rv-transformations","poisson","bernoulli-trials","mgf"]},{"name":"Probability II","short":"Probability II","ideas":["conditioning","covariance","min-max","normal-sampling","clt","lln","log-uniform"]},{"name":"Statistical Estimation","short":"Estimation","ideas":["mle","least-squares","unbiasedness","sufficiency-umvue","confidence-intervals"]},{"name":"Hypothesis Testing","short":"Testing","ideas":["size-power","neyman-pearson","lrt-t-test"]}],"edges":[["absolute-value","integral-area"],["absolute-value","partial-derivative-limit"],["am-gm","auxiliary-angle"],["am-gm","calculus-optimisation"],["am-gm","monotone-convergence"],["am-gm","symmetric-substitution"],["auxiliary-angle","trig-identities"],["bernoulli-trials","complement-counting"],["bernoulli-trials","poisson"],["binomial-identities","polar-form"],["binomial-identities","stars-bars"],["binomial-identities","taylor-coefficients"],["boundary-extrema","calculus-optimisation"],["boundary-extrema","hessian"],["calculus-optimisation","hessian"],["calculus-optimisation","root-counting"],["cdf-density","mgf"],["cdf-density","rv-transformations"],["chain-rule","integral-area"],["chain-rule","linear-ode"],["circle-geometry","trig-identities"],["clt","lln"],["clt","mgf"],["clt","normal-sampling"],["complement-counting","probability-inequalities"],["complement-counting","size-power"],["complement-counting","stars-bars"],["complete-square-conics","gaussian-integral"],["complete-square-conics","hessian"],["complete-square-conics","modulus-distance"],["complete-square-conics","polar-coordinates"],["complete-square-conics","reflection"],["conditioning","covariance"],["conditioning","min-max"],["conditioning","normal-sampling"],["confidence-intervals","normal-sampling"],["confidence-intervals","unbiasedness"],["conjugate-real-part","linear-systems"],["conjugate-real-part","modulus-distance"],["covariance","normal-sampling"],["density-sequences","derivative-definition"],["derivative-definition","lhopital"],["derivative-definition","lipschitz"],["derivative-definition","partial-derivative-limit"],["determinant-operations","eigen-cayley"],["determinant-operations","linear-systems"],["dimension","linear-systems"],["discriminant","root-counting"],["discriminant","tan-quadratic"],["discriminant","vieta"],["eigen-cayley","roots-of-unity"],["gamma-beta","gaussian-integral"],["gamma-beta","log-uniform"],["gamma-beta","taylor-coefficients"],["gaussian-integral","multiple-integrals"],["gaussian-integral","normal-sampling"],["integral-area","riemann-sums"],["integral-area","solids-of-revolution"],["least-squares","mle"],["lhopital","log-limits"],["lhopital","rationalise"],["linear-systems","swap-substitution"],["lipschitz","mvt"],["lln","log-uniform"],["log-limits","taylor-coefficients"],["log-uniform","rv-transformations"],["lrt-t-test","neyman-pearson"],["lrt-t-test","normal-sampling"],["mgf","poisson"],["mle","sufficiency-umvue"],["modular-counting","stars-bars"],["monotone-convergence","series-tests"],["multiple-integrals","polar-coordinates"],["multiple-integrals","solids-of-revolution"],["mvt","root-counting"],["neyman-pearson","size-power"],["polar-form","roots-of-unity"],["polar-form","trig-identities"],["progressions","series-differentiation"],["roots-of-unity","vieta"],["series-differentiation","taylor-coefficients"],["stars-bars","symmetry-counting"],["sufficiency-umvue","unbiasedness"],["symmetric-substitution","vieta"]],"steps":[{"k":5,"from":"30 Oct","to":"31 Oct","w":{"swap-substitution":0.9,"linear-systems":0.9,"absolute-value":0.6,"am-gm":0.9,"trig-identities":0.9,"reflection":1,"circle-geometry":0.9},"disc":["linear-systems","swap-substitution"],"text":[],"ncom":3,"nsol":7},{"k":10,"from":"30 Oct","to":"6 Nov","w":{"swap-substitution":0.9,"linear-systems":0.9,"absolute-value":1,"am-gm":1,"trig-identities":1,"reflection":1,"circle-geometry":1,"hessian":1,"partial-derivative-limit":0.9,"polar-coordinates":1,"multiple-integrals":1},"disc":["absolute-value","am-gm","circle-geometry","hessian","linear-systems","swap-substitution","trig-identities"],"text":[],"ncom":9,"nsol":11},{"k":15,"from":"30 Oct","to":"6 Nov","w":{"swap-substitution":0.9,"linear-systems":0.9,"absolute-value":1,"am-gm":1,"trig-identities":1,"reflection":1,"circle-geometry":1,"hessian":1,"partial-derivative-limit":1,"polar-coordinates":1,"multiple-integrals":1,"gaussian-integral":1,"complete-square-conics":0.6,"probability-inequalities":1,"complement-counting":1,"cdf-density":1,"rv-transformations":1},"disc":["absolute-value","am-gm","circle-geometry","complement-counting","hessian","linear-systems","multiple-integrals","partial-derivative-limit","polar-coordinates","probability-inequalities","swap-substitution","trig-identities"],"text":[],"ncom":13,"nsol":17},{"k":20,"from":"30 Oct","to":"7 Nov","w":{"swap-substitution":0.9,"linear-systems":0.9,"absolute-value":1,"am-gm":1,"trig-identities":1,"reflection":1,"circle-geometry":1,"hessian":1,"partial-derivative-limit":1,"polar-coordinates":1,"multiple-integrals":1,"gaussian-integral":1,"complete-square-conics":0.6,"probability-inequalities":1,"complement-counting":1,"cdf-density":1,"rv-transformations":1,"conditioning":1,"covariance":1,"root-counting":0.8,"calculus-optimisation":0.8,"normal-sampling":1,"min-max":1},"disc":["absolute-value","am-gm","circle-geometry","complement-counting","covariance","hessian","linear-systems","multiple-integrals","partial-derivative-limit","polar-coordinates","probability-inequalities","swap-substitution","trig-identities"],"text":[],"ncom":16,"nsol":23},{"k":25,"from":"30 Oct","to":"9 Nov","w":{"swap-substitution":0.9,"linear-systems":0.9,"absolute-value":1,"am-gm":1,"trig-identities":1,"reflection":1,"circle-geometry":1,"hessian":1,"partial-derivative-limit":1,"polar-coordinates":1,"multiple-integrals":1,"gaussian-integral":1,"complete-square-conics":0.6,"probability-inequalities":1,"complement-counting":1,"cdf-density":1,"rv-transformations":1,"conditioning":1,"covariance":1,"root-counting":0.8,"calculus-optimisation":0.8,"normal-sampling":1,"min-max":1,"poisson":1,"bernoulli-trials":1,"clt":1,"mle":0.9,"sufficiency-umvue":0.9,"log-uniform":1,"lln":1},"disc":["absolute-value","am-gm","circle-geometry","clt","complement-counting","conditioning","covariance","hessian","linear-systems","lln","log-uniform","min-max","multiple-integrals","normal-sampling","partial-derivative-limit","polar-coordinates","probability-inequalities","swap-substitution","trig-identities"],"text":[],"ncom":22,"nsol":30},{"k":29,"from":"30 Oct","to":"14 Nov","w":{"swap-substitution":0.9,"linear-systems":0.9,"absolute-value":1,"am-gm":1,"trig-identities":1,"reflection":1,"circle-geometry":1,"hessian":1,"partial-derivative-limit":1,"polar-coordinates":1,"multiple-integrals":1,"gaussian-integral":1,"complete-square-conics":0.6,"probability-inequalities":1,"complement-counting":1,"cdf-density":1,"rv-transformations":1,"conditioning":1,"covariance":1,"root-counting":0.8,"calculus-optimisation":0.8,"normal-sampling":1,"min-max":1,"poisson":1,"bernoulli-trials":1,"clt":1,"mle":1,"sufficiency-umvue":1,"log-uniform":1,"lln":1,"unbiasedness":1,"size-power":1,"neyman-pearson":1},"disc":["absolute-value","am-gm","circle-geometry","clt","complement-counting","conditioning","covariance","hessian","linear-systems","lln","log-uniform","min-max","mle","multiple-integrals","neyman-pearson","normal-sampling","partial-derivative-limit","poisson","polar-coordinates","probability-inequalities","size-power","sufficiency-umvue","swap-substitution","trig-identities","unbiasedness"],"text":[],"ncom":35,"nsol":33}],"n":73};
+const ST9 = (function(){
+  const svg = document.getElementById('stSvg'), pos = {}, nodes = {}, rings = {}, labels = [], edges = [];
+  KG9.mods.forEach((m, mi)=>{
+    const row = mi < 7 ? 0 : 1, col = row ? mi - 7 : mi, n = row ? 8 : 7;
+    const cx = 130 + (col + .5) * (1340 / n), cy = row ? 600 : 345, k = m.ideas.length, R = k > 1 ? 20 + 5*k : 0;
+    m.ideas.forEach((id, j)=>{ const a = -Math.PI/2 + j * 2*Math.PI / k; pos[id] = {x: cx + R*Math.cos(a), y: cy + R*Math.sin(a)}; });
+    const t = el('text', {x:cx, y:cy + R + 40, 'text-anchor':'middle', 'font-size':18, fill:'#9a9a9a', 'font-weight':500}, null);
+    t.textContent = m.short; labels.push({t, ideas:m.ideas});
+  });
+  const eg = el('g', {}, svg), ng = el('g', {}, svg);
+  KG9.edges.forEach(([a,b])=> edges.push({a, b, e: el('line', {x1:pos[a].x, y1:pos[a].y, x2:pos[b].x, y2:pos[b].y, stroke:'#f4f4f4', 'stroke-width':1.5}, eg)}));
+  Object.keys(pos).forEach(id=>{
+    rings[id] = el('circle', {cx:pos[id].x, cy:pos[id].y, r:15, fill:'none', stroke:'#111', 'stroke-width':2.2, opacity:0, style:'transition:opacity .4s'}, ng);
+    nodes[id] = el('circle', {cx:pos[id].x, cy:pos[id].y, r:10, fill:'#e8590c', 'fill-opacity':0, stroke:'#cfcfcf', 'stroke-width':1.6, style:'transition:fill-opacity .5s,stroke .5s'}, ng);
+  });
+  labels.forEach(l=> ng.appendChild(l.t));
+  return {nodes, rings, labels, edges};
+})();
+function runStudent(){
+  const {nodes, rings, labels, edges} = ST9;
+  const K = document.getElementById('stK'), D = document.getElementById('stD'), Pc = document.getElementById('stP');
+  const apply = st => {
+    Object.entries(nodes).forEach(([id, c])=>{ const g = st ? st.w[id] : undefined;
+      c.setAttribute('fill-opacity', g ? (0.15 + 0.85 * g).toFixed(2) : 0); c.setAttribute('stroke', g ? '#e8590c' : '#cfcfcf'); });
+    Object.entries(rings).forEach(([id, r])=> r.setAttribute('opacity', st && st.disc.includes(id) ? 1 : 0));
+    edges.forEach(e=> e.e.setAttribute('stroke', st && st.w[e.a] && st.w[e.b] ? '#f5c4a6' : '#f4f4f4'));
+    labels.forEach(l=>{ const on = st && l.ideas.some(i=>st.w[i]); l.t.setAttribute('fill', on ? '#111' : '#9a9a9a'); l.t.setAttribute('font-weight', on ? 700 : 500); });
+    const pct = st ? Math.round(100 * Object.values(st.w).reduce((a,b)=>a+b,0) / KG9.n) : 0;
+    Pc.textContent = pct + '%';
+    K.textContent = st ? st.k + ' problems · ' + st.ncom + ' discussions' : ' ';
+    D.textContent = st ? st.from + ' → ' + st.to : ' ';
+  };
+  apply(null);
+  KG9.steps.forEach((st, i)=> later(()=> apply(st), 800 + i*1500));
+}
+
+/* ===================== 10 · adaptive: stuck → simpler, solved → step up ===================== */
+const AD = (function(){
+  const svg = document.getElementById('adSvg');
+  const N = { prob:[300,470,'Probability','simpler'], rv:[700,470,'Random variables','you are here'],
+              cts:[1100,370,'Continuous distributions','a step up'], disc:[1100,570,'Discrete distributions','similar level'],
+              utrans:[1420,470,'Transformations','harder'] };
+  const E = [['prob','rv'],['rv','cts'],['rv','disc'],['cts','utrans'],['disc','utrans']];
+  E.forEach(([a,b])=>{ const A=N[a], B=N[b], mx=(A[0]+B[0])/2;
+    el('path', {d:`M${A[0]},${A[1]} C${mx},${A[1]} ${mx},${B[1]} ${B[0]},${B[1]}`, class:'ad-e'}, svg); });
+  const back = el('path', {d:'M660,420 C600,300 400,300 340,420', stroke:'#e8590c', 'stroke-width':4, 'stroke-dasharray':'10 9', fill:'none', class:'adarrow', 'marker-end':'url(#ah)'}, svg);
+  const fwd  = el('path', {d:'M745,440 C850,330 960,320 1050,350', stroke:'#e8590c', 'stroke-width':4, 'stroke-dasharray':'10 9', fill:'none', class:'adarrow', 'marker-end':'url(#ah)'}, svg);
+  const defs = el('defs', {}, svg), mk = el('marker', {id:'ah', viewBox:'0 0 10 10', refX:6, refY:5, markerWidth:6, markerHeight:6, orient:'auto-start-reverse'}, defs);
+  el('path', {d:'M0,0 L10,5 L0,10 z', fill:'#e8590c'}, mk);
+  const subs = {};
+  Object.entries(N).forEach(([id,[x,y,l,s]])=>{
+    el('circle', {cx:x, cy:y, r:30, class:'ad-n'}, svg);
+    const t = el('text', {x, y:y+66, class:'ad-l'}, svg); t.textContent = l;
+    subs[id] = el('text', {x, y:y+94, class:'ad-s'}, svg); subs[id].textContent = s;
+  });
+  const marker = el('g', {id:'adMarker'}, svg);
+  el('circle', {cx:0, cy:0, r:46, fill:'none', stroke:'#e8590c', 'stroke-width':6}, marker);
+  el('circle', {cx:0, cy:0, r:16, fill:'#e8590c'}, marker);
+  return {N, marker, back, fwd};
+})();
+function runAdapt(){
+  const {N, marker, back, fwd} = AD, card = document.getElementById('adCard');
+  const go = id => { marker.style.transform = `translate(${N[id][0]}px,${N[id][1]}px)`; };
+  const say = html => { card.style.opacity = 0; later(()=>{ card.innerHTML = html; card.style.opacity = 1; }, 250); };
+  marker.style.transition = 'none'; go('rv'); void marker.getBoundingClientRect(); marker.style.transition = '';
+  back.classList.remove('on'); fwd.classList.remove('on'); card.innerHTML = '&nbsp;';
+  later(()=> say('A problem on <b>random variables</b>'), 500);
+  later(()=>{ say('<span class="k">Stuck?</span> → a simpler problem'); back.classList.add('on'); later(()=>go('prob'), 500); }, 2000);
+  later(()=>{ back.classList.remove('on'); say('Solved ✓ <span class="k">7/10</span> → a similar one'); go('rv'); }, 4300);
+  later(()=>{ say('Solved ✓ <span class="k">9/10</span> → a step up'); fwd.classList.add('on'); later(()=>go('cts'), 500); }, 6400);
+}
+
+/* ===================== 7 · solve, snap, submit ===================== */
+function runSnap(){
+  const s = slides.find(x=>x.dataset.id==='snap'), steps = s.querySelectorAll('.stp');
+  const st = cls => { s.classList.remove('s7-blur','s7-clear','s7-text','s7-done','s7-flash'); cls.forEach(c=>s.classList.add(c)); };
+  const on = n => steps.forEach((e,i)=> e.classList.toggle('on', i <= n));
+  st([]); on(0);
+  later(()=>{ st(['s7-blur','s7-flash']); on(2); }, 1600);
+  later(()=>{ st(['s7-clear','s7-flash']); on(2); }, 3500);
+  later(()=>{ st(['s7-clear','s7-text']); on(3); }, 4700);
+  later(()=>{ st(['s7-clear','s7-text','s7-done']); on(4); s.querySelector('.pbtn').textContent = 'Submitted ✓'; }, 7000);
+  s.querySelector('.pbtn').textContent = 'Submit';
+}
+
+/* ===================== video (optional demos) ===================== */
+const vbox = document.getElementById('video'), vid = vbox.querySelector('video');
+slides.forEach(s=>{
+  if (!s.dataset.video) return;
+  const probe = document.createElement('video'); probe.preload = 'metadata'; probe.muted = true;
+  probe.addEventListener('loadedmetadata', ()=> s.classList.add('has-video'));
+  probe.src = s.dataset.video;
+});
+const videoOpen = () => vbox.classList.contains('on');
+function openVideo(){ const s = slides[cur]; if (!s.classList.contains('has-video')) return false; vid.src = s.dataset.video; vid.currentTime = 0; vbox.classList.add('on'); vid.play().catch(()=>{}); return true; }
+function closeVideo(){ if (!videoOpen()) return; vid.pause(); vbox.classList.remove('on'); }
+
+/* ===================== navigation ===================== */
+const HOOKS = { kg:runKG, snap:runSnap, student:runStudent, adapt:runAdapt };
+const STEPHOOKS = { ml: n => { if (n === 2) runML(); } };
+let stepN = 1;
+function show(i){
+  i = Math.max(0, Math.min(slides.length-1, i));
+  closeVideo(); stopAll();
+  slides.forEach(s=>s.classList.remove('active','st2','st3','st4'));
+  stepN = 1;
+  const s = slides[i]; void s.offsetWidth; s.classList.add('active'); cur = i;
+  countUps(s); (HOOKS[s.dataset.id]||(()=>{}))();
+  history.replaceState(null, '', '#' + (i+1));
+  document.getElementById('progress').style.width = ((i+1)/slides.length*100) + '%';
+  document.getElementById('counter').textContent = (i+1) + ' / ' + slides.length;
+  document.getElementById('nSlide').textContent = 'slide ' + (i+1) + ' / ' + slides.length;
+  document.getElementById('nTarget').textContent = s.dataset.time || '';
+  document.getElementById('nSay').textContent = s.dataset.say || '';
+}
+function next(){
+  if (!startTime) startTime = Date.now();
+  if (videoOpen()) { closeVideo(); show(cur+1); return; }
+  const s = slides[cur];
+  if (stepN < (+s.dataset.steps || 1)) { stepN++; s.classList.add('st' + stepN); (STEPHOOKS[s.dataset.id]||(()=>{}))(stepN); return; }
+  if (s.classList.contains('has-video') && openVideo()) return;
+  show(cur+1);
+}
+function prev(){ if (videoOpen()) { closeVideo(); return; } if (stepN > 1) { show(cur); return; } show(cur-1); }
+addEventListener('keydown', e=>{
+  const k = e.key;
+  if (['ArrowRight',' ','PageDown','ArrowDown','Enter'].includes(k)) { e.preventDefault(); next(); }
+  else if (['ArrowLeft','PageUp','ArrowUp','Backspace'].includes(k)) { e.preventDefault(); prev(); }
+  else if (k==='Home') show(0);
+  else if (k==='End') show(slides.length-1);
+  else if (k==='n' || k==='N') document.getElementById('notes').classList.toggle('on');
+  else if (k==='f' || k==='F') toggleFS();
+  else if (k==='v' || k==='V') { videoOpen() ? closeVideo() : openVideo(); }
+  else if (k==='Escape') closeVideo();
+  else if (k==='r' || k==='R') show(cur);
+});
+function toggleFS(){ document.fullscreenElement ? document.exitFullscreen() : (document.documentElement.requestFullscreen ? document.documentElement.requestFullscreen().catch(()=>{}) : null); }
+document.getElementById('fs').addEventListener('click', e=>{ e.stopPropagation(); toggleFS(); });
+document.addEventListener('fullscreenchange', ()=> document.body.classList.toggle('isfs', !!document.fullscreenElement));
+addEventListener('click', e=>{
+  if (e.target.closest('#notes') || e.target.closest('video') || e.target.closest('#fs')) return;
+  (e.clientX > innerWidth/2) ? next() : prev();
+});
+setInterval(()=>{
+  if (!startTime) return;
+  const s = Math.floor((Date.now()-startTime)/1000);
+  document.getElementById('nElapsed').textContent = Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+}, 500);
+addEventListener('hashchange', ()=>{ const n = (parseInt(location.hash.slice(1))||1) - 1; if (n !== cur) show(n); });
+show((parseInt(location.hash.slice(1))||1) - 1);
+</script>
+</body>
+</html>

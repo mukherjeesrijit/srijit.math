@@ -809,11 +809,15 @@
         keptProfiles.set(String(d.person.id), d);
       } catch (err) { first = false; if (!drawn) profileBox.innerHTML = `<p class="soon">Couldn't find that profile.</p>`; } // keep the last one
     };
+    // Profile pictures: only the MahaKali profile (user 3) has one (Srijit, 2026-11-14). A 13 KB file in the site repo,
+    // fetched only when that profile is opened; nobody else's profile changes.
+    const AVATAR = { 3: "/assets/img/kali/mahakali-avatar.webp" };
     function paint(d) {
       const p = d.person, l = d.level, next = l.next;
       const pct = next ? Math.round(100 * (d.karma - (LEVEL_FLOOR[l.n - 1] || 0)) / (next - (LEVEL_FLOOR[l.n - 1] || 0))) : 100;
       document.title = nm(p.name) + " · Mathematics for Machine Learning";
-      profileBox.innerHTML = `<header class="who-head"><h1>${esc(nm(p.name))}</h1>${linkedin(p).replace('class="li"', 'class="li big"')}
+      const pic = AVATAR[p.id];
+      profileBox.innerHTML = `<header class="who-head">${pic ? `<img class="avatar" src="${pic}" alt="" width="72" height="72" decoding="async">` : ""}<h1>${esc(nm(p.name))}</h1>${linkedin(p).replace('class="li"', 'class="li big"')}
           ${p.owner ? "" : `<span class="lvl big">Level ${l.n} · ${esc(l.name)}</span>`}
           <p class="muted">Joined ${day(p.joined)}${p.mine ? ` · this is you · <button type="button" class="linkish" data-rename>change name</button>` : ""}</p>
           ${p.mine ? `<form class="li-form"><label>Your LinkedIn <input type="url" inputmode="url" placeholder="https://www.linkedin.com/in/your-name/" value="${esc(p.linkedin || "")}"></label>

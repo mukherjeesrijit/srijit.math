@@ -241,6 +241,7 @@ a.who:hover { color: var(--accent); }
 .notes .muted { padding: 10px; margin: 0; font-size: 14px; color: var(--muted); }
 .profile .who-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
 .profile .who-head h1 { margin: 0; }
+.profile .who-head .avatar { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; align-self: center; border: 1px solid var(--line); }
 .profile .who-head p { flex-basis: 100%; margin: 0; }
 .stats-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 24px 0 12px; }
 .stats-row div { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; }

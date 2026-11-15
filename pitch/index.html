@@ -168,6 +168,13 @@ text{font-family:var(--sans)}
 .receipt .rule{border-top:2px solid var(--ink);margin:14px 0}
 .receipt .tot{font-weight:700;color:var(--accent);font-size:38px}
 
+/* ---------- now → next ---------- */
+.stagecol{position:absolute;top:170px;width:600px}
+.stagecol h3{margin:16px 0 26px;font-size:46px;letter-spacing:-.03em;line-height:1.1}
+.stagecol .row{display:flex;justify-content:space-between;align-items:baseline;border-top:1.5px solid #e6e6e6;padding:16px 0;font-size:26px}
+.stagecol .row span{color:#444}
+.stagecol .row b{color:var(--accent);font-weight:700}
+.chip2{font-style:normal;font-size:15px;font-weight:600;background:#111;color:#fff;border-radius:999px;padding:4px 10px;margin-left:8px;vertical-align:3px}
 /* ---------- engine ---------- */
 .card{position:absolute;top:470px;width:360px;border:2px solid var(--ink);border-radius:16px;padding:24px 26px;background:#fff}
 .card h3{margin:0 0 8px;font-size:34px;letter-spacing:-.02em}
@@ -222,7 +229,7 @@ body.isfs #fs{display:none}
 </section>
 
 <!-- ============ 2 · A TEACHER ============ -->
-<section class="slide" data-id="teach" data-time="0:25"
+<section class="slide" data-id="teach" data-time="0:20"
   data-say="→ But more importantly, I'm a teacher.  For eleven years, I've taught mathematics to students of every age and every background. And I've learned one thing: understanding happens at the tip of a pen.">
   <div class="photo fade" style="left:215px;top:70px;width:330px;height:440px;--d:.1s"><img src="media/teach-1.jpg" alt=""></div>
   <div class="photo fade" style="left:575px;top:70px;width:450px;height:440px;--d:.4s"><img src="media/teach-2.jpg" alt=""></div>
@@ -248,7 +255,7 @@ body.isfs #fs{display:none}
 </section>
 
 <!-- ============ 4 · I AM NOT ALONE (2 steps: comment, then numbers) ============ -->
-<section class="slide s-ml" data-id="ml" data-steps="2" data-time="0:25"
+<section class="slide s-ml" data-id="ml" data-steps="2" data-time="0:30"
   data-say="→ And I'm not alone.  Read this. An AI engineer wrote it under my video: &quot;I have stopped using my brain and I am not becoming better. I want to solve maths.&quot; (pause)  [press →]  And there are millions like this engineer. 1.6 million machine learning engineers today. A projected 5 million by 2030. Every one of them uses AI every day. Every one of them needs maths every day.">
   <div class="mlhead fade" style="--d:.1s">I am not alone.</div>
   <img class="cm fade" style="--d:.6s" src="media/iamnotalone.png" alt="A YouTube comment from an AI engineer">
@@ -265,7 +272,7 @@ body.isfs #fs{display:none}
 </section>
 
 <!-- ============ 5 · WHY I BUILT SRIJITMATH.COM ============ -->
-<section class="slide" data-id="built" data-time="0:30"
+<section class="slide" data-id="built" data-time="0:25"
   data-say="→ So I built something, first for myself.  srijitmath.com. One problem a day. By hand. Now, you're already asking the right question: how can one teacher reach thousands of students? (pause) Because AI does the busywork, and the teacher stays in the loop.">
   <div class="fade" style="--d:.1s;position:absolute;left:110px;top:96px;font-size:30px;line-height:1.6">
     <div><b>2025</b> <span style="color:#8a8a8a">· built for me</span></div>
@@ -276,7 +283,7 @@ body.isfs #fs{display:none}
 </section>
 
 <!-- ============ 6 · DUMP → REAL KNOWLEDGE GRAPH ============ -->
-<section class="slide" data-id="kg" data-time="0:35"
+<section class="slide" data-id="kg" data-time="0:25"
   data-say="→ It starts with a map.  I poured in everything I've taught: problems, solutions, notes. AI turned it into a knowledge graph. 35 topics. 1,883 problems. Every idea connected to the next. This is the north star, and every student walks it.">
   <canvas id="kgCanvas" width="3200" height="1440" style="position:absolute;left:0;top:0;width:1600px;height:720px"></canvas>
   <div class="fade" style="--d:.2s;position:absolute;left:0;top:628px;width:360px;text-align:center;font-size:19px;color:#8a8a8a;white-space:nowrap">problems · solutions · notes</div>
@@ -285,7 +292,7 @@ body.isfs #fs{display:none}
 </section>
 
 <!-- ============ 7 · SOLVE, SNAP, SUBMIT ============ -->
-<section class="slide" data-id="snap" data-time="0:30" data-video="media/demo-photo.mp4"
+<section class="slide" data-id="snap" data-time="0:25" data-video="media/demo-photo.mp4"
   data-say="→ One problem at a time. By hand.  Watch. The student solves on paper and snaps a photo. Blurry? It says retake. Clear? AI reads the handwriting in seconds, the student checks it, and submits. The pen does the thinking. AI does the typing.">
   <div class="phone fade" style="--d:.1s">
     <div class="pt">problem 14 · random variables</div>
@@ -306,7 +313,7 @@ body.isfs #fs{display:none}
 </section>
 
 <!-- ============ 8 · THE TEACHER'S PERSONA ============ -->
-<section class="slide" data-id="persona" data-time="0:35" data-video="media/demo-grade.mp4"
+<section class="slide" data-id="persona" data-time="0:30" data-video="media/demo-grade.mp4"
   data-say="→ Then the solution comes to me, or rather, to my persona.  I built it from my conversations with students, the way I solve problems, and my YouTube videos. It grades in my voice. And it never just hands over the answer. It asks one question back, because that's the moment you start thinking.">
   <div class="src fade" style="top:170px;--d:.1s">Conversations with students</div>
   <div class="src fade" style="top:345px;--d:.4s">My problem-solving</div>
@@ -341,14 +348,14 @@ body.isfs #fs{display:none}
 </section>
 
 <!-- ============ 10 · ADAPTIVE ============ -->
-<section class="slide" data-id="adapt" data-time="0:30"
+<section class="slide" data-id="adapt" data-time="0:20"
   data-say="→ And the graph decides what comes next.  Stuck? It walks you back one step, to a simpler problem. Solved it? A similar one. Solved it well? A step up. You never wonder what to do next. You just keep climbing.">
   <div class="adcard" id="adCard">&nbsp;</div>
   <svg id="adSvg" viewBox="0 0 1600 900" width="1600" height="900" style="position:absolute;inset:0"></svg>
   </section>
 
 <!-- ============ 11 · TRACTION ============ -->
-<section class="slide" data-id="traction" data-time="0:10"
+<section class="slide" data-id="traction" data-time="0:15"
   data-say="→ And people are using it.  Since October: 3,084 learners. 451 this week alone. 223 handwritten solutions graded. Zero dollars on ads. They find me on Instagram, where 49,300 people follow along.">
   <div class="nums" style="top:160px">
     <div class="fade" style="--d:.1s"><div class="n" data-cfg="learners" data-countup></div><div class="l">learners</div></div>
@@ -359,9 +366,17 @@ body.isfs #fs{display:none}
   <div class="sub fade" style="--d:1.6s;bottom:150px;font-size:28px">since <span data-cfg="launch"></span> · <b class="accent">$0</b> spent on ads</div>
 </section>
 
-<!-- ============ 12 · RECEIPT ============ -->
+<!-- ============ 12 · SRIJITMATH.COM, IN ONE LINE ============ -->
+<section class="slide" data-id="close" data-time="0:10"
+  data-say="→ That's srijitmath.com, in one line:  Solve by hand. Get graded. Discuss with peers. (pause) Scan it, and start solving today.">
+  <div class="close-l" style="top:120px"><span class="fade" style="display:inline-block;--d:.1s">Solve by hand.</span><br><span class="fade" style="display:inline-block;--d:.7s">Get graded.</span><br><span class="fade accent" style="display:inline-block;--d:1.3s">Discuss with peers.</span></div>
+  <div class="qr fade" style="--d:2s;top:520px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 250" class="segno"><path transform="scale(10)" class="qrline" stroke="#111" d="M0 0.5h7m3 0h1m2 0h3m2 0h7m-25 1h1m5 0h1m2 0h2m1 0h1m2 0h2m1 0h1m5 0h1m-25 1h1m1 0h3m1 0h1m2 0h4m5 0h1m1 0h3m1 0h1m-25 1h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m-25 1h1m1 0h3m1 0h1m4 0h2m1 0h3m1 0h1m1 0h3m1 0h1m-25 1h1m5 0h1m1 0h1m2 0h1m3 0h2m1 0h1m5 0h1m-25 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-16 1h4m2 0h2m-17 1h1m2 0h1m1 0h2m1 0h2m1 0h1m1 0h2m1 0h2m1 0h1m-18 1h2m1 0h1m1 0h2m1 0h1m1 0h2m2 0h1m1 0h1m5 0h1m-25 1h3m1 0h4m1 0h3m2 0h1m1 0h1m1 0h1m4 0h2m-24 1h2m1 0h1m3 0h1m2 0h1m1 0h1m1 0h2m1 0h3m-20 1h1m2 0h5m2 0h3m1 0h5m1 0h1m1 0h2m-23 1h3m6 0h3m3 0h3m1 0h2m1 0h1m-25 1h1m1 0h1m2 0h2m2 0h2m1 0h3m1 0h2m1 0h2m1 0h1m1 0h1m-24 1h4m3 0h3m1 0h5m3 0h1m2 0h1m-24 1h2m1 0h1m1 0h5m1 0h1m4 0h7m-15 1h2m4 0h1m1 0h1m3 0h2m2 0h1m-25 1h7m2 0h2m4 0h2m1 0h1m1 0h2m1 0h2m-25 1h1m5 0h1m1 0h1m1 0h2m2 0h1m1 0h1m3 0h5m-25 1h1m1 0h3m1 0h1m2 0h4m3 0h6m2 0h1m-25 1h1m1 0h3m1 0h1m1 0h1m2 0h3m5 0h4m-23 1h1m1 0h3m1 0h1m2 0h6m1 0h1m2 0h2m1 0h1m1 0h1m-25 1h1m5 0h1m3 0h7m1 0h1m2 0h1m-22 1h7m1 0h1m2 0h2m1 0h3m2 0h1m3 0h2"/></svg></div>
+  <div class="close-url fade" style="--d:2.3s;top:756px">srijitmath.com</div>
+</section>
+
+<!-- ============ 13 · THE TURN + THE COST ============ -->
 <section class="slide" data-id="receipt" data-time="0:25"
-  data-say="→ Why does this work now, and not five years ago? Cost.  Reading a page of handwriting: three hundredths of a cent. A grade in my voice: about two cents. Fifty-five problems a month, two a day, for one dollar ten. A teacher's twin for less than a cup of coffee, per month.">
+  data-say="→ srijitmath.com is course number one. The engine behind it works for any teacher, because it's cheap.  Reading a page of handwriting: three hundredths of a cent. A grade in my voice: about two cents. Fifty-five problems a month, two a day, for one dollar ten. A teacher's twin for less than a cup of coffee, per month.">
   <div class="receipt">
     <div class="h fade">one student · one month · 55 problems</div>
     <div class="row fade" style="--d:.6s"><span>read 110 handwritten pages</span><span>$0.03</span></div>
@@ -372,54 +387,46 @@ body.isfs #fs{display:none}
   <div class="caption fade" style="--d:3.2s;bottom:120px">A teacher's twin for $1.10 a month.</div>
   </section>
 
-<!-- ============ 13 · ENGINE + 3 CUSTOMERS ============ -->
+<!-- ============ 14 · NOW → NEXT ============ -->
 <section class="slide" data-id="engine" data-time="0:30"
-  data-say="→ And it's a business.  One engine, three customers. Creators turn their videos into courses that grade themselves. Teachers give every student feedback. Universities plug it into Canvas. Each student costs a dollar ten and pays two ninety. That's a 62% margin, from day one.">
-  <svg viewBox="0 0 1600 900" width="1600" height="900" style="position:absolute;inset:0">
-    <path class="draw" pathLength="1" style="--d:.9s;--t:.6s" d="M720,330 L420,470" stroke="#111" stroke-width="2.5" fill="none"/>
-    <path class="draw" pathLength="1" style="--d:1.5s;--t:.6s" d="M800,360 L800,470" stroke="#111" stroke-width="2.5" fill="none"/>
-    <path class="draw" pathLength="1" style="--d:2.1s;--t:.6s" d="M880,330 L1180,470" stroke="#111" stroke-width="2.5" fill="none"/>
-    <g class="pop" style="--d:.1s">
-      <circle cx="800" cy="215" r="145" fill="#fff" stroke="#e8590c" stroke-width="5"/>
-      <text x="800" y="170" text-anchor="middle" font-size="22" fill="#8a8a8a" letter-spacing="2">THE ENGINE</text>
-      <text x="800" y="212" text-anchor="middle" font-size="25" font-weight="600">course → graph</text>
-      <text x="800" y="246" text-anchor="middle" font-size="25" font-weight="600">photo → grade</text>
-      <text x="800" y="280" text-anchor="middle" font-size="25" font-weight="600" fill="#e8590c">in your voice</text>
-    </g>
+  data-say="→ So the business grows in two steps.  Now: srijitmath.com. Learners pay two ninety a month, and it stays free for those who can't pay. Next: the same engine for every teacher. Creators and teachers pay two ninety per student; universities plug it into Canvas at twelve dollars a term. Each student costs a dollar ten and pays two ninety. That's a 62% margin, from day one.">
+  <div class="stagecol fade" style="left:110px;--d:.1s">
+    <span class="tag built">now</span>
+    <h3>srijitmath.com</h3>
+    <div class="row"><span>Learners</span><b>$2.90 / month</b></div>
+    <div class="row"><span>Can't pay?</span><b>free</b></div>
+  </div>
+  <svg viewBox="0 0 1600 900" width="1600" height="900" style="position:absolute;inset:0;pointer-events:none">
+    <path class="draw" pathLength="1" style="--d:1s;--t:.6s" d="M730,262 L870,262" stroke="#e8590c" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path class="draw" pathLength="1" style="--d:1.5s;--t:.3s" d="M848,242 L872,262 L848,282" stroke="#e8590c" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
-  <div class="card fade" style="left:200px;--d:1.1s"><h3>Creators</h3><div class="price">$2.90 / student / month</div></div>
-  <div class="card fade" style="left:620px;--d:1.7s"><h3>Teachers</h3><div class="price">$2.90 / student / month</div></div>
-  <div class="card fade" style="left:1040px;--d:2.3s"><h3>Universities</h3><div class="price">$12 / student / term</div><div class="chip">plugs into Canvas</div></div>
-  <div class="sub fade" style="--d:3.4s;bottom:60px;font-size:28px;color:#111">per student, per month: costs <b>$1.10</b> · sells for <b class="accent">$2.90</b> · 62% margin</div>
+  <div class="stagecol fade" style="left:900px;--d:1.7s">
+    <span class="tag next">next</span>
+    <h3>The engine, for every teacher</h3>
+    <div class="row"><span>Creators</span><b>$2.90 / student / month</b></div>
+    <div class="row"><span>Teachers</span><b>$2.90 / student / month</b></div>
+    <div class="row"><span>Universities <i class="chip2">plugs into Canvas</i></span><b>$12 / student / term</b></div>
+  </div>
+  <div class="sub fade" style="--d:2.8s;bottom:110px;font-size:30px;color:#111">per student, per month: costs <b>$1.10</b> · sells for <b class="accent">$2.90</b> · 62% margin</div>
 </section>
 
-<!-- ============ 14 · THE ASK ============ -->
-<section class="slide" data-id="ask" data-time="0:25"
-  data-say="→ So here's my ask: fifty thousand dollars.  Not to survive; every student already pays for themselves. To grow. Fifteen thousand to build, thirteen for a year of AI, ten for a human grader, ten for pilots starting right here at Penn State, and two for servers. (pause) Now imagine twelve months from now: a thousand paying students, fifty-five thousand graded solutions, three universities.">
+<!-- ============ 15 · THE ASK ============ -->
+<section class="slide" data-id="ask" data-time="0:35"
+  data-say="→ So here's my ask: fifty thousand dollars.  Not to survive; every paying student already covers their own cost. To grow. Twenty thousand to build it for every teacher: course drop-in, the student graph, the Canvas plug-in. Fifteen for three university pilots, starting right here at Penn State. Ten to keep it free for students who can't pay. Five for servers and privacy. (pause) Now imagine twelve months from now: a thousand paying students, three universities, and seven hundred and fifty learners solving for free. (pause) AI made us faster. Let's not let it make us forget how to think. Thank you.">
   <div class="ask fade" data-cfg="ask"></div>
   <div class="askbar">
-    <div class="seg" style="flex:15;background:#e8590c;--d:.7s"></div>
-    <div class="seg" style="flex:13;background:#111;--d:1s"></div>
-    <div class="seg" style="flex:10;background:#555;--d:1.3s"></div>
-    <div class="seg" style="flex:10;background:#999;--d:1.6s"></div>
-    <div class="seg" style="flex:2;background:#ccc;--d:1.9s"></div>
+    <div class="seg" style="flex:20;background:#e8590c;--d:.7s"></div>
+    <div class="seg" style="flex:15;background:#111;--d:1.1s"></div>
+    <div class="seg" style="flex:10;background:#666;--d:1.5s"></div>
+    <div class="seg" style="flex:5;background:#bbb;--d:1.9s"></div>
   </div>
   <div class="barlab">
-    <div class="fade" style="flex:15;--d:.9s"><b>$15k</b>build</div>
-    <div class="fade" style="flex:13;--d:1.2s"><b>$13k</b>AI · 1,000 paying students</div>
-    <div class="fade" style="flex:10;--d:1.5s"><b>$10k</b>grader</div>
-    <div class="fade" style="flex:10;--d:1.8s"><b>$10k</b>pilots</div>
-    <div class="fade" style="flex:2;--d:2.1s;padding-right:0"><b>$2k</b></div>
+    <div class="fade" style="flex:20;--d:.9s"><b>$20k</b>build for every teacher</div>
+    <div class="fade" style="flex:15;--d:1.3s"><b>$15k</b>3 university pilots</div>
+    <div class="fade" style="flex:10;--d:1.7s"><b>$10k</b>free for those who can't pay</div>
+    <div class="fade" style="flex:5;--d:2.1s;padding-right:0"><b>$5k</b>servers · privacy</div>
   </div>
-  <div class="caption fade" style="--d:2.7s;bottom:110px;font-size:35px;white-space:nowrap;left:0;right:0">12 months → 1,000 paying students · 55,000 graded solutions · 3 university pilots</div>
-</section>
-
-<!-- ============ 15 · CLOSE ============ -->
-<section class="slide" data-id="close" data-time="0:10"
-  data-say="→ AI made us faster. Let's not let it make us forget how to think.  Solve by hand. Get graded. Discuss with peers. Start solving today, at srijitmath.com. (pause) Thank you.">
-  <div class="close-l" style="top:120px"><span class="fade" style="display:inline-block;--d:.1s">Solve by hand.</span><br><span class="fade" style="display:inline-block;--d:.7s">Get graded.</span><br><span class="fade accent" style="display:inline-block;--d:1.3s">Discuss with peers.</span></div>
-  <div class="qr fade" style="--d:2s;top:520px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 250" class="segno"><path transform="scale(10)" class="qrline" stroke="#111" d="M0 0.5h7m3 0h1m2 0h3m2 0h7m-25 1h1m5 0h1m2 0h2m1 0h1m2 0h2m1 0h1m5 0h1m-25 1h1m1 0h3m1 0h1m2 0h4m5 0h1m1 0h3m1 0h1m-25 1h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m-25 1h1m1 0h3m1 0h1m4 0h2m1 0h3m1 0h1m1 0h3m1 0h1m-25 1h1m5 0h1m1 0h1m2 0h1m3 0h2m1 0h1m5 0h1m-25 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-16 1h4m2 0h2m-17 1h1m2 0h1m1 0h2m1 0h2m1 0h1m1 0h2m1 0h2m1 0h1m-18 1h2m1 0h1m1 0h2m1 0h1m1 0h2m2 0h1m1 0h1m5 0h1m-25 1h3m1 0h4m1 0h3m2 0h1m1 0h1m1 0h1m4 0h2m-24 1h2m1 0h1m3 0h1m2 0h1m1 0h1m1 0h2m1 0h3m-20 1h1m2 0h5m2 0h3m1 0h5m1 0h1m1 0h2m-23 1h3m6 0h3m3 0h3m1 0h2m1 0h1m-25 1h1m1 0h1m2 0h2m2 0h2m1 0h3m1 0h2m1 0h2m1 0h1m1 0h1m-24 1h4m3 0h3m1 0h5m3 0h1m2 0h1m-24 1h2m1 0h1m1 0h5m1 0h1m4 0h7m-15 1h2m4 0h1m1 0h1m3 0h2m2 0h1m-25 1h7m2 0h2m4 0h2m1 0h1m1 0h2m1 0h2m-25 1h1m5 0h1m1 0h1m1 0h2m2 0h1m1 0h1m3 0h5m-25 1h1m1 0h3m1 0h1m2 0h4m3 0h6m2 0h1m-25 1h1m1 0h3m1 0h1m1 0h1m2 0h3m5 0h4m-23 1h1m1 0h3m1 0h1m2 0h6m1 0h1m2 0h2m1 0h1m1 0h1m-25 1h1m5 0h1m3 0h7m1 0h1m2 0h1m-22 1h7m1 0h1m2 0h2m1 0h3m2 0h1m3 0h2"/></svg></div>
-  <div class="close-url fade" style="--d:2.3s;top:756px">srijitmath.com</div>
+  <div class="caption fade" style="--d:2.7s;bottom:110px;font-size:35px;white-space:nowrap;left:0;right:0">12 months → 1,000 paying students · 3 university pilots · 750 learners free</div>
 </section>
 
 <div id="video"><video playsinline controls></video></div>

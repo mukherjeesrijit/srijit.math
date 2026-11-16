@@ -102,8 +102,8 @@
     const on = !stuck.has(here);
     stuckBtn.disabled = true;
     try {
-      const r = await fetch(API + "/stuck", { method: "POST", body: JSON.stringify({ problem: here, on }),
-        headers: { "content-type": "application/json", authorization: "Bearer " + auth.token() } }).then((x) => x.json());
+      const r = await fetch(API + "/stuck", { method: "POST", headers: { "content-type": "text/plain" }, // one trip (cohort.js cf)
+        body: JSON.stringify({ t: auth.token(), m: "POST", b: { problem: here, on } }) }).then((x) => x.json());
       if (!r.ok) throw new Error(r.error);
       on ? stuck.add(here) : stuck.delete(here);
       ready = true; paintStuck(); paintMore();

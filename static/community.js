@@ -102,8 +102,8 @@
     return !!(API ? auth.token() : auth.session());
   }
   async function call(method, path, body) {
-    const r = await fetch(API + path, { method, headers: { "content-type": "application/json", authorization: "Bearer " + token },
-      body: body ? JSON.stringify(body) : undefined });
+    const r = await fetch(API + path, { method: "POST", headers: { "content-type": "text/plain" }, // one trip (cohort.js cf)
+      body: JSON.stringify({ t: token, m: method, b: body || null }) });
     const d = await r.json().catch(() => ({ ok: false, error: "server" }));
     if (r.status === 401) { auth.clear(); throw new Error("session"); }
     if (!d.ok) throw new Error(d.error || "server");

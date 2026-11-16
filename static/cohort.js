@@ -39,9 +39,11 @@
                    { left: "$", right: "$", display: false }, { left: "\\(", right: "\\)", display: false }],
       throwOnError: false });
   };
-  const cf = (path, body, auth) => fetch(CF + path, { method: body ? "POST" : "GET",
-    headers: Object.assign({ "content-type": "application/json" }, auth && token ? { authorization: "Bearer " + token } : {}),
-    body: body ? JSON.stringify(body) : undefined }).then((r) => r.json().then((d) => Object.assign({ status: r.status }, d)));
+  // One trip, not two (2026-11-16): sent as plain text with the sign-in inside, so the browser doesn't first ask the
+  // Worker for permission (a preflight: a whole extra round trip). The Worker reads it as the same request.
+  const cf = (path, body, auth) => fetch(CF + path, { method: "POST", headers: { "content-type": "text/plain" },
+    body: JSON.stringify({ t: auth && token ? token : null, m: body ? "POST" : "GET", b: body || null }) })
+    .then((r) => r.json().then((d) => Object.assign({ status: r.status }, d)));
   const toast = (msg) => {
     const t = Object.assign(document.createElement("div"), { className: "toast", textContent: msg });
     document.body.appendChild(t); setTimeout(() => t.remove(), 3200);

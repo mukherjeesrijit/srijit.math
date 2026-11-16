@@ -26,8 +26,8 @@
     hint.textContent = state.signedIn ? (state.loves ? "" : "Be the first to ❤️ this post") : "Sign in to ❤️ this post";
     btn.disabled = false;
   };
-  const call = (method, path, body) => fetch(API + path, { method, body: body ? JSON.stringify(body) : undefined,
-    headers: Object.assign({ "content-type": "application/json" }, token() ? { authorization: "Bearer " + token() } : {}) })
+  const call = (method, path, body) => fetch(API + path, { method: "POST", headers: { "content-type": "text/plain" }, // one trip (cohort.js cf)
+    body: JSON.stringify({ t: token(), m: method, b: body || null }) })
     .then((r) => r.json());
   // the count comes with the page's one request (/hello, cohort.js); asked separately only if that didn't bring it
   (window.cohortHello || Promise.resolve(null)).then((h) => (h && h.blog ? h.blog

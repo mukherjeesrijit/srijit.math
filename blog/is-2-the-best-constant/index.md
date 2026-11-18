@@ -1,15 +1,17 @@
 <!-- title: Is 2 the best constant?
 subtitle: Regional Mathematical Olympiad 2026, Problem 3.
 published: 2026-11-18T18:41:14.078Z
-updated: 2026-11-18T18:41:14.078Z -->
+updated: 2026-11-18T18:42:57.477Z -->
 
 # Is 2 the best constant?
 
-**Problem**: Prove that for any two real numbers $x$ and$y$, we have
+## Problem
+
+Prove that for any two real numbers $x$ and$y$, we have
 
 $(x^6 - x^2 + 3)(y^6 - y^2 + 3) > 2(x^2 + y^2)^2.$
 
-## Chains of thought
+## Chain of thought
 
 You can see that $x^6 - x^2 + 3$ looks reducible to a lower-degree polynomial. Let's assume $x^2 = a$ and $y^2 = b$. This also reduces the RHS of the expression. So you get
 

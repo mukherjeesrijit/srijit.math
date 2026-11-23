@@ -173,9 +173,12 @@
     chatAfter = last ? last.id : undefined;
   }
   // a signed-out visitor on a page that shows nothing live (Start, Books, Roadmap, Privacy): no request at all
-  const hello = !CF || (!token && !want.length && !discuss) ? Promise.resolve(null) : cf("/hello", { want,
+  // a page the browser prepared ahead (speculation rules, 2026-11-23) asks the Worker only once it is actually shown
+  const visible = document.prerendering ? new Promise((r) => document.addEventListener("prerenderingchange", r, { once: true }))
+    : Promise.resolve();
+  const hello = !CF || (!token && !want.length && !discuss) ? Promise.resolve(null) : visible.then(() => cf("/hello", { want,
       problem: discuss ? discuss.dataset.discuss : undefined, u: profileBox ? location.hash.slice(1) || "me" : undefined,
-      chat_u: chatU, chat_after: chatAfter, blog_post: blogPost ? blogPost.dataset.love : undefined }, true)
+      chat_u: chatU, chat_after: chatAfter, blog_post: blogPost ? blogPost.dataset.love : undefined }, true))
     .then((d) => { if (d.ok && token && !d.signedIn) clear(); return d.ok ? d : null; }) // a sign-in that has run out
     .catch(() => null);
   window.cohortHello = hello;

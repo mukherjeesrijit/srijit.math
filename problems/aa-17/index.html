@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Finite commutative rings · Abstract Algebra</title>
+<meta name="description" content="Abstract Algebra, Rings &amp; Ideals: Finite commutative rings">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="/static/cohort.css?v=53b658f412">
+<link rel="preconnect" href="https://srijitmath-community.srijitmath.workers.dev" crossorigin>
+</head><body>
+
+<header class="top"><a class="brand" href="/" aria-label="Mathematics for Machine Learning and Quant Finance">Mathematics for
+<span class="swap nw" aria-hidden="true"><span>Machine Learning</span><span>Quant Finance</span></span></a>
+<div class="menu"><button type="button" class="menubtn" aria-label="Menu" aria-expanded="false" data-menu>☰</button>
+<nav class="menulist" hidden><a href="/dashboard/">Dashboard</a><a href="/roadmap/">Roadmap</a><a href="/books/">Books</a><a href="/blog/" data-blog>Blog</a></nav></div>
+<a class="ytbtn" href="https://www.youtube.com/@srijitmath" target="_blank" rel="noopener" title="Srijit on YouTube" aria-label="Srijit on YouTube"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#FF0000" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8z"/><path fill="#fff" d="M9.6 15.6 15.8 12 9.6 8.4z"/></svg></a>
+<button class="enrol" data-enrol>Enroll</button></header>
+<div class="wrap"><nav class="side"><details open><summary><b>Groups &amp; Subgroups</b></summary><ol><li><a href="/problems/aa-1/"><span class="num">1.1</span> The subgroups of ℤ₂ × ℤ₂ × ℤ₂</a></li><li><a href="/problems/aa-2/"><span class="num">1.2</span> Symmetric difference as a group</a></li><li><a href="/problems/aa-3/"><span class="num">1.3</span> Does o(ab) equal o(ba)?</a></li><li><a href="/problems/aa-4/"><span class="num">1.4</span> When x⁵y³ = x⁸y⁵ = e</a></li></ol></details><details open><summary><b>Cyclic &amp; Permutation Groups</b></summary><ol><li><a href="/problems/aa-5/"><span class="num">2.1</span> Cyclic subgroups of order 6 in S₅</a></li><li><a href="/problems/aa-6/"><span class="num">2.2</span> The order of (1</a></li><li><a href="/problems/aa-7/"><span class="num">2.3</span> The order of a permutation of nine symbols</a></li><li><a href="/problems/aa-8/"><span class="num">2.4</span> Copies of S₃ inside S₄</a></li></ol></details><details open><summary><b>Lagrange &amp; Sylow</b></summary><ol><li><a href="/problems/aa-9/"><span class="num">3.1</span> A group of order 2024</a></li><li><a href="/problems/aa-10/"><span class="num">3.2</span> Elements of order 2 in a group of order 98</a></li><li><a href="/problems/aa-11/"><span class="num">3.3</span> A group of order 30</a></li><li><a href="/problems/aa-12/"><span class="num">3.4</span> Elements of order 5 in a group of order 75</a></li></ol></details><details open><summary><b>Homomorphisms &amp; Quotients</b></summary><ol><li><a href="/problems/aa-13/"><span class="num">4.1</span> Diagonalizable images of S₃</a></li><li><a href="/problems/aa-14/"><span class="num">4.2</span> What a homomorphism preserves</a></li><li><a href="/problems/aa-15/"><span class="num">4.3</span> The second isomorphism theorem</a></li><li><a href="/problems/aa-16/"><span class="num">4.4</span> A normal subgroup of upper triangular matrices</a></li></ol></details><details open><summary><b>Rings &amp; Ideals</b></summary><ol><li><a href="/problems/aa-17/" aria-current=page><span class="num">5.1</span> Finite commutative rings</a></li><li><a href="/problems/aa-18/"><span class="num">5.2</span> Comaximal ideals</a></li><li><a href="/problems/aa-19/"><span class="num">5.3</span> Units of ℤ[√−2022]</a></li></ol></details><details open><summary><b>Polynomial Rings &amp; Fields</b></summary><ol><li><a href="/problems/aa-20/"><span class="num">6.1</span> The quotient of ℝ[X</a></li><li><a href="/problems/aa-21/"><span class="num">6.2</span> Generators of an ideal in ℤ[X]</a></li><li><a href="/problems/aa-22/"><span class="num">6.3</span> Ring homomorphisms from ℤ[x]/(x² − px) to ℤ</a></li></ol></details></nav><main class="cohort"><p class="crumb">Abstract Algebra · Rings &amp; Ideals · Problem 1</p>
+<h1>Finite commutative rings</h1>
+<article class="statement" data-guard><p>Let $R$ be a finite commutative ring. Which of the following statements is necessarily correct?
+<ol class="opts"><li><span class="opt">(a)</span> $R$ is a field if it has a unique prime ideal.</li><li><span class="opt">(b)</span> $R$ is a product of fields.</li><li><span class="opt">(c)</span> $R$ is a field if the group of units of $R$ is cyclic.</li><li><span class="opt">(d)</span> If any degree $2$ polynomial $f$ in $R[x]$ has at most two roots in $R$, then $R$ is a field.</li></ol></p></article>
+<div class="actions" data-slug="aa-17">
+<button data-gate="solve" aria-expanded="false">Solve</button>
+<button data-gate="discuss" aria-expanded="false">Discuss</button>
+
+<button class="stuck" data-stuck aria-pressed="false" title="Say so, and you get easier problems that lead here">Stuck?</button>
+<button class="love" data-love aria-pressed="false" title="Love this problem">♥</button>
+</div>
+<section class="panel" hidden></section>
+<section class="solve" data-solve="aa-17" hidden></section>
+<section class="discuss" data-discuss="aa-17" hidden></section>
+<nav class="pager"><a href="/problems/aa-16/">← A normal subgroup of upper triangular matrices</a><a href="/problems/aa-18/">Comaximal ideals →</a></nav>
+</main></div>
+<div class="modal" hidden><div class="card">
+<div class="google"><h2>Join srijitmath</h2>
+<p class="why">Free. Sign in with Google to read Srijit's solutions and talk the problems through with everyone in the cohort.</p>
+<div class="gbtn"></div>
+<div class="row"><button type="button" class="btn ghost" data-close>Not now</button></div></div></div></div>
+<script src="/static/config.js?v=53b658f412"></script><script src="/static/cohort.js?v=53b658f412"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+<script src="/static/community.js?v=53b658f412"></script><script src="/static/path.js?v=53b658f412"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "0c0fcff22d044cee9a5cbae5a0ac57aa"}'></script>
+</body></html>

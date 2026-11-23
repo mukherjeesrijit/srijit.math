@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Differentiating an integral with variable limits · Calculus I</title>
+<meta name="description" content="Calculus I, Definite Integrals &amp; Riemann Sums: Differentiating an integral with variable limits">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="/static/cohort.css?v=53b658f412">
+<link rel="preconnect" href="https://srijitmath-community.srijitmath.workers.dev" crossorigin>
+</head><body>
+
+<header class="top"><a class="brand" href="/" aria-label="Mathematics for Machine Learning and Quant Finance">Mathematics for
+<span class="swap nw" aria-hidden="true"><span>Machine Learning</span><span>Quant Finance</span></span></a>
+<div class="menu"><button type="button" class="menubtn" aria-label="Menu" aria-expanded="false" data-menu>☰</button>
+<nav class="menulist" hidden><a href="/dashboard/">Dashboard</a><a href="/roadmap/">Roadmap</a><a href="/books/">Books</a><a href="/blog/" data-blog>Blog</a></nav></div>
+<a class="ytbtn" href="https://www.youtube.com/@srijitmath" target="_blank" rel="noopener" title="Srijit on YouTube" aria-label="Srijit on YouTube"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#FF0000" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8z"/><path fill="#fff" d="M9.6 15.6 15.8 12 9.6 8.4z"/></svg></a>
+<button class="enrol" data-enrol>Enroll</button></header>
+<div class="wrap"><nav class="side"><details open><summary><b>Limits</b></summary><ol><li><a href="/problems/seq-40/"><span class="num">1.1</span> A log limit at 0+</a></li><li><a href="/problems/c1-1/"><span class="num">1.2</span> A limit fixing α and β</a></li><li><a href="/problems/c1-2/"><span class="num">1.3</span> A limit with e⁻³ˣ and 1 − cos x</a></li></ol></details><details open><summary><b>Continuity &amp; the Intermediate Value Theorem</b></summary><ol><li><a href="/problems/c1-3/"><span class="num">2.1</span> Continuous f with f(x)² = x²</a></li><li><a href="/problems/c1-4/"><span class="num">2.2</span> A function built from distances to intervals</a></li></ol></details><details open><summary><b>Derivatives</b></summary><ol><li><a href="/problems/seq-47/"><span class="num">3.1</span> Summing the derivatives of (1+x)^201</a></li><li><a href="/problems/c1-5/"><span class="num">3.2</span> A Taylor polynomial of 3eˣ cos 2x</a></li><li><a href="/problems/diff-7/"><span class="num">3.3</span> A second-derivative limit</a></li></ol></details><details open><summary><b>Applications of Derivatives</b></summary><ol><li><a href="/problems/cont-12/"><span class="num">4.1</span> Real roots of a quartic</a></li><li><a href="/problems/cont-7/"><span class="num">4.2</span> Where x² meets x sin x + cos x</a></li><li><a href="/problems/diff-32/"><span class="num">4.3</span> The biggest cone in a sphere</a></li><li><a href="/problems/cont-9/"><span class="num">4.4</span> Real roots of 3ˣ + 4ˣ = 5ˣ</a></li><li><a href="/problems/c1-6/"><span class="num">4.5</span> Where an integral function turns</a></li></ol></details><details open><summary><b>Integration Techniques</b></summary><ol><li><a href="/problems/c1-7/"><span class="num">5.1</span> 100 ∫ x⁹⁹(1 − x)¹⁰⁰ dx</a></li><li><a href="/problems/c1-8/"><span class="num">5.2</span> A Gaussian-type integral</a></li></ol></details><details open><summary><b>Definite Integrals &amp; Riemann Sums</b></summary><ol><li><a href="/problems/seq-48/"><span class="num">6.1</span> The harmonic block from n to kn</a></li><li><a href="/problems/c1-9/"><span class="num">6.2</span> A limit of a sum from n² to 2n²</a></li><li><a href="/problems/c1-10/" aria-current=page><span class="num">6.3</span> Differentiating an integral with variable limits</a></li><li><a href="/problems/seq-103/"><span class="num">6.4</span> A Riemann sum in disguise</a></li></ol></details><details open><summary><b>Areas &amp; Volumes</b></summary><ol><li><a href="/problems/integ-13/"><span class="num">7.1</span> Volume of revolution about y = 2</a></li><li><a href="/problems/c1-11/"><span class="num">7.2</span> The length of y = ln(sec x)</a></li><li><a href="/problems/integ-14/"><span class="num">7.3</span> The area between x⁴ − 2x² and 2x²</a></li></ol></details></nav><main class="cohort"><p class="crumb">Calculus I · Definite Integrals &amp; Riemann Sums · Problem 3</p>
+<h1>Differentiating an integral with variable limits</h1>
+<article class="statement" data-guard><p>If $F(x)=\int_{x^3}^4 \sqrt{4+t^2}\, dt$, for $x\in\mathbb{R}$, then $F'(1)$ equals
+<ol class="opts"><li><span class="opt">(A)</span> $-3\sqrt5$</li><li><span class="opt">(B)</span> $-2\sqrt5$</li><li><span class="opt">(C)</span> $2\sqrt5$</li><li><span class="opt">(D)</span> $3\sqrt5$</li></ol></p></article>
+<div class="actions" data-slug="c1-10">
+<button data-gate="solve" aria-expanded="false">Solve</button>
+<button data-gate="discuss" aria-expanded="false">Discuss</button>
+
+<button class="stuck" data-stuck aria-pressed="false" title="Say so, and you get easier problems that lead here">Stuck?</button>
+<button class="love" data-love aria-pressed="false" title="Love this problem">♥</button>
+</div>
+<section class="panel" hidden></section>
+<section class="solve" data-solve="c1-10" hidden></section>
+<section class="discuss" data-discuss="c1-10" hidden></section>
+<nav class="pager"><a href="/problems/c1-9/">← A limit of a sum from n² to 2n²</a><a href="/problems/seq-103/">A Riemann sum in disguise →</a></nav>
+<section class="more" data-more hidden><h2>Keep practising</h2><p class="why" data-why hidden></p><div class="group" data-g="simpler"><h3>Simpler problems</h3><div class="cards"><a class="pcard" href="/problems/ra-9/" data-p="ra-9"><b>Zeros of f and zeros of f′</b><span class="meta"><span class="dots" title="difficulty 1 of 3">●○○</span> Real Analysis 5.3</span></a></div></div><div class="group" data-g="similar"><h3>Similar problems</h3><div class="cards"><a class="pcard" href="/problems/diff-31/" data-p="diff-31"><b>Differentiating y³y″ when y² is a cubic</b><span class="meta"><span class="dots" title="difficulty 1 of 3">●○○</span> Differentiability &amp; Applications</span></a><a class="pcard" href="/problems/diff-27/" data-p="diff-27"><b>A polynomial from its minimum</b><span class="meta"><span class="dots" title="difficulty 1 of 3">●○○</span> Elementary Calculus 1.4</span></a><a class="pcard" href="/problems/alg-2/" data-p="alg-2"><b>Fourth roots that add to 5</b><span class="meta"><span class="dots" title="difficulty 1 of 3">●○○</span> Algebra &amp; Functions 1.2</span></a></div></div><div class="group" data-g="harder"><h3>A step up</h3><div class="cards"><a class="pcard" href="/problems/integ-14/" data-p="integ-14"><b>The area between x⁴ − 2x² and 2x²</b><span class="meta"><span class="dots" title="difficulty 1 of 3">●○○</span> Calculus I 7.3</span></a><a class="pcard" href="/problems/ra-11/" data-p="ra-11"><b>The limit of (n + 1) ∫ xⁿ ln(1 + x) dx</b><span class="meta"><span class="dots" title="difficulty 1 of 3">●○○</span> Real Analysis 6.2</span></a></div></div></section></main></div>
+<div class="modal" hidden><div class="card">
+<div class="google"><h2>Join srijitmath</h2>
+<p class="why">Free. Sign in with Google to read Srijit's solutions and talk the problems through with everyone in the cohort.</p>
+<div class="gbtn"></div>
+<div class="row"><button type="button" class="btn ghost" data-close>Not now</button></div></div></div></div>
+<script src="/static/config.js?v=53b658f412"></script><script src="/static/cohort.js?v=53b658f412"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+<script src="/static/community.js?v=53b658f412"></script><script src="/static/path.js?v=53b658f412"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "0c0fcff22d044cee9a5cbae5a0ac57aa"}'></script>
+</body></html>

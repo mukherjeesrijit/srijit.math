@@ -540,3 +540,4 @@ a.who:hover { color: var(--accent); }
 .grade-live .kicker { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
 .grade-live .typing { color: var(--muted); }
 form.write[hidden], .pages-panel[hidden], .grade-live[hidden] { display: none !important; }
+.pick-h { margin: 36px 0 14px; font-size: 15px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }

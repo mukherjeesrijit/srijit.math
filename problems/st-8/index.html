@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The confidence level of (X₍₁₎ − c, X₍₁₎) · Statistics</title>
+<meta name="description" content="Statistics, Confidence Intervals: The confidence level of (X₍₁₎ − c, X₍₁₎)">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="/static/cohort.css?v=53b658f412">
+<link rel="preconnect" href="https://srijitmath-community.srijitmath.workers.dev" crossorigin>
+</head><body>
+
+<header class="top"><a class="brand" href="/" aria-label="Mathematics for Machine Learning and Quant Finance">Mathematics for
+<span class="swap nw" aria-hidden="true"><span>Machine Learning</span><span>Quant Finance</span></span></a>
+<div class="menu"><button type="button" class="menubtn" aria-label="Menu" aria-expanded="false" data-menu>☰</button>
+<nav class="menulist" hidden><a href="/dashboard/">Dashboard</a><a href="/roadmap/">Roadmap</a><a href="/books/">Books</a><a href="/blog/" data-blog>Blog</a></nav></div>
+<a class="ytbtn" href="https://www.youtube.com/@srijitmath" target="_blank" rel="noopener" title="Srijit on YouTube" aria-label="Srijit on YouTube"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#FF0000" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8z"/><path fill="#fff" d="M9.6 15.6 15.8 12 9.6 8.4z"/></svg></a>
+<button class="enrol" data-enrol>Enroll</button></header>
+<div class="wrap"><nav class="side"><details open><summary><b>Methods of Estimation</b></summary><ol><li><a href="/problems/mle-18/"><span class="num">1.1</span> Estimating θ for Uniform(0, θ)</a></li><li><a href="/problems/st-1/"><span class="num">1.2</span> Estimating α from a sample of four</a></li><li><a href="/problems/st-2/"><span class="num">1.3</span> A discrete parameter in θ/x²</a></li><li><a href="/problems/mle-77/"><span class="num">1.4</span> Fitting bivariate data</a></li><li><a href="/problems/mle-21/"><span class="num">1.5</span> The MLE of an exponential median</a></li></ol></details><details open><summary><b>Sufficiency, Unbiasedness &amp; UMVUE</b></summary><ol><li><a href="/problems/umvue-3/"><span class="num">2.1</span> Bulb lifetimes: estimating λ</a></li><li><a href="/problems/st-3/"><span class="num">2.2</span> Estimators of σ for a normal sample</a></li><li><a href="/problems/st-4/"><span class="num">2.3</span> Three uniforms around θ</a></li><li><a href="/problems/umvue-18/"><span class="num">2.4</span> Estimating θ from three observations</a></li><li><a href="/problems/unb-10/"><span class="num">2.5</span> How many tickets are in the box?</a></li><li><a href="/problems/suff-31/"><span class="num">2.6</span> MLE for the Laplace scale</a></li><li><a href="/problems/suff-36/"><span class="num">2.7</span> A five-point family in θ</a></li></ol></details><details open><summary><b>Confidence Intervals</b></summary><ol><li><a href="/problems/st-5/"><span class="num">3.1</span> A confidence interval for an exponential mean</a></li><li><a href="/problems/ci-17/"><span class="num">3.2</span> Estimating a bivariate normal correlation</a></li><li><a href="/problems/st-7/"><span class="num">3.3</span> How large a sample for a given interval?</a></li><li><a href="/problems/st-8/" aria-current=page><span class="num">3.4</span> The confidence level of (X₍₁₎ − c, X₍₁₎)</a></li><li><a href="/problems/st-9/"><span class="num">3.5</span> A 95% interval for a location parameter</a></li></ol></details><details open><summary><b>Hypothesis Testing</b></summary><ol><li><a href="/problems/np-21/"><span class="num">4.1</span> Most powerful test for an exponential mean</a></li><li><a href="/problems/lrt-1/"><span class="num">4.2</span> A normal test from four observations</a></li><li><a href="/problems/st-6/"><span class="num">4.3</span> A most powerful test from a table</a></li><li><a href="/problems/test-24/"><span class="num">4.4</span> Testing a Poisson mean</a></li><li><a href="/problems/np-24/"><span class="num">4.5</span> Cauchy versus Laplace</a></li><li><a href="/problems/np-35/"><span class="num">4.6</span> Tails before the first head</a></li><li><a href="/problems/test-37/"><span class="num">4.7</span> Statistics from three normals</a></li><li><a href="/problems/test-38/"><span class="num">4.8</span> A normal mixture with a Bernoulli switch</a></li><li><a href="/problems/lrt-3/"><span class="num">4.9</span> A test with unknown mean and variance</a></li></ol></details></nav><main class="cohort"><p class="crumb">Statistics · Confidence Intervals · Problem 4</p>
+<h1>The confidence level of (X₍₁₎ − c, X₍₁₎)</h1>
+<article class="statement" data-guard><p>Let $X_1,\ldots,X_n$ be a random sample from a population with density
+\[ f(x,\mu) = \begin{cases} e^{\mu-x}, &amp; \text{if } x&gt;\mu, \\ 0, &amp; \text{otherwise,} \end{cases} \]
+and let $X_{(1)}=\min\{X_1,X_2,\ldots,X_n\}$. Then $\left(X_{(1)}-\dfrac2n \log_e 5, X_{(1)}\right)$ is a _____ % confidence interval for $\mu$.</p></article>
+<div class="actions" data-slug="st-8">
+<button data-gate="solve" aria-expanded="false">Solve</button>
+<button data-gate="discuss" aria-expanded="false">Discuss</button>
+
+<button class="stuck" data-stuck aria-pressed="false" title="Say so, and you get easier problems that lead here">Stuck?</button>
+<button class="love" data-love aria-pressed="false" title="Love this problem">♥</button>
+</div>
+<section class="panel" hidden></section>
+<section class="solve" data-solve="st-8" hidden></section>
+<section class="discuss" data-discuss="st-8" hidden></section>
+<nav class="pager"><a href="/problems/st-7/">← How large a sample for a given interval?</a><a href="/problems/st-9/">A 95% interval for a location parameter →</a></nav>
+<section class="more" data-more hidden><h2>Keep practising</h2><p class="why" data-why hidden></p><div class="group" data-g="simpler"><h3>Simpler problems</h3><div class="cards"><a class="pcard" href="/problems/st-9/" data-p="st-9"><b>A 95% interval for a location parameter</b><span class="meta"><span class="dots" title="difficulty 1 of 3">●○○</span> Statistics 3.5</span></a></div></div><div class="group" data-g="similar"><h3>Similar problems</h3><div class="cards"><a class="pcard" href="/problems/mle-18/" data-p="mle-18"><b>Estimating θ for Uniform(0, θ)</b><span class="meta"><span class="dots" title="difficulty 1 of 3">●○○</span> Statistics 1.1</span></a><a class="pcard" href="/problems/st-2/" data-p="st-2"><b>A discrete parameter in θ/x²</b><span class="meta"><span class="dots" title="difficulty 1 of 3">●○○</span> Statistics 1.3</span></a><a class="pcard" href="/problems/wlln-6/" data-p="wlln-6"><b>A limit for uniform samples</b><span class="meta"><span class="dots" title="difficulty 1 of 3">●○○</span> Probability 5.1</span></a></div></div></section></main></div>
+<div class="modal" hidden><div class="card">
+<div class="google"><h2>Join srijitmath</h2>
+<p class="why">Free. Sign in with Google to read Srijit's solutions and talk the problems through with everyone in the cohort.</p>
+<div class="gbtn"></div>
+<div class="row"><button type="button" class="btn ghost" data-close>Not now</button></div></div></div></div>
+<script src="/static/config.js?v=53b658f412"></script><script src="/static/cohort.js?v=53b658f412"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+<script src="/static/community.js?v=53b658f412"></script><script src="/static/path.js?v=53b658f412"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "0c0fcff22d044cee9a5cbae5a0ac57aa"}'></script>
+</body></html>

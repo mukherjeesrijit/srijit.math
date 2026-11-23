@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Variance of the number of even dice · Probability</title>
+<meta name="description" content="Probability, Random Variables &amp; Expectation: Variance of the number of even dice">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="/static/cohort.css?v=53b658f412">
+<link rel="preconnect" href="https://srijitmath-community.srijitmath.workers.dev" crossorigin>
+</head><body>
+
+<header class="top"><a class="brand" href="/" aria-label="Mathematics for Machine Learning and Quant Finance">Mathematics for
+<span class="swap nw" aria-hidden="true"><span>Machine Learning</span><span>Quant Finance</span></span></a>
+<div class="menu"><button type="button" class="menubtn" aria-label="Menu" aria-expanded="false" data-menu>☰</button>
+<nav class="menulist" hidden><a href="/dashboard/">Dashboard</a><a href="/roadmap/">Roadmap</a><a href="/books/">Books</a><a href="/blog/" data-blog>Blog</a></nav></div>
+<a class="ytbtn" href="https://www.youtube.com/@srijitmath" target="_blank" rel="noopener" title="Srijit on YouTube" aria-label="Srijit on YouTube"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#FF0000" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8z"/><path fill="#fff" d="M9.6 15.6 15.8 12 9.6 8.4z"/></svg></a>
+<button class="enrol" data-enrol>Enroll</button></header>
+<div class="wrap"><nav class="side"><details open><summary><b>Elementary Probability</b></summary><ol><li><a href="/problems/prob-38/"><span class="num">1.1</span> Numbering the faces of a cube</a></li><li><a href="/problems/pr-1/"><span class="num">1.2</span> A random point in a square</a></li><li><a href="/problems/pr-2/"><span class="num">1.3</span> Uniforms against a binomial</a></li><li><a href="/problems/prob-60/"><span class="num">1.4</span> Y next to a vowel</a></li><li><a href="/problems/prob-146/"><span class="num">1.5</span> Two events with P(E) + P(F) ≥ 1</a></li></ol></details><details open><summary><b>Random Variables &amp; Expectation</b></summary><ol><li><a href="/problems/pr-3/"><span class="num">2.1</span> Chebyshev&#x27;s bound</a></li><li><a href="/problems/rv-77/"><span class="num">2.2</span> Mean and tail of the logistic density</a></li><li><a href="/problems/rv-78/"><span class="num">2.3</span> A pmf from a recursion</a></li><li><a href="/problems/pr-7/" aria-current=page><span class="num">2.4</span> Variance of the number of even dice</a></li><li><a href="/problems/pr-8/"><span class="num">2.5</span> E(3 − X)² for sixes in three throws</a></li></ol></details><details open><summary><b>Standard Distributions</b></summary><ol><li><a href="/problems/pr-4/"><span class="num">3.1</span> The Jacobian of Y = X⁴</a></li><li><a href="/problems/cts-28/"><span class="num">3.2</span> Mean from a distribution function</a></li><li><a href="/problems/disc-26/"><span class="num">3.3</span> Three successes before four failures</a></li><li><a href="/problems/utrans-29/"><span class="num">3.4</span> The distribution of |X − 1|</a></li><li><a href="/problems/pr-9/"><span class="num">3.5</span> A uniform ratio of logarithms</a></li></ol></details><details open><summary><b>Joint Distributions</b></summary><ol><li><a href="/problems/joint-10/"><span class="num">4.1</span> Making X + bY and X uncorrelated</a></li><li><a href="/problems/mvfun-10/"><span class="num">4.2</span> Correlation of X + Y and X − Y</a></li><li><a href="/problems/pr-5/"><span class="num">4.3</span> A t-type ratio of normal samples</a></li><li><a href="/problems/joint-77/"><span class="num">4.4</span> A joint density 1/x on 0 &lt; y &lt; x &lt; 1</a></li><li><a href="/problems/order-31/"><span class="num">4.5</span> Identifying the distribution of W</a></li><li><a href="/problems/order-18/"><span class="num">4.6</span> The min or max of X and Y</a></li><li><a href="/problems/mvn-12/"><span class="num">4.7</span> Cashews in biscuits</a></li></ol></details><details open><summary><b>Limit Theorems</b></summary><ol><li><a href="/problems/wlln-6/"><span class="num">5.1</span> A limit for uniform samples</a></li><li><a href="/problems/pr-6/"><span class="num">5.2</span> The limit of the mean of X²</a></li><li><a href="/problems/clt-18/"><span class="num">5.3</span> A CLT limit with fourth powers</a></li><li><a href="/problems/pr-10/"><span class="num">5.4</span> A chi-square tail limit</a></li><li><a href="/problems/pr-11/"><span class="num">5.5</span> P(Sₙ &gt; n) for exponential sums</a></li></ol></details></nav><main class="cohort"><p class="crumb">Probability · Random Variables &amp; Expectation · Problem 4</p>
+<h1>Variance of the number of even dice</h1>
+<article class="statement" data-guard><p>Six identical fair dice are thrown independently. Let $S$ denote the number of dice showing even numbers on their upper faces. Then the variance of the random variable $S$ is
+<ol class="opts"><li><span class="opt">(A)</span> $\dfrac{1}{2}$</li><li><span class="opt">(B)</span> $1$</li><li><span class="opt">(C)</span> $\dfrac{3}{2}$</li><li><span class="opt">(D)</span> $3$</li></ol></p></article>
+<div class="actions" data-slug="pr-7">
+<button data-gate="solve" aria-expanded="false">Solve</button>
+<button data-gate="discuss" aria-expanded="false">Discuss</button>
+
+<button class="stuck" data-stuck aria-pressed="false" title="Say so, and you get easier problems that lead here">Stuck?</button>
+<button class="love" data-love aria-pressed="false" title="Love this problem">♥</button>
+</div>
+<section class="panel" hidden></section>
+<section class="solve" data-solve="pr-7" hidden></section>
+<section class="discuss" data-discuss="pr-7" hidden></section>
+<nav class="pager"><a href="/problems/rv-78/">← A pmf from a recursion</a><a href="/problems/pr-8/">E(3 − X)² for sixes in three throws →</a></nav>
+<section class="more" data-more hidden><h2>Keep practising</h2><p class="why" data-why hidden></p><div class="group" data-g="simpler"><h3>Simpler problems</h3><div class="cards"><a class="pcard" href="/problems/pr-8/" data-p="pr-8"><b>E(3 − X)² for sixes in three throws</b><span class="meta"><span class="dots" title="difficulty 1 of 3">●○○</span> Probability 2.5</span></a></div></div><div class="group" data-g="similar"><h3>Similar problems</h3><div class="cards"><a class="pcard" href="/problems/pr-9/" data-p="pr-9"><b>A uniform ratio of logarithms</b><span class="meta"><span class="dots" title="difficulty 1 of 3">●○○</span> Probability 3.5</span></a><a class="pcard" href="/problems/mvfun-10/" data-p="mvfun-10"><b>Correlation of X + Y and X − Y</b><span class="meta"><span class="dots" title="difficulty 1 of 3">●○○</span> Probability 4.2</span></a><a class="pcard" href="/problems/joint-27/" data-p="joint-27"><b>A conditional variance of Poisson sums</b><span class="meta"><span class="dots" title="difficulty 1 of 3">●○○</span> Joint, Marginal &amp; Conditional Distributions</span></a></div></div></section></main></div>
+<div class="modal" hidden><div class="card">
+<div class="google"><h2>Join srijitmath</h2>
+<p class="why">Free. Sign in with Google to read Srijit's solutions and talk the problems through with everyone in the cohort.</p>
+<div class="gbtn"></div>
+<div class="row"><button type="button" class="btn ghost" data-close>Not now</button></div></div></div></div>
+<script src="/static/config.js?v=53b658f412"></script><script src="/static/cohort.js?v=53b658f412"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+<script src="/static/community.js?v=53b658f412"></script><script src="/static/path.js?v=53b658f412"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "0c0fcff22d044cee9a5cbae5a0ac57aa"}'></script>
+</body></html>

@@ -557,3 +557,4 @@ form.write[hidden], .pages-panel[hidden], .grade-live[hidden] { display: none !i
 img.fig { display: block; max-width: 100%; height: auto; margin: 12px 0; background: #fff; } /* problem figures (data/figures) */
 pre.code { background: var(--soft, #f6f6f6); padding: 10px 12px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.45; } /* program code in statements */
 .tnotes code { font-size: .92em; background: var(--soft); padding: 1px 5px; border-radius: 4px; }
+.blank { display: inline-block; width: 3.5em; border-bottom: 1.5px solid currentColor; margin: 0 .15em; vertical-align: -.15em; } /* fill-in blanks */

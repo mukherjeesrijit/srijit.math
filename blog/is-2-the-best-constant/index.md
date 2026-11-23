@@ -1,9 +1,9 @@
-<!-- title: Is 2 the best constant?
+<!-- title: Is 2 thesbest constant?
 subtitle: Regional Mathematical Olympiad 2026, Problem 3.
 published: 2026-11-18T18:41:14.078Z
-updated: 2026-11-18T18:42:57.477Z -->
+updated: 2026-11-23T19:33:08.676Z -->
 
-# Is 2 the best constant?
+# Is 2 thesbest constant?
 
 ## Problem
 

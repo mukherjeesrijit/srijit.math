@@ -121,9 +121,7 @@
   document.querySelectorAll("a[data-level]:not([aria-current])").forEach((a) => {
     const last = store.get("level_" + a.dataset.level);
     if (typeof last !== "string" || !last.startsWith(CFG.problems || "/problems/")) return;
-    a.href = last;
-    const go = a.querySelector("small");
-    if (go) go.textContent = "Continue →";
+    a.href = last; // no "Continue →" label (Srijit, 2026-11-23); the tile just resumes
   });
 
   const ready = Promise.resolve().then(() => refresh());

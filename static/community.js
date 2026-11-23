@@ -816,7 +816,7 @@
     function paint(d) {
       const p = d.person, l = d.level, next = l.next;
       const pct = next ? Math.round(100 * (d.karma - (LEVEL_FLOOR[l.n - 1] || 0)) / (next - (LEVEL_FLOOR[l.n - 1] || 0))) : 100;
-      document.title = nm(p.name) + " · Mathematics for Machine Learning";
+      document.title = nm(p.name) + " · Master Mathematics";
       const face = AVATAR[p.id];
       profileBox.innerHTML = `<header class="who-head">${face ? `<img class="avatar" src="${face}" alt="" width="72" height="72" decoding="async">` : ""}<h1>${esc(nm(p.name))}</h1>${linkedin(p).replace('class="li"', 'class="li big"')}
           ${p.owner ? "" : `<span class="lvl big">Level ${l.n} · ${esc(l.name)}</span>`}

@@ -541,3 +541,16 @@ a.who:hover { color: var(--accent); }
 .grade-live .typing { color: var(--muted); }
 form.write[hidden], .pages-panel[hidden], .grade-live[hidden] { display: none !important; }
 .pick-h { margin: 36px 0 14px; font-size: 15px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+/* Notes (2026-11-22): a topic's notes in place of the problem */
+.tnotes { max-width: 760px; line-height: 1.65; font-size: 16.5px; }
+.tnotes h1 { font-size: 34px; letter-spacing: -.02em; margin: 6px 0 14px; }
+.tnotes h2 { font-size: 22px; margin: 34px 0 10px; padding-top: 6px; border-top: 1px solid var(--line); }
+.tnotes h3 { font-size: 17px; margin: 22px 0 8px; }
+.tnotes p { margin: 10px 0; }
+.tnotes ul { margin: 8px 0 12px; padding-left: 22px; }
+.tnotes li { margin: 5px 0; }
+.tnotes .dm { margin: 14px 0; overflow-x: auto; }
+.tnotes .tbl { overflow-x: auto; margin: 12px 0; }
+.tnotes table { border-collapse: collapse; font-size: 15px; }
+.tnotes th, .tnotes td { border-bottom: 1px solid var(--line); padding: 7px 12px; text-align: left; vertical-align: top; }
+.tnotes th { font-weight: 700; }

@@ -554,3 +554,6 @@ form.write[hidden], .pages-panel[hidden], .grade-live[hidden] { display: none !i
 .tnotes table { border-collapse: collapse; font-size: 15px; }
 .tnotes th, .tnotes td { border-bottom: 1px solid var(--line); padding: 7px 12px; text-align: left; vertical-align: top; }
 .tnotes th { font-weight: 700; }
+img.fig { display: block; max-width: 100%; height: auto; margin: 12px 0; background: #fff; } /* problem figures (data/figures) */
+pre.code { background: var(--soft, #f6f6f6); padding: 10px 12px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.45; } /* program code in statements */
+.tnotes code { font-size: .92em; background: var(--soft); padding: 1px 5px; border-radius: 4px; }

@@ -1,7 +1,7 @@
 <!-- title: How to use srijitmath.com to build your excellence in mathematics?
 subtitle: How to use the site, in five steps. Then pick up a pen.
 published: 2026-11-13T13:08:45.108Z
-updated: 2026-11-23T19:32:46.121Z -->
+updated: 2026-11-24T01:39:01.377Z -->
 
 # How to use srijitmath.com to build your excellence in mathematics?
 
@@ -11,11 +11,13 @@ Mathematics grows only one way: you solve a problem yourself, with a pen, on pap
 
 Press **Start solving** and pick where you are:
 
-* **School and Olympiad:** Algebra, Geometry, Combinatorics, Number Theory, Precalculus.
-* **University:** Calculus I, Linear Algebra, Calculus II, Probability, Real Analysis, Abstract Algebra, Metric Spaces & Topology, Statistics.
-* **Applied:** Programming, Quantitative Finance, Machine Learning.
+- **School and Olympiad:** Algebra, Geometry, Combinatorics, Number Theory, Precalculus.
+- **University:** Calculus I, Linear Algebra, Calculus II, Probability, Real Analysis, Abstract Algebra, Metric Spaces & Topology, Statistics.
+- **Applied:** Programming, Quantitative Finance, Machine Learning.
 
-Not sure? Start with Algebra. If it feels easy, move on. Every topic has short notes next to its problems. Read them when you need them, not before.
+Every topic has three tabs: **Easy**, **Hard** and **Notes**. Start with Easy. Hard has harder problems, most of them from olympiads and written entrance exams, where you write a full argument, not just an answer. Go there once Easy feels comfortable. Read the Notes when you need them, not before.
+
+Not sure where to begin? Start with Algebra, on Easy.
 
 ## 2. Solve on paper
 
